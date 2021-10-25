@@ -1,0 +1,69 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.33.0.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: 78e34208cc2069274def3335078121eb9810c65562a8e177bb53997212645df4
+
+name:           imp
+version:        0.1.0.0
+description:    Please see the README on GitHub at <https://github.com/githubuser/imp#readme>
+homepage:       https://github.com/githubuser/imp#readme
+bug-reports:    https://github.com/githubuser/imp/issues
+author:         Author name here
+maintainer:     example@example.com
+copyright:      2021 Author name here
+license:        BSD3
+license-file:   LICENSE
+build-type:     Simple
+extra-source-files:
+    README.md
+    ChangeLog.md
+
+source-repository head
+  type: git
+  location: https://github.com/githubuser/imp
+
+library
+  exposed-modules:
+      Lib
+      Pkg.Mod
+  other-modules:
+      Paths_imp
+  hs-source-dirs:
+      src
+  build-depends:
+      base >=4.7 && <5
+    , mtl
+    , parsec
+  default-language: Haskell2010
+
+executable imp
+  main-is: Main.hs
+  other-modules:
+      Paths_imp
+  hs-source-dirs:
+      app
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      base >=4.7 && <5
+    , imp
+    , mtl
+    , parsec
+  default-language: Haskell2010
+
+test-suite imp-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      Paths_imp
+  hs-source-dirs:
+      test
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      base >=4.7 && <5
+    , imp
+    , mtl
+    , parsec
+  default-language: Haskell2010

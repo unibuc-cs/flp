@@ -1,0 +1,798 @@
+
+\documentclass[xcolor=pdftex,romanian,colorlinks]{beamer}
+\usepackage[romanian]{babel} 
+
+\usepackage{hyperref}
+\usepackage[export]{adjustbox}
+\usepackage{../tslides} 
+\lstset{language=Haskell}
+\lstset{escapeinside={(*@}{@*)}}
+
+\AtBeginSection[]{
+  \begin{frame}
+ \vfill
+  \centering
+  \begin{beamercolorbox}[sep=8pt,center,shadow=true,rounded=true]{title}
+    \usebeamerfont{title}\insertsectionhead\par%
+  \end{beamercolorbox}
+  \vfill
+  \end{frame}
+}
+
+\newcommand{\li}[1]{\lstinline$#1$}
+
+\title[FLP---Interpretoare Monadice]{FLP - Interpretoare monadice}
+\subtitle{Introducere în programarea funcțională folosind Haskell}
+\date{}
+\begin{document}
+\begin{frame}
+  \titlepage
+\end{frame}
+
+%\begin{frame}
+%\frametitle{}
+%\tableofcontents
+%\end{frame}
+
+
+
+\begin{frame}[fragile]{Evaluare cu efecte laterale}
+
+
+În acest curs:
+
+\begin{itemize}
+\item vom defini un mini-limbaj asemănător cu limbajul Mini Haskell definit în cursurile trecute
+
+\item  vom defini semantica limbajului folosind o monadă generică \li{M}
+
+\item  înlocuind \li{M} cu monadele standard studiate anterior vom obține variații ale semanticii generale, 
+care vor fi particularizate prin tipul de efecte surprins de fiecare monadă
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}[fragile]{Sintaxă abstractă}
+
+
+Lambda calcul cu întregi Sintaxă
+
+\begin{asciihs}
+type Name = String
+
+data Term = Var Name
+          | Con Integer
+          | Term :+: Term
+          | Lam Name Term
+          | App Term Term
+
+
+\end{asciihs}
+
+\end{frame}
+
+
+
+\begin{frame}[fragile]{Program - Exemplu}
+
+ $\lambda$-expresia $\,\,\,\, (\lambda x. x+x)(10+11)$
+ 
+ 
+
+este definită astfel:
+
+
+
+\begin{asciihs}
+pgm :: Term
+pgm = App 
+          (Lam "x" ((Var "x") :+: (Var "x")))
+          ((Con 10) :+:  (Con 11))
+\end{asciihs}
+\end{frame}
+
+\begin{frame}[fragile]{Program - Exemplu}
+  \medskip
+\begin{asciihs}
+pgm :: Term
+pgm = App
+  (Lam "y"
+    (App
+      (App
+        (Lam "f"
+          (Lam "y"
+            (App (Var "f") (Var "y"))
+          )
+        )
+        (Lam "x"
+          (Var "x" :+: Var "y")
+        )
+      )
+      (Con 3)
+    )
+  )
+  (Con 4)
+\end{asciihs}
+\end{frame}
+
+\begin{frame}[fragile]{Valori și medii de evaluare}
+
+
+\begin{asciihs}
+data Value = Num Integer
+           | Fun (Value -> (*@\color{blue}{M}@*) Value)
+           | Wrong
+
+instance Show Value where
+ show (Num x) = show x
+ show (Fun _) = "<function>"
+ show Wrong   = "<wrong>"
+\end{asciihs}
+\structure{Observații}
+
+\begin{itemize}
+\item Vom interpreta termenii în valori `M Value`, unde `M` este o monadă;
+variind  se obțin comportamente diferite;
+\item  `Wrong` reprezintă o eroare, de exemplu adunarea unor valori care nu
+sunt numere sau aplicarea unui termen care nu e funcție.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Evaluare - variabile și valori}
+
+
+\begin{asciihs}
+type Environment = [(Name, Value)]
+\end{asciihs}
+
+\structure{Interpretarea termenilor în monada} `M` 
+
+
+\begin{asciihs}
+interp :: Term -> Environment -> M Value
+interp (Var x) env = lookupM x env
+interp (Con i) _ = return $ Num i
+interp (Lam x e) env = return $ 
+  Fun $ \ v -> interp e ((x,v):env)
+
+lookupM :: Name -> Environment -> M Value
+lookupM x env = case lookup x env of
+  Just v  -> return v
+  Nothing -> return Wrong
+\end{asciihs}
+\end{frame}
+
+\begin{frame}[fragile]{Evaluare - adunare}
+
+
+\begin{asciihs}
+interp (t1 :+: t2) env = do
+  v1 <- interp t1 env
+  v2 <- interp t2 env
+  add v1 v2
+\end{asciihs}
+
+\structure{Interpretarea adunării în monada} `M` 
+
+
+\begin{asciihs}  
+add :: Value -> Value -> M Value
+add (Num i) (Num j) = return (Num $ i + j)
+add _ _             = return Wrong
+\end{asciihs}
+\end{frame}
+
+\begin{frame}[fragile]{Evaluare - aplicarea funcțiilor}
+
+
+\begin{asciihs}
+interp (App t1 t2) env = do
+  f <- interp t1 env
+  v <- interp t2 env
+  apply f v
+\end{asciihs}
+
+
+\structure{Interpretarea aplicării funcțiilor în monada} `M` 
+
+
+\begin{asciihs}  
+apply :: Value -> Value -> M Value
+apply (Fun k) v = k v
+apply _ _       = return Wrong
+
+-- k :: Value -> M Value
+\end{asciihs}
+\end{frame}
+
+\begin{frame}[fragile]{Testarea interpretorului}
+
+
+\begin{asciihs}
+test :: Term -> String
+test t = showM $ interp t []
+\end{asciihs}
+unde 
+
+\begin{asciihs}
+showM :: Show a => M a -> String
+\end{asciihs} 
+este o funcție definită special pentru fiecare tip de efecte laterale
+dorit.
+
+\pause
+
+\structure{Exemplu de program}
+\begin{asciihs}
+pgmW :: Term
+pgmW = App 
+          (Lam "x" ((Var "x") :+: (Var "x")))
+          ((Con 10) :+:  (Con 11))
+
+test pgmW  -- apelul pentru testare           
+\end{asciihs}
+\end{frame}
+
+\begin{frame}[fragile]{Interpretor monadic}
+
+
+\begin{asciihs}
+data Value = Num Integer
+           | Fun (Value -> M Value)
+           | Wrong
+           
+interp :: Term -> Environment -> M Value           
+\end{asciihs}
+
+\medskip
+
+\^{I}n continuare vom \^{\i}nlocui monada \li{M} cu:
+\begin{itemize}
+\item \li{Identity}
+\item \li{Maybe}
+\item \li{Either String}
+\item monada listelor
+\item \li{Writer}
+\item \li{Reader}
+\item \li{State}
+\end{itemize}
+\end{frame}          
+
+\begin{frame}[fragile]{Interpretare în monada `Identity`}
+
+
+Monada `Identity` este "efectul identitate".
+
+\begin{asciihs}
+newtype Identity a = Identity { runIdentity :: a } 
+ 
+instance Monad Identity where
+    return a           = Identity a   
+    ma >>= k = k (runIndentity ma) 
+\end{asciihs} 
+\pause
+
+Pentru a particulariza interpretorul definim 
+    
+\begin{asciihs}
+type M a = Identity a
+
+showM :: Show a => M a -> String
+showM = show . runIdentity
+\end{asciihs}
+\pause 
+
+Obținem interpretorul standard, 
+asemănător celui discutat pentru limbajul Mini-Haskell.
+\end{frame}
+
+
+\begin{frame}[fragile]{Interpretare folosind monada `Identity`}
+
+
+\begin{asciihs}
+type M a = Identity a
+
+showM :: Show a => M a -> String
+showM = show . runIdentity
+\end{asciihs}
+
+
+\begin{asciihs}
+pgm = App 
+          (Lam "x" ((Var "x") :+: (Var "x")))
+          ((Con 10) :+:  (Con 11))
+\end{asciihs}
+
+\begin{asciihs}
+*Var0> test pgm
+"42"
+\end{asciihs}
+\end{frame}
+
+
+
+\begin{frame}[fragile]{Interpretare în monada `Maybe` (opțiune)}
+
+
+
+\begin{asciihs}
+data Maybe a = Nothing | Just a
+
+instance Monad Maybe where
+  return = Just
+  Just a  >>= k   = k a
+  Nothing >>= _   = Nothing
+\end{asciihs}
+
+Putem renunța la valoarea `Wrong`, folosind monada `Maybe`
+
+\begin{asciihs}
+
+type M a = Maybe a
+
+showM :: Show a => M a -> String
+showM (Just a) = show a
+showM Nothing  = "<wrong>"
+\end{asciihs}
+\end{frame}
+
+\begin{frame}[fragile]{Interpretare în monada `Maybe`}
+
+
+Putem acum înlocui rezultatele `Wrong` cu `Nothing`
+
+
+\begin{asciihs} 
+type M a = Maybe a
+
+lookupM :: Name -> Environment -> M Value
+lookupM x env = case lookup x env of
+  Just v  -> return v
+  Nothing -> Nothing
+
+add :: Value -> Value -> M Value
+add (Num i) (Num j) = return (Num $ i + j)
+add _ _             = Nothing
+
+apply :: Value -> Value -> M Value
+apply (Fun k) v = k v
+apply _ _       = Nothing
+\end{asciihs}
+\end{frame}
+
+\begin{frame}[fragile]{Interpretare în monada `Either String`}
+
+\begin{asciihs}
+data Either a b = Left a | Right b
+
+instance Monad (Either err) where
+  return = Right
+  Right a >>= k  = k a
+  err     >>= _  = err
+\end{asciihs}
+
+Putem nuanța erorile folosind monada `Either String`
+
+\begin{asciihs}
+type M a = Either String a
+
+showM :: Show a => M a -> String
+showM (Left s)  = "Error: " ++ s
+showM (Right a) = "Success: " ++ show a
+\end{asciihs}
+\end{frame}
+
+\begin{frame}[fragile]{Interpretare în monada `Either String`}
+
+\medskip
+Putem acum înlocui rezultatele `Wrong` cu valori `Left`
+
+\begin{asciihs}
+type M a = Either String a
+
+lookupM :: Name -> Environment -> M Value
+lookupM x env = case lookup x env of
+  Just v  -> return v
+  Nothing -> Left ("unbound variable " ++ x)
+
+add :: Value -> Value -> M Value
+add (Num i) (Num j) = return $ Num $ i + j
+add v1 v2           = Left $
+  "Expected numbers: " ++ show v1 ++ ", " ++ show v2
+
+apply :: Value -> Value -> M Value
+apply (Fun k) v = k v
+apply v _       = Left $
+  "Expected function: " ++ show v
+\end{asciihs}
+\end{frame}
+
+
+
+\begin{frame}[fragile]{Interpretare în monada `Either String`}
+\begin{asciihs}
+type M a = Either String a
+
+showM :: Show a => M a -> String
+showM (Left s)  = "Error: " ++ s
+showM (Right a) = "Success: " ++ show a
+\end{asciihs}
+
+ 
+\begin{asciihs}
+pgm = App 
+          (Lam "x" ((Var "x") :+: (Var "x")))
+          ((Con 10) :+:  (Con 11))
+          
+*Var2> test pgm
+"Success: 42"          
+\end{asciihs}
+
+\pause
+ 
+\begin{asciihs}
+pgmE = App (Var "x") ((Con 10) :+:  (Con 11))
+          
+*Var2> test pgmE
+"Error: unbound variable x"
+\end{asciihs}
+\end{frame}
+
+\begin{frame}[fragile]{Monada listelor (a funcțiilor nedeterministe)}
+
+
+\begin{asciihs}
+instance Monad [] where
+  return a = [a]
+  ma >>= k = [b | a <- ma, b <- k a]
+\end{asciihs}
+
+Rezultatul funcției e lista tuturor valorilor posibile.
+
+
+
+\begin{asciihs}
+> [4,9,25] >>= \x -> [(sqrt x), -(sqrt x)]
+[2.0,-2.0,3.0,-3.0,5.0,-5.0]
+
+\end{asciihs}
+\end{frame}
+
+\begin{frame}[fragile]{Interpretare în monada listelor}
+
+Adăugarea unei instrucțiuni nedeterministe
+
+\begin{asciihs}
+data Term = ... | Amb Term Term | Fail
+
+type M a = [a]
+
+showM :: Show a => M a -> String
+showM = show
+
+interp Fail _ = []
+interp (Amb t1 t2) env = interp t1 env ++ interp t2 env
+\end{asciihs}
+
+\begin{asciihs}
+pgm = (App (Lam "x" (Var "x" :+: Var "x")) 
+      (Amb (Con 1) (Con2))) 
+> test pgm 
+"[2,4]"
+\end{asciihs}
+\end{frame}
+
+
+\begin{frame}[fragile]{Monada `Writer`}
+
+
+Este folosită pentru a acumula
+(logging) informație produsă în timpul execuției.
+
+\begin{asciihs}
+newtype Writer log a = Writer { runWriter :: (a, log) }
+
+instance Monoid log => Monad (Writer log) where
+  return a = Writer (a, mempty)
+  ma >>= k = let (a, log1) = runWriter ma
+                 (b, log2) = runWriter (k a)
+              in Writer (b, log1 `mappend` log2)
+\end{asciihs}              
+
+Funcție ajutătoare
+
+\begin{asciihs}
+tell :: log -> Writer log () 
+tell log = Writer ((), log)  -- produce mesajul
+\end{asciihs}
+\end{frame}
+
+\begin{frame}[fragile]{Interpretare în monada `Writer`}
+
+
+
+Adăugarea unei instrucțiuni de afișare
+
+data Term = ... | Out Term
+
+\begin{asciihs}
+type M a = Writer String a
+
+showM :: Show a => M a -> String
+showM ma = "Output: " ++ w ++ "  Value: " ++ show a
+  where (a, w) = runWriter ma
+
+
+interp (Out t) env = do
+  v <- interp t env
+  tell (show v ++ "; ")
+  return v
+  
+\end{asciihs}
+\begin{itemize}
+\item \li{Out t} se evaluează la valoarea lui \li{t},
+    cu efectul lateral de a adăuga valoarea la șirul de ieșire.  
+    \end{itemize}
+\end{frame}    
+    
+  
+\begin{frame}[fragile]{Interpretare în monada `Writer`}
+
+
+
+\begin{asciihs}
+
+data Term = ... | Out Term
+
+type M a = Writer String a
+
+showM :: Show a => M a -> String
+showM ma = "Output: " ++ w ++ "  Value: " ++ show a
+  where (a, w) = runWriter ma
+\end{asciihs}
+
+
+\begin{asciihs}
+pgmW = App 
+          (Lam "x" ((Var "x") :+: (Var "x")))
+          ((Out (Con 10)) :+: (Out (Con 11)))
+          
+> test pgm
+"Output: 10; 11; Value: 42"
+\end{asciihs}
+\end{frame}
+
+
+
+\begin{frame}[fragile]{Monada `Reader`}
+
+Face accesibilă o memorie (environment) nemodificabilă (imuabilă)
+
+\begin{asciihs}
+newtype Reader env a = Reader {runReader :: env -> a}
+
+instance Monad (Reader env) where
+  return a = Reader (const a)
+  ma >>= k = Reader f
+    where f env = let a = runReader ma env
+                  in  runReader (k a) env
+\end{asciihs}
+\pause
+
+Funcții ajutătoare
+
+\begin{asciihs}
+ask :: Reader r r   -- obtine memoria
+ask = Reader id  -- Reader (\r -> r) 
+              
+-- modifica local memoria
+local :: (r -> r) -> Reader r a -> Reader r a
+local f ma = Reader $ (\r -> (runReader ma)(f r)
+\end{asciihs}
+\end{frame}
+
+\begin{frame}[fragile]{Interpretare în monada `Reader`}
+
+Eliminarea argumentului `Environment` 
+
+\begin{asciihs}
+
+type Environment = [(Name, Value)]
+type M a = Reader Environment a
+
+showM :: Show a => M a -> String
+showM ma = show $ runReader ma []
+\end{asciihs}
+Funcția de interpretare era definită astfel:
+
+\begin{asciihs}
+interp :: Term -> Enviroment -> M Value
+\end{asciihs}
+
+Deoarece interpretăm în monada `Reader Enviroment a` 
+signatura funcției de interpretare este:
+
+\begin{asciihs}
+interp :: Term ->  M Value
+\end{asciihs}
+\end{frame}
+
+\begin{frame}[fragile]{Interpretare în monada `Reader`}
+
+
+Interpretarea expresiilor de bază și căutare(`lookup`)
+
+\begin{asciihs}
+type Environment = [(Name, Value)]
+type M a = Reader Environment a
+
+interp :: Term -> M Value
+interp (Var x) = lookupM x
+interp (Con i) = return $ Num i
+
+
+lookupM :: Name -> M Value
+lookupM x = do
+  env <- ask
+  case lookup x env of
+    Just v  -> return v
+    Nothing -> return Wrong
+\end{asciihs}
+\end{frame}
+
+\begin{frame}[fragile]{Interpretare în monada `Reader`}
+
+\begin{asciihs}
+type Environment = [(Name, Value)]
+interp :: Term ->  M Value
+\end{asciihs}
+Operatori binari și funcții
+
+\begin{asciihs}
+interp (t1 :+: t2) = do
+  v1 <- interp t1
+  v2 <- interp t2
+  add v1 v2
+interp (App t1 t2) = do
+  f <- interp t1
+  v <- interp t2
+  apply f v
+interp (Lam x e) = do
+  env <- ask
+  return $ Fun $ \ v -> 
+    local (const ((x,v):env)) (interp e) 
+\end{asciihs}  
+\end{frame}
+
+\begin{frame}[fragile]{Interpretare în monada `Reader`}
+
+
+\begin{asciihs}
+type Environment = [(Name, Value)]
+type M a = Reader Environment a
+
+showM :: Show a => M a -> String
+showM ma = show $ runReader ma []
+
+interp :: Term ->  M Value
+\end{asciihs}
+
+\begin{asciihs}
+pgm = App 
+          (Lam "x" ((Var "x") :+: (Var "x")))
+          ((Con 10) :+:  (Con 11))
+
+> test pgm
+"42"
+\end{asciihs}
+\end{frame}
+
+\begin{frame}[fragile]{Monada `State`}
+
+
+\begin{asciihs}
+newtype State state a =
+  State { runState :: state -> (a, state) }
+instance Monad (State state) where
+  return a = State (\ s -> (a, s))
+  ma >>= k = State (\state ->
+      let (a, aState) = runState ma state
+       in runState (k a) aState)
+\end{asciihs}
+
+
+Funcții ajutătoare
+
+\begin{asciihs}
+get :: State state state
+get = State (\s -> (s, s))  -- starea curenta
+
+put :: s -\> State s ()  
+put s = State (\_ ->((), s)) -- schimba starea
+
+modify :: (state -> state) -> State state ()
+modify f = State (\s -> ((), f s))
+\end{asciihs}
+\end{frame}
+
+
+ 
+
+
+\begin{frame}[fragile]{Interpretare în monada `State`}
+
+
+Adăugăm un contor de instrucțiuni `Count`, valoarea acestui contor reprezentând starea.
+
+Astfel variabilele care reprezintă starea sunt numere întregi. 
+
+\begin{asciihs}
+data Term = ... | Count
+
+type M a = State Integer a
+
+showM :: Show a => M a -> String
+showM ma = show a ++ "\n" ++ "Count: " ++ show s
+           where (a, s) = runState ma 0
+
+interp Count _ = do
+                  i <- get
+                  return (Num i)
+\end{asciihs}
+\end{frame}
+
+\begin{frame}[fragile]{Interpretare în monada `State`}
+
+
+Creștem starea (contorul) la fiecare instrucțiune
+
+\begin{asciihs}
+tickS :: M ()
+tickS = modify (+1)  -- \s ->((), (s+1))
+
+add :: Value -> Value -> M Value
+add (Num i) (Num j) = tickS >> return (Num $ i + j)
+add _ _             = return Wrong
+
+apply :: Value -> Value -> M Value
+apply (Fun k) v = tickS >> k v
+apply _ _       = return Wrong
+\end{asciihs}
+\end{frame}
+
+\begin{frame}[fragile]{Interpretare în monada `State`}
+
+
+\begin{asciihs}
+data Term = ... | Count
+
+type M a = State Integer a
+
+showM :: Show a => M a -> String
+showM ma = show a ++ "\n" ++ "Count: " ++ show s
+           where (a, s) = runState ma 0
+\end{asciihs}
+
+
+\begin{asciihs}
+pgm = App 
+          (Lam "x" ((Var "x") :+: (Var "x")))
+          ((Con 10) :+:  (Con 11))
+
+> test pgm
+"42\nCount: 3"
+\end{asciihs}
+
+\end{frame}
+
+ \begin{frame}
+  \vfill
+  \centering
+    \usebeamerfont{title} Pe săptămâna viitoare! \par%
+  \vfill
+  \end{frame}
+
+\end{document}
+
+

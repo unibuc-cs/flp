@@ -1,0 +1,832 @@
+\documentclass[xcolor=pdftex,romanian,colorlinks]{beamer}
+
+\usepackage{../tslides}
+\usepackage{comment}
+
+\lstset{language=Haskell}
+\lstset{escapeinside={(*@}{@*)}}
+\newcommand{\li}[1]{\lstinline$#1$}
+\newcommand{\ra}{\rightarrow}
+\newcommand{\sra}{\stackrel{*}{\rightarrow}}
+ 
+\begin{document}
+\title{\\Curs 7}
+\author{Fundamentele Limbajelor de Programare} 
+\date{2020-2021} 
+
+\frame{\titlepage} 
+
+ 
+
+%\frame{\frametitle{Cuprins}\tableofcontents} 
+
+\begin{frame}{$\lambda$-calcul și calculabilitate}
+
+  \begin{itemize}
+  \item În 1929-1932 Church a propus 
+  $\lambda$-calculul ca sistem formal pentru logica matematică.
+  În 1935 a argumentat că orice funcție calculabilă peste numere naturale poate
+  fi calculată in $\lambda$-calcul.
+  
+  \item În 1935, independent de Church, Turing a dezvoltat mecanismul de calcul
+  numit astăzi Mașina Turing. 
+  În 1936 și el a argumentat câ orice funcție calculabilă peste numere naturale poate
+  fi calculată de o mașină Turing.
+  De asemenea, a arătat echivalența celor două modele de calcul.
+  Această echivalență a constituit o indicație puternică asupra "universalității" 
+  celor două modele, conducând la ceea ce numim astăzi "Teza Church-Turing".
+  \end{itemize}
+\end{frame}
+
+
+\begin{frame}[fragile]{ $\lambda$-calcul: sintaxa}
+
+  \begin{center}
+   \begin{tabular}{lll}
+  $t=$ &  $x$ &  (variabilă) \\
+   & $\mid (\lambda x.\, t)$ & (abstractizare)\\
+    & $\mid (t\; t)$ & (aplicare)
+  \end{tabular}
+  \end{center}
+
+Conven\ts ii:
+
+\begin{itemize}
+\item se elimin\u a parantezele exterioare
+\item aplicarea este asociativ\u a la st\^{\i}nga: $t_1t_2t_3$ este $(t_1t_2)t_3$
+\item corpul abstractiz\u arii este extins la dreapta: $\lambda x.t_1t_2$ este $\lambda x.(t_1t_2)$ (nu $(\lambda x.t_1)t_2$)
+\item scriem $\lambda xyz.t$ \^{\i}n loc de $\lambda x.\lambda y.\lambda z.t$
+\end{itemize}
+
+\pause
+
+\begin{block}{Întrebare}
+  Ce putem exprima / calcula folosind {\bf doar} $\lambda$-calcul?
+\end{block}
+
+\end{frame}  
+
+\section{Expresivitatea $\lambda$-calculului}
+
+\begin{frame}{Rezumat}
+  \begin{itemize}
+    \item Reprezentarea valorilor de adevăr și a expresiilor condiționale
+    \item Reprezentarea perechilor (tuplurilor) și a funcțiilor proiecție
+    \item Reprezentarea numerelor și a operatiilor aritmetice de bază
+    \item Recursie
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Ideea generală}
+  \begin{block}{Intuiție}
+    Tipurile de date sunt codificate de {\em capabilități}
+  \end{block}
+
+  \begin{description}
+    \item[Boole] capabilitatea de a alege între două alternative
+    \item[Perechi] capabilitatea de a calcula ceva bazat pe două valori
+    \item[Numere naturale] capabilitatea de a itera de un număr dat de ori
+  \end{description}
+\end{frame}
+
+\subsection{Valori de adevăr}
+
+\begin{frame}{Valori de adevăr}
+
+\begin{description}
+  \item[Intuiție:] Capabilitatea de a alege între două alternative.
+  \item[Codificare:] Un Boolean este o funcție cu 2 argumente
+       
+        reprezentând ramurile unei alegeri.
+  \item[$\Strue$ ::=] $\lambda t\; f. t$
+      --- din cele două alternative o alege pe prima
+  \item[$\Sfalse$ ::=] $\lambda t\; f. f$
+      --- din cele două alternative o alege pe a doua
+\end{description}
+
+\end{frame}
+
+\begin{frame}{Operații Booleene}
+  \begin{description}
+  \item[$\Strue$ ::=] $\lambda t\; f. t$
+      --- din cele două alternative o alege pe prima
+  \item[$\Sfalse$ ::=] $\lambda t\; f. f$
+      --- din cele două alternative o alege pe a doua
+  \item[$\Sif$ ::= ] $\lambda c\; then\; else. c\; then\; else$
+  --- pur și simplu folosim valoarea de adevăr pentru a alege între alternative
+
+  $\Sif \Sfalse\; (\lambda x.x\; x)\; (\lambda x.x) \pause \rightarrow^3_\beta
+   \Sfalse\; (\lambda x.x\; x)\; (\lambda x.x) \rightarrow^2_\beta \lambda x.x$
+
+  \item[$\Sand$ ::= ] $\lambda b1\; b2.\Sif b1\; b2\; \Sfalse$ sau  $\lambda b1\; b2.b1\; b2\; b1$
+
+  $\Sand \Strue\; \Sfalse \pause \rightarrow^2_\beta \Strue\; \Sfalse\; \Strue \rightarrow^2_\beta \Sfalse$
+  \item[$\Sor$ ::= ] $\lambda b1\; b2.\Sif b1\; \Strue\; b2$ sau  $\lambda b1\; b2.b1\; b1\; b2$
+
+  $\Sor \Strue\; \Sfalse \pause \rightarrow^2_\beta \Strue\; \Strue\; \Sfalse \rightarrow^2_\beta \Strue$
+  \item[$\Snot$ ::= ] $\lambda b.\Sif b\; \Sfalse\; \Strue$ sau $\lambda b\; t\; f.b\; f\; t$
+  
+  $\Snot \Strue \pause \rightarrow_\beta \lambda t\; f.\Strue\; f\; t \rightarrow_\beta \lambda t\; f.f$
+  \end{description}
+\end{frame}
+
+\section{Perechi (și tupluri)}
+
+\begin{frame}{Perechi}
+
+  \begin{description}
+    \item[Intuiție:] Capabilitatea de a aplica o funcție componentelor perechii
+    \item[Codificare:] O funcție cu 3 argumente 
+         
+          reprezentând componentele perechii și funcția ce vrem să o aplicăm lor.
+    \item[$\Spair$ ::=] $\lambda x\; y.\lambda f.f\; x\; y$
+
+    Constructorul de perechi
+
+  \end{description}
+    \begin{block}{Exemplu: $\Spair 3\; 5 \rightarrow^2_\beta \lambda f.f\; 3\; 5$}
+    
+    perechea $(3,5)$
+    reprezintă capabilitatea de a aplica o funcție de două argumente lui $3$ si apoi lui $5$.
+    \end{block}
+\end{frame}
+
+\begin{frame}{Operații pe perechi}
+
+  \begin{description}
+    \item[$\Spair$ ::=] $\lambda x\; y.\lambda f.f\; x\; y$
+    \item[$\Spair x y \equiv_\beta$] $f\; x\; y$
+    \item[]
+    \item[$\Sfst$ ::=] $\lambda p.p\; \Strue$ --- $\Strue$ alege prima componentă
+
+    $\Sfst (\Spair 3\; 5) \rightarrow_\beta
+    {\Spair 3\; 5\; \Strue} \rightarrow^3_\beta
+    \Strue\; 3\; 5 \rightarrow^2_\beta 3$
+
+    \item[$\Ssnd$ ::=] $\lambda p.p\; \Sfalse$ --- $\Sfalse$ alege a doua componentă
+
+    $\Ssnd (\Spair 3\; 5) \rightarrow_\beta
+    {\Spair 3\; 5\; \Sfalse} \rightarrow^3_\beta
+    \Sfalse\; 3\; 5 \rightarrow^2_\beta 5$
+  \end{description}
+\end{frame}
+
+\subsection{Numere naturale}
+
+\begin{frame}{Numere naturale}
+  \begin{description}
+  \item[Intuiție:] Capabilitatea de a itera o funcție de un număr de ori peste o valoare inițială
+  \item[Codificare:] Un număr natural este o funcție cu 2 argumente
+       
+        \begin{itemize}
+          \item[s] funcția care se iterează
+          \item[z] valoarea inițială
+        \end{itemize}
+  \item[0 ::=] $\lambda s\; z. z$
+      --- $s$ se iterează de 0 ori, deci valoarea inițială
+  \item<2->[1 ::=] $\lambda s\; z. s\; z$
+      --- funcția iterată o dată aplicată valorii inițiale
+  \item<3->[2 ::=] $\lambda s\; z. s (s\; z)$
+      --- $s$ iterată de 2 ori, aplicată valorii inițiale
+  \item<4->[...]
+  \item<4->[8 ::=] $\lambda s\; z. s (s (s (s (s (s (s (s\; z)))))))$
+  \item<4->[...]
+  \item[]
+  \item<5->[Observație:] $0 = \Sfalse$
+  \end{description}
+
+\end{frame}
+
+\begin{frame}{Operații aritmetice de bază}
+\begin{description}
+  \item[0 ::=] $\lambda s\; z. z$
+      --- $s$ se iterează de 0 ori, deci valoarea inițială
+  \item[8 ::=] $\lambda s\; z. s (s (s (s (s (s (s (s\; z)))))))$
+  \item[$\Ssucc$ ::=] $\lambda n\; s\; z.s\; (n\; s\; z)$ sau  $\lambda n\; s\; z.n\; s\; (s z)$
+    
+  $\Ssucc 0 \pause \rightarrow_\beta \lambda s\; z.0 s (s z) \rightarrow^2_\beta
+    \lambda s\; z. s z
+    = 1
+  $
+  \item[$\Splus$ ::=] $\lambda m\; n. m\; \Ssucc\; n$ sau $\lambda m\; n.\lambda s\; z.m\; s\; (n\; s\; z)$
+
+  $\Splus 3\; 2 \pause \rightarrow^2_\beta \lambda s\; z.3\; s\; (2\; s\; z) \rightarrow^2_\beta \lambda s\; z. s (s (s (2\; s\; z))) \rightarrow^2_\beta
+    \lambda s\; z. s (s (s (s (s\; z)))
+    = 5
+    $
+  \item[$\Smul$ ::=] $\lambda m\; n. m\; (\Splus n)\; 0$ sau $\lambda m\; n.\lambda s.m\; (n\; s)$
+
+  $\Smul 3\; 2 \pause \rightarrow^2_\beta 3\; (\Splus 2) 0 \rightarrow^2_\beta
+    \Splus 2 (\Splus 2 (\Splus 2\; 0)) \rightarrow^4_\beta$ 
+    $\Splus 2 (\Splus 2\; 2)  \rightarrow^4_\beta
+     \Splus 2\; 4  \rightarrow^4_\beta 6$
+
+  \item[$\Spow$ ::=] $\lambda m\; n. n\; (\Smul m)\; 1$ sau $\lambda m\; n.n\; m$
+
+  $\Spow 3\; 2 \pause \rightarrow^2_\beta 2\; 3 \rightarrow^2_\beta
+    \lambda z.3 (3\; z) \rightarrow_\beta
+     \lambda z.\lambda z'.3\; z (3\; z (3\; z\; z')) \equiv_\alpha
+     \lambda s\; z.3\; s (3\; s (3\; s\; z)) \rightarrow^6_\beta
+     \lambda s\; z.s ( s ( s (s ( s ( s (s (s (s \; z))))))))
+     = 9
+  $
+\end{description}
+\end{frame}
+
+\begin{frame}{Scăderi și comparații}
+  Presupunem că avem o funcție predecesor
+  $\Spred x = \left\{\begin{array}{lr}0 & x = 0\\x-1 & x\neq 0 \end{array}\right.$
+  \begin{description}
+  \item[$\Sminus$ ::= ] \pause $\lambda m\; n.n \Spred m$  --- dă 0 dacă $m \leq n$
+  \item[$\SisZero$ ::= ] \pause $\lambda n.n (\lambda x.\Sfalse) \Strue$ --- testează dacă $n$ e $0$
+  \item[$\Slte$ ::=] \pause $\lambda m\; n.\SisZero (\Sminus m\; n)$
+  \item[$\Sgt$ ::=] \pause $\lambda m\; n.\Snot (\Slte m\; n)$
+  \item[$\Sgte$ ::=] $\lambda m\; n.\Slte n\; m$
+  \item[$\Slt$ ::=] $\lambda m\; n.\Sgt n\; m$
+  \item[$\Seq$ ::=] \pause $\lambda m\; n.\Sand (\Slte m\; n)\; (\Sgte m\; n)$
+  \item[$\Sneq$ ::=] $\lambda m\; n.\Snot (\Seq m\; n)$
+  \end{description}
+
+  \begin{block}{Problemă}
+    Cum definim funcția $\Spred$?
+  \end{block}
+\end{frame}
+
+\begin{frame}{Definirea funcției $\Spred$ folosind perechi}
+
+  $$\Spred x = \left\{\begin{array}{lr}0 & x = 0\\x-1 & x\neq 0 \end{array}\right.$$
+
+  \pause
+
+  $$\Spred'' = \lambda n. n \Ssucc'' (\Spair 0\; 0)$$
+
+  \pause
+
+  $$\Ssucc'' = \lambda p.(\lambda x.\Spair x (\Ssucc x))\; (\Ssnd p)$$
+
+  \pause
+
+  $$\Spred = \lambda n.\Sfst(\Spred'' n)$$
+
+  \pause
+
+  $\Spred 2 \rightarrow_\beta {\Sfst (\Spred'' 2)} \rightarrow_\beta
+  {\Sfst (2 \Ssucc'' (\Spair 0\; 0))} \rightarrow^2_\beta
+  {\Sfst (\Ssucc'' (\Ssucc'' (\Spair 0\; 0)))} \rightarrow_\beta
+  {\Sfst (\Ssucc'' (\Ssucc'' (\Spair 0\; 0)))} \rightarrow_\beta
+  {\Sfst (\Ssucc'' ((\lambda x.\Spair x (\Ssucc x))\; (\Ssnd (\Spair 0\; 0))))} \rightarrow^6_\beta
+  {\Sfst (\Ssucc'' ((\lambda x.\Spair x (\Ssucc x))\; 0))} \rightarrow_\beta
+  {\Sfst (\Ssucc'' (\Spair 0 (\Ssucc 0)))} \rightarrow^8_\beta
+  {\Sfst (\Spair (\Ssucc 0) (\Ssucc (\Ssucc 0)))} \rightarrow^6_\beta
+  {\Ssucc 0} \rightarrow^3_\beta
+  1
+  $
+\end{frame}
+
+\begin{frame}{Funcția predecesor --- definiție alternativă directă}
+
+  \begin{description}
+    \item[Idee 1:] $\Spred$ ::= $\lambda n.\SisZero n\; 0\;  (\Spred' n)$
+           --- am tratat primul caz. acum vrem o funcție $\Spred'$ care calculeaza $n-1$ dacă $n\neq 0$
+    \item[Idee 2:] folosim iterația $\Spred'$ ::= $\lambda n. n \Ssucc' Z'$, unde
+         \begin{itemize}
+          \item $\Ssucc'$ e un fel de succesor
+          \item $Z'$ e un fel de $-1$, i.e. $\Ssucc' Z' = 0$
+         \end{itemize}
+    \item[$\Ssucc'$ ::= ] $\lambda n. n \Ssucc 1$
+    \item[$Z'$ ::= ] $\lambda s\; z.0$ --- $Z'$ nu e codificarea unui număr
+
+    Dar se verifică că $\Ssucc' Z' \rightarrow_\beta Z' \Ssucc 1 \rightarrow^2_\beta 0$
+
+    \item[Totul e OK] deoarece $\Spred'$ e aplicată {\bf doar} pe numere diferite de 0.
+    \item[$\Spred$ ::= ] $\lambda n.\SisZero n\; 0\; (n \; (\lambda n.n\; \Ssucc 1)\; (\lambda s\; z.0))$
+  \end{description}
+\end{frame}
+
+
+\section{Liste}
+
+\newcommand{\Snull}{\terminal{null}}
+\newcommand{\Scons}{\terminal{cons}}
+\newcommand{\Shead}{\terminal{head}}
+\newcommand{\SisNull}{\terminal{?null=}}
+\newcommand{\Stail}{\terminal{tail}}
+\newcommand{\Ssum}{\terminal{sum}}
+\newcommand{\Sfoldr}{\terminal{foldr}}
+\newcommand{\Smap}{\terminal{map}}
+\newcommand{\Sfilter}{\terminal{filter}}
+
+\begin{frame}{Liste}
+
+  \begin{description}
+    \item[Intuiție:] Capabilitatea de a agrega o listă
+    \item[Codificare:] O funcție cu 2 argumente 
+         
+        funcția de agregare și valoarea inițială
+    \item[$\Snull$ ::=] $\lambda a\; i.i$ --- lista vidă
+    \item[$\Scons$ ::=] $\lambda x\; l.\lambda a\; i.a\; x\; (l\; a\; i)$
+
+    Constructorul de liste
+
+  \end{description}
+    \begin{block}{Exemplu: $\Scons 3\; (\Scons 5 \Snull) \rightarrow^2_\beta
+      \lambda a\; i.a\; 3\; (\Scons 5 \Snull a\; i) \rightarrow^4_\beta
+      \lambda a\; i.a\; 3\; (a\; 5\; (\Snull a\; i)) \rightarrow^2_\beta
+      \lambda a\; i.a\; 3\; (a\; 5\; i)
+      $}
+    
+    Lista $[3, 5]$
+    reprezintă capabilitatea de a agrega elementele $3$ si apoi $5$ dată
+    fiind o funcție de agregare $a$ și o valoare implicită $i$.
+
+    Pentru aceste liste, operația de bază este \texttt{foldr}.
+    \end{block}
+\end{frame}
+
+\begin{frame}{Operații pe liste}
+
+  \begin{description}
+    \item[$\Snull$ ::=] $\lambda a\; i.i$ --- lista vidă
+    \item[$\Scons$ ::=] $\lambda x\; l.\lambda a\; i.a\; x\; (l\; a\; i)$
+    \item[]
+    \pause
+    \item[$\SisNull$ ::=] $\lambda l. l\; (\lambda x\; v.\Sfalse)\; \Strue$
+    \pause
+    \item[$\Shead$ ::=] $\lambda d\; l. l\; (\lambda x\; v.x)\; d$
+
+    primul element al listei, sau $d$ dacă lista e vidă
+
+    \pause
+    \item[$\Stail$ ::=] $\lambda l. \Sfst (l\; (\lambda x\; p.\Spair (\Ssnd p)\; (\Scons x\; (\Ssnd p)))\; (\Spair\; \Snull\; \Snull))$
+
+    coada listei, sau lista vidă dacă lista e vidă
+
+    \item[$\Sfoldr$ ::=] $\lambda f\; i\; l. l\; f\; i$
+    \item[$\Smap$ ::=] $\lambda f\; l. l\; (\lambda x\; t.\Scons (f\; x)\; t)\; \Snull$
+    \item[$\Sfilter$ ::=] $\lambda p\; l. l\; (\lambda x\; t.p\; x\; (\Scons x\; t)\; t)\; \Snull$
+
+  \end{description}
+\end{frame}
+
+
+
+
+\begin{frame}{Factorial, Fibonacci, împărțire folosind perechi}
+  \begin{description}
+    \item[$\terminal{fact}$ ::= ] $\lambda n.\Ssnd (n\;(\lambda p. \Spair (\Ssucc (\Sfst p)) (\Smul (\Sfst p) (\Ssnd p)))\;(\Spair 1\; 1))$
+    \pause
+    \item[$\terminal{fib}$ ::= ] $\lambda n.\Sfst (n\; (\lambda p. \Spair (\Ssnd p) (\Splus (\Sfst p)\; (\Ssnd p)))\; (\Spair 0\; 1))$
+    \pause
+    \item[$\terminal{divMod}$ ::= ] $\lambda m\; n. m\; (\lambda p. \Sgt n\; (\Ssnd p)\; p\; (\Spair (\Ssucc (\Sfst p))\; (\Sminus (\Ssnd p)\; n)))\; (\Spair 0\; m)$
+  \end{description}
+
+    \pause
+  \begin{block}{Observații}
+    \begin{itemize}
+      \item Nu toate funcțiile pot fi definite prin iterare fixată
+      \item Pentru $\terminal{divMod}$ obținem răspunsul (de obicei) din mult mai puțin de $m$ iterații
+    \end{itemize}
+  \end{block}
+\end{frame}
+
+\section{Recursie}
+\begin{frame}[fragile]{Recursie}
+\begin{itemize}
+\item exist\u a termeni care {\bf nu} pot fi redu\sh i la o $\beta$-form\u a normal\u a, de exemplu 
+
+$(\lambda x. x\; x)(\lambda x. x\; x)\ra_\beta (\lambda x. x\; x)(\lambda x. x\; x)$
+
+\^{I}n $\lambda$-calcul putem defini calcule infinite!
+
+\pause
+
+\item Dac\u a not\u am $Af ::= \lambda x. f\; (x\; x)$ atunci 
+
+$Af\; Af =_\beta (\lambda x. f\; (x\; x))\; Af =_\beta f\; (Af\; Af)$
+
+\item Dac\u a not\u am $Yf ::= Af\; Af$ atunci $Yf =_\beta f\; Yf$.
+
+\pause
+
+\item Fie $Y ::= \lambda f. (\lambda x. f\; (x\; x))\; (\lambda x. f\; (x\; x))$
+
+Atunci $Y\; f =_\beta f\;(Y\; f)$
+
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Puncte fixe}
+
+\begin{itemize}
+\item pentru o func\ts ie $f:X\to X$ un {\bf punct fix} este un element $x_0\in X$ cu $f(x_0)=x_0$.
+
+
+\begin{itemize}
+\item $f:\Nat\to\Nat, f(x)=x+1$ nu are puncte fixe
+\item $f:\Nat\to\Nat, f(x)=2x$ are punctul fix $x=0$
+\end{itemize} 
+
+\pause
+
+\item \^{I}n $\lambda$-calcul  
+  \begin{description}
+    \item[$\terminal{Y}$ ::= ] $\lambda f. (\lambda x. f\; (x\; x))(\lambda x. f\; (x\; x))$
+\end{description}
+    
+are proprietatea c\u a $Y\; f =_\beta f\; (Y\; f)$, deci $Y\; f$ este un {\bf punct fix} pentru $f$.     
+    \pause
+
+\medskip
+
+$Y$ se nume\sh te {\bf combinator de punct fix}. \pause\medskip
+
+
+Avem $Y\; f =_\beta f\; (Y\; f) =_\beta f\; (f\; (Y\; f)) =_\beta \ldots$
+
+\medskip
+Putem folosi $Y$ pentru a ob\ts ine apeluri recursive!
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Puncte fixe - func\ts ia factorial}
+
+  \begin{description}
+    \item[$\terminal{fact}$ ::=] $\lambda n. \Sif (\SisZero n)\; 1\; (\Smul n\; ({\textcolor{red}{fact}}\; (\Spred \;n)))$
+    \end{description}
+    \pause\medskip
+Aceast\u a defini\ts ie nu este corect\u a conform regulilor noastre, cum proced\u am?\pause\medskip
+\begin{itemize}
+\item Pasul 1: abstractiz\u am, astfel \^{\i}nc\^ at construc\ts ia s\u a fie corect\u a
+
+\begin{description}
+    \item[$\terminal{factA}$ ::=] $\lambda f.\lambda n. \Sif (\SisZero n)\; 1\; (\Smul n\; ({\textcolor{red}{f}}\; (\Spred \;n)))$
+    \end{description}
+\pause
+\item Pasul 2: aplic\u am combinatorul de punct fix
+
+\begin{description}
+    \item[$\terminal{fact}$ ::=] $ Y \, \terminal{factA}$
+    \end{description}
+    \pause
+    
+Deoarece $Y\,\terminal{factA} =_\beta \terminal{factA}(Y\,\terminal{factA})$ ob\ts inem 
+
+   $$\terminal{fact} =_\beta \lambda n. \Sif (\SisZero n)\; 1\; (\Smul n\; ({\terminal{}{fact}}\; (\Spred \;n))$$ 
+\end{itemize}    
+\end{frame}
+
+\begin{frame}{divMod --- definiție recursivă}
+  \begin{block}{Definiția primitiv recursivă (fără Y)}
+  \begin{description}
+  \item[$\terminal{divMod}$ ::= ] $\lambda m\; n. m\; (\lambda p. \Sgt n\; (\Ssnd p)\; p\; (\Spair (\Ssucc (\Sfst p))\; (\Sminus (\Ssnd p)\; n)))\; (\Spair 0\; m)$  
+  \end{description}
+  \end{block}
+
+  \begin{block}{Definiția recursivă (incorectă)}
+  \begin{description}
+  \item[$\terminal{divMod}$ ::= ] $\lambda m\; n. \SisZero n\; (\Spair 0\; m)\; (\terminal{divMod}'\; 0\; m)$  where
+  \item[$\terminal{divMod'}$ ::= ] $\lambda q\; r. \Sgt n\; r\; (\Spair q\; r)\; (\terminal{divMod}'\; (\Ssucc q) (\Sminus m\; n))$
+  \end{description}
+  \end{block}
+
+  \begin{block}{Definiția recursivă (corectă, folosind Y)}
+  \begin{description}
+  \item[$\terminal{divMod}$ ::= ] $\lambda m\; n.\SisZero n\;\;(\Spair 0\; m)$
+  
+  $\;\;(\terminal{Y} (\lambda f.\lambda q\; r.\Sgt n\; r\; (\Spair q\; r)\; (f\; (\Ssucc q)\; (\Sminus m\; n)))$
+  
+  $\;\; 0\; m)$
+  \end{description}
+  \end{block}
+
+
+\end{frame}
+
+%\begin{frame}[fragile]{Puncte fixe - func\ts ia factorial}
+%
+%$\begin{array}{l}
+%\terminal{fact}\,\,  \terminal{zero}  \,\,=_\beta \,\,(Y\, \terminal{factA}) \terminal{zero}\\
+% =_\beta \,\,\terminal{factA} (Y\, \terminal{factA}) \terminal{zero}\\
+% =_\beta \,\, if\,\, (\terminal{isZero}\,\terminal{zero})\,\, \terminal{one}\,\, (*\, \terminal{zero}\, ((Y\,\terminal{factA}) (\terminal{pred} \,\,\terminal{zero})))\\
+% =_\beta \,\,\terminal{one}
+%\end{array}$    \pause
+%\medskip
+%
+%$\begin{array}{l}
+%\terminal{fact}\,\,  \terminal{one}  \,\,=_\beta \,\,(Y\, \terminal{factA}) \terminal{one}\\
+% =_\beta \,\,\terminal{factA} (Y\, \terminal{factA}) \terminal{one}\\
+% =_\beta \,\, if\,\, (\terminal{isZero}\,\terminal{one})\,\, \terminal{one}\,\, (*\, \terminal{one}\, ((Y\,\terminal{factA}) (\terminal{pred} \,\,\terminal{one})))\\
+% =_\beta \,\, *\, \terminal{one}\, ((Y\,\terminal{factA}) (\terminal{pred} \,\,\terminal{one}))\\
+% =_\beta \ldots
+%\end{array}$
+%\end{frame}
+
+\section{Strategii de evaluare}
+
+\begin{frame}{Apel prin valoare (Call by Value)}
+\begin{block}{}
+Pentru a reduce $e_1 \mathrel{} e_2$:
+\begin{itemize}
+\item  Reducem $e_1$ până la o funcție
+$\fun{x}{e}$
+\item Apoi reducem $e_2$ până la o valoare $v$
+\item Apoi reducem $(\fun{x}{e})\mathrel{}v$ la $\substapp{e}{\subst{\substpair{v}{x}}}$
+\item[Nu] simplificăm sub $\lambda$
+\end{itemize}
+\end{block}
+
+\pause
+
+$\SisZero 0\; (\Splus 2\; 1)\; (\Splus 3\; 4) \hfill \SisZero ::= (\lambda n. n\;(\lambda x. \Sfalse)\; \Strue)$\\
+$\rightarrow_{\beta(V)} 0\;(\lambda x. \Sfalse)\; \Strue\; (\Splus 2\; 1)\; (\Splus 3\; 4) \hfill 0 ::= (\lambda s\; z.z)$\\
+$\rightarrow_{\beta(V)}^2 \Strue\; (\Splus 2\; 1)\; (\Splus 3\; 4)
+\hfill \Splus ::= (\lambda m\; n\; s\; z.m\; s\; (n\; s\; z))$\\
+$\rightarrow_{\beta(V)}^2 \Strue\; (\lambda s\; z.2\; s\; (1\; s\; z))\; (\Splus 3\; 4) \hfill \Strue ::= \lambda t\; f.t$\\
+$\rightarrow_{\beta(V)} (\lambda f.\lambda s\; z.2\; s\; (1\; s\; z))\;(\Splus 3\; 4)$\\
+$\rightarrow_{\beta(V)}^2 (\lambda f.\lambda s\; z.2\; s\; (1\; s\; z))\;(\lambda s\; z.3\; s\; (4\; s\; z))$\\
+$\rightarrow_{\beta(V)} \lambda s\; z.2\; s\; (1\; s\; z)$\\
+$\not\rightarrow_{\beta(V)}$
+
+\end{frame}
+
+
+\begin{frame}{Apel prin nume (Limbaje pur funcționale)} 
+\begin{block}{}
+Pentru a reduce $e_1 \mathrel{} e_2$:
+\begin{itemize}
+\item  Reducem $e_1$ până la o funcție $\fun{x}{e}$
+\item Apoi reducem $(\fun{x}{e}) \mathrel{}e_2$ la $\substapp{e}{\subst{\substpair{e_2}{x}}}$
+\item[Nu] simplificăm sub $\lambda$ nici în dreapta aplicației
+\end{itemize}
+\end{block}
+
+\pause
+
+$\SisZero 0\; (\Splus 2\; 1)\; (\Splus 3\; 4) \hfill \SisZero ::= (\lambda n. n\;(\lambda x. \Sfalse)\; \Strue)$\\
+$\rightarrow_{\beta(N)} 0\;(\lambda x. \Sfalse)\; \Strue\; (\Splus 2\; 1)\; (\Splus 3\; 4) \hfill 0 ::= (\lambda s\; z.z)$\\
+$\rightarrow_{\beta(N)}^2 \Strue\; (\Splus 2\; 1)\; (\Splus 3\; 4)
+ \hfill \Strue ::= \lambda t\; f.t$\\
+$\rightarrow_{\beta(N)}^2 (\Splus 2\; 1) \hfill \Splus ::= (\lambda m\; n\; s\; z.m\; s\; (n\; s\; z))$\\
+$\rightarrow_{\beta(N)}^2 (\lambda s\; z.2\; s\; (1\; s\; z))$\\
+$\not\rightarrow_{\beta(N)}$
+
+\end{frame}
+
+\begin{frame}{Evaluare leneșă}{Implementări ale limbajelor pure gen Haskell}
+\begin{block}{}
+Pentru a reduce $e_1 \mathrel{} e_2$:
+\begin{itemize}
+\item  Reduc $e_1$ până la o funcție
+$\fun{x}{e}$
+\item Apoi reduc corpul funcției \structure{e} până la un $e'$ care are nevoie de $x$
+\item Apoi reduc $e_2$ până la o valoare $v$
+\item Apoi reduc $(\fun{x}{e'})\mathrel{} v$ la $\substapp{e'}{\subst{\substpair{v}{x}}}$
+\end{itemize}
+\end{block}
+
+\end{frame}
+
+
+\begin{frame}{Evaluare nerestricționată}
+\begin{block}{}
+Pentru a reduce $e_1 \mathrel{} e_2$
+\begin{itemize}
+\item Reducem fie $e_1$ fie $e_2$
+\item Putem reduce corpurile funcțiilor
+\item Oricând avem  $(\fun{x}{e'}) e''$, o putem (sau nu)
+reduce la $\substapp{e'}{\subst{\substpair{e''}{x}}}$
+\item Reduce până la o formă normală
+\item[Nu] garantează găsirea unei forme normale
+\end{itemize} 
+\end{block}
+\end{frame}
+
+\begin{frame}{Evaluare „normală“}
+\begin{block}{}
+Pentru a reduce $e_1 \mathrel{} e_2$
+\begin{itemize}
+\item Reducem mereu cel mai din stânga redex din cele de mai sus
+\item Reducem $(\fun{x}{e'}) e''$ la $\substapp{e'}{\subst{\substpair{e''}{x}}}$
+\item Reducem $e_1$ (putem reduce și corpurile funcțiilor)
+\item Dacă $e_1\not\rightarrow$, reducem $e_2$
+\item Reduce până la o formă normală
+\item Garantează găsirea unei forme normale
+\end{itemize} 
+\end{block}
+
+\end{frame}
+
+
+\begin{subsection}{Reguli de reducție pentru strategii de evaluare}
+
+
+\begin{frame}{Apel prin valoare}
+\begin{block}{}
+Pentru a reduce $e_1 \mathrel{} e_2$:
+\begin{itemize}
+\item  Reducem $e_1$ până la o funcție
+$\fun{x}{e}$
+\item Apoi reducem $e_2$ până la o valoare $v$
+\item Apoi reducem $(\fun{x}{e})\mathrel{}v$ la $\substapp{e}{\subst{\substpair{v}{x}}}$
+\end{itemize}
+\end{block}
+
+\begin{block}{Reguli}
+\begin{itemize}
+\item[]$\displaystyle\reg[V@S]{e_1\mathrel{}e_2 \rightarrow_\beta e_1'\mathrel{}e_2}{e_1 \rightarrow_\beta e_1'}{}$
+\item[]$\displaystyle\reg[V@D]{(\lambda x.e_1)\mathrel{}e_2 \rightarrow_\beta (\lambda x.e_1)\mathrel{}e_2'}{e_2 \rightarrow_\beta e_2'}{}$
+\item[]$\reg[V@]{(\fun{x}{e_1})\mathrel{}v_2 \rightarrow_\beta e}{}{e = \substapp{e_1}{\subst{\substpair{v_2}{x}}}}$
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}{Apel prin nume} 
+\begin{block}{}
+Pentru a reduce $e_1 \mathrel{} e_2$:
+\begin{itemize}
+\item  Reducem $e_1$ până la o funcție $\fun{x}{e}$ 
+\item Apoi reducem $(\fun{x}{e}) \mathrel{}e_2$ la $\substapp{e}{\subst{\substpair{e_2}{x}}}$
+\end{itemize}
+\end{block}
+
+\begin{block}{Reguli}
+\begin{itemize}
+\item[]$\displaystyle\reg[N@S]{e_1\mathrel{}e_2 \rightarrow_\beta e_1'\mathrel{}e_2}{e_1 \rightarrow_\beta e_1'}{}$
+\item[]$\reg[N@]{(\fun{x}{e_1})\mathrel{}e_2 \rightarrow_\beta e}{}{e = \substapp{e_1}{\subst{\substpair{e_2}{x}}}}$
+\end{itemize}
+\end{block}
+
+\end{frame}
+
+\begin{frame}{Evaluare nerestricționată}
+\begin{block}{}
+Pentru a reduce $e_1 \mathrel{} e_2$
+\begin{itemize}
+\item Reducem fie $e_1$ fie $e_2$
+\item Putem reduce corpurile funcțiilor
+\item Oricând avem  $(\fun{x}{e'}) e''$, o putem (sau nu)
+reduce la $\substapp{e'}{\subst{\substpair{e''}{x}}}$
+\end{itemize} 
+\end{block}
+
+\begin{block}{Reguli}
+\begin{itemize}
+\item[]$\reg[NR@S]{\Ss{e_1\mathrel{}e_2}{e_1'\mathrel{}e_2}}{\Ss{e_1}{e_1'}}{}$
+\item[]$\reg[NR@D]{\Ss{e_1\mathrel{}e_2}{e_1\mathrel{}e_2'}}{\Ss{e_2}{e_2'}}{}$
+\item[]$\reg[NRfunD]{\Ss{\fun{x}{e}}{\fun{x}{e'}}}{\Ss{e}{e'}}{}$
+\item[]$\reg[NR@]{\Ss{(\fun{x}{e_1})\mathrel{}e_2}{e}}{}{e = \substapp{e_1}{\subst{\substpair{e_2}{x}}}}$
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}{Evaluare „normală“}
+\begin{block}{}
+Pentru a reduce $e_1 \mathrel{} e_2$
+\begin{itemize}
+\item Reducem mereu cel mai din stânga redex din cele de mai sus
+\item Reducem $(\fun{x}{e'}) e''$ la $\substapp{e'}{\subst{\substpair{e''}{x}}}$
+\item Reducem $e_1$ (putem reduce și corpurile funcțiilor)
+\item Dacă $e_1\not\rightarrow$, reducem $e_2$
+\end{itemize} 
+\end{block}
+
+\begin{block}{Reguli}
+\begin{itemize}
+\item[]$\reg[Nor@]{\Ss{(\fun{x}{e_1})\mathrel{}e_2}{e}}{}{e = \substapp{e_1}{\subst{\substpair{e_2}{x}}}}$
+\item[]$\reg[Nor@S]{\Ss{e_1\mathrel{}e_2}{e_1'\mathrel{}e_2}}{\Ss{e_1}{e_1'}}{e_1 \mbox{ nu e încă funcție}}$
+\item[]$\reg[NorfunD]{\Ss{\fun{x}{e}}{\fun{x}{e'}}}{\Ss{e}{e'}}{}$
+\item[]$\reg[Nor@D]{\Ss{e_1\mathrel{}e_2}{e_1\mathrel{}e_2'}}{\displaystyle e_1\not\rightarrow \si \Ss{e_2}{e_2'}}{}$
+\end{itemize}
+\end{block}
+\end{frame}
+
+
+\begin{frame}{Evaluare leneșă}{Implementări ale limbajelor pure gen Haskell}
+\begin{block}{}
+Pentru a reduce $e_1 \mathrel{} e_2$:
+\begin{itemize}
+\item  Reduc $e_1$ până la o funcție
+$\Sfun (x : T) \rightarrow e$
+\item Apoi reduc corpul funcției \structure{e} până la un $e'$ care are nevoie de $x$
+\item Apoi reduc $e_2$ până la o valoare $v$
+\item Apo reduc $(\fun{x}{e'})\mathrel{} v$ la $\substapp{e'}{\subst{\substpair{v}{x}}}$
+\end{itemize}
+\end{block}
+\begin{block}{Reguli?}
+E mai complicat decât pare, deoarece trebuie să ne dăm seama că $e'$ are nevoie de $x$.
+\end{block}
+
+\end{frame}
+
+\end{subsection}
+%
+%\begin{subsection}{Implementare --- Reprezentare De Buijn}
+%\end{subsection}
+%
+
+%
+%\begin{section}{Semantică operațională contextuală}
+\begin{frame}{Contexte de evaluare}
+  \begin{itemize}
+    \item Găsirea redex-ului prin analiză sintactică
+    \item Putem înlocui regulile structurale cu reguli gramaticale
+  \end{itemize}\small
+    \[\structure{\text{Sintaxă:\hspace{1em}}} e \mathrel{::=} {x \mid {\lambda x. e} \mid {e \; e}}\]
+
+    \medskip
+  \begin{tabular}{ll}
+    \structure{Reguli structurale} 
+    & 
+    \structure{Contexte de evaluare} 
+    \\[1ex]
+        \begin{tabular}[t]{c} 
+          $\displaystyle\frac{ e_1 \longrightarrow_\beta e'_1}{ e_1 \; e_2 \longrightarrow_\beta e'_1 \; e_2}$ 
+          \\
+          \\
+          $\displaystyle\frac{e_2\longrightarrow_\beta e'_2}{\langle (\lambda x.e_1) \; e_2\longrightarrow_\beta (\lambda x.e_1) \; e'_2}$ 
+        \end{tabular}\hspace{4em}
+          &
+        $\begin{array}[t]{rcl} 
+          c & \mathrel{::=} &\blacksquare
+          \\[1ex]
+         &  \mid & c \; e  
+          \\[1ex]
+          & \mid & (\lambda x.e) \; c 
+        \end{array}$
+      \end{tabular}
+  \vfill\begin{block}{Instanțierea unui context $c$ cu expresia $e$}
+      \[c[e] = \substapp{c}{\subst{\substpair{e}{\blacksquare}}}\]
+    \end{block}
+\end{frame}
+
+
+\begin{frame}{Contexte de evaluare}{Exemple}
+  \begin{description}
+    \item[Sintaxă:] $e \mathrel{::=} {x \mid {\lambda x. e} \mid {e \; e}}$
+    \item[Contexte:] $c \mathrel{::=} {\blacksquare} \mid {c \; e} \mid  {(\lambda x.e) \; c }$
+  \end{description}
+
+  \vfill
+  \begin{block}{Exemple de contexte}
+    \begin{tabular}{l@{\extracolsep{4em}}l}
+        \structure{Corecte} & \structure{Greșite}
+        \\
+        $\blacksquare$ & $5$
+        \\
+        $3 \; \blacksquare$ & $\Strue\; x \; \blacksquare$
+      \end{tabular}
+    \end{block}
+
+      \vfill
+      \begin{block}{Exemple de contexte instanțiate}
+        \begin{itemize}
+          \item $\blacksquare[x \; 1] = x \; 1$
+          \item $(9 \; (\blacksquare \; 7))[x] = 9 \; (x \; 7)$
+          \item $(9 \; (\blacksquare \; 7))[5] = 9 \; (5 \; 7)$
+        \end{itemize}
+      \end{block}
+\end{frame}
+
+
+\begin{frame}{Semantica Operațională Contextuală}
+{\cites{Felleisen, 1992}}
+  \begin{block}{Un pas de execuție folosind contexte de evaluare}
+    \begin{itemize}
+      \item Descompune expresia în contextul $c$ și redex-ul $r$
+      \item Aplică o regulă operațională asupra lui $r$ obținând $e$
+      \item Pune $e$ în contextul inițial, obținând $c[e]$
+%      \item Regulile structurale înlocuite de o \structure{singură} regulă de reducție globală
+    \[\frac{ r \longrightarrow_\beta e}
+      {c[r] \longrightarrow_\beta c[e]}
+    \]
+      \end{itemize}
+  \end{block}
+\end{frame}
+
+\begin{frame}{Evaluare leneșă folosind Semantica Contextuală}{Idee de bază}
+\begin{block}{Contexte de evaluare pentru aplicație}
+ \[\begin{array}{crl}
+c & \mathrel{::=} & {\blacksquare} \\
+ & \mid & c\; e\\
+ & \mid & (\lambda x. c)\; e \\
+ & \mid & (\lambda x . c[x])\; c 
+\end{array}
+\]
+\end{block}
+
+\begin{block}{Regulă de evaluare pentru aplicație}
+ \[
+\Ss{(\lambda x . c[x])\; v}{(\lambda x . c[v])\; v}
+\]
+\end{block}
+
+
+\end{frame}
+%
+%
+%\end{section}
+
+
+
+
+\end{document}

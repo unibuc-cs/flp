@@ -1,0 +1,713 @@
+%\documentclass[handout,xcolor=x11names,compress,10pt]{beamer}
+
+\documentclass[xcolor=x11names,compress,10pt]{beamer}
+%\documentclass[xcolor=pdftex,romanian,colorlinks]{beamer}
+
+\usepackage{../tslides}
+%\usepackage{comment}
+
+%% General document %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%\newcommand{\plus}[1] {{\color{Green4} #1}}
+%\newcommand{\intens}[1] {{\color{DeepSkyBlue3} #1}}
+%\newcommand{\egf}[1]{\stackrel{\cdot}{=}_{#1}}
+%\newcommand{\regR}{\mbox{R}}
+%\newcommand{\regS}{\mbox{S}}
+%\newcommand{\regT}{\mbox{T}}
+%\newcommand{\regCS}{\mbox{C}\Sigma}
+%\newcommand{\regSub}{\mbox{Sub}_\Gamma}
+%\newcommand{\te}[1]{\mbox{\texttt{#1}}}
+\newcommand{\Conf}[2]{\ensuremath{\langle #1\ ,\ #2\rangle}}
+%\newcommand{\cc}[1]{\ensuremath{\langle #1 \rangle}}
+%
+%
+%
+%\newcommand{\parrow}{\rightharpoonup}
+%\makeatletter
+%\newcommand{\vo}{\vec{o}\@ifnextchar{^}{\,}{}}
+%\makeatother
+\renewcommand{\to}{}
+%=========================================
+
+\begin{document}
+\title{\\Curs 10}
+\author{Fundamentele limbajelor de programare} 
+\date{2020-2021} 
+
+
+\frame{\titlepage} 
+
+
+\frame{\frametitle{Cuprins}\tableofcontents
+
+} 
+
+\begin{section}{Semantica Small-Step pentru Lambda Calcul}
+
+  \begin{frame}[fragile]{Sintaxa limbajului LAMBDA}
+    \begin{block}{BNF}
+    \[
+    \begin{array}{rcl}
+      e & ::= & {\Id} \Smid {\Int} \Smid {\Strue} \Smid {\Sfalse} \\
+        & \Smid & {e + e} \Smid {e < e} \Smid { \terminal{not}(e) } \\
+        & \Smid & \Sif e \Sthen e \Selse e \\
+        & \Smid & {\lambda \Id . e} \Smid {e \; e} \\
+        & \Smid & \terminal{let} \Id \terminal{=} e \terminal{in} e
+    \end{array}
+    \]
+    \end{block}
+
+    \begin{block}{Verificarea sintaxei în Prolog}
+      \begin{asciipl}
+exp(Id) :- atom(Id).                      % identifier
+exp(Lit) :- Lit = true ; Lit = false ; integer(Lit).
+exp(E1 + E2) :- exp(E1), exp(E2).         % same for any op
+exp(if(E1, E2, E3)) :- exp(E1), exp(E2), exp(E3).
+exp(Id -> Exp) :- atom(Id), exp(Exp).     % lambda
+exp(Exp1 $ Exp2) :- exp(Exp1), exp(Exp2). % application
+exp(let(Id, Exp1, Exp2)) :- atom(Id), exp(Exp1), exp(Exp2).
+      \end{asciipl}
+    \end{block}
+ \end{frame}
+
+\begin{frame}[fragile]{Semantica small-step pentru Lambda}
+\vspace*{0.5cm}
+\begin{itemize}
+  \item Definește cel mai mic pas de execuție ca o relație de tranziție  \^{\i}ntre expresii
+    dată fiind o stare cu valori pentru variabilele libere
+  \begin{center}
+	$\rho \vdash \Ss{cod}{cod\,'}$ \hfill\intens{\texttt{step(Env, Cod1,Cod2)}}
+  \end{center}
+%  \item Fiecare pas de execuÈie este concluzia unei demonstraÈii
+
+  \item Execuția se obține ca o succesiune de astfel de tranziții.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Semantica variabilelor}
+	\[\reg{\rho \vdash \Ss{x}{v}}{}{\rho(x) = v}\]
+  \begin{block}{Prolog}
+    \begin{asciipl}
+      step(Env, X, V) :- atom(X), get(Env, X, V).
+    \end{asciipl}
+  \end{block}
+
+\end{frame}
+
+  
+\begin{frame}[fragile]{Semantica expresiilor aritmetice}
+    \begin{itemize}
+    \item \intens{Semantica adunării a două expresii aritmetice}	
+     \item[] $\reg{\Ss{\Conf{i_1 + i_2}{\sigma}}{\Conf{i}{\sigma}}}{}{i = i_1 + i_2}$
+    
+    \item[] $\reg{\Ss{\Conf{a_1 + a_2}{\sigma}}{\Conf{a_1' + a_2}{\sigma'}}}{\Ss{\Conf{a_1}{\sigma}}{\Conf{a_1'}{\sigma'}}}{}$\hfill$\reg{\Ss{\Conf{a_1 + a_2}{\sigma}}\to{\Conf{a_1 + a_2'}{\sigma'}}}{\Ss{\Conf{a_2}{\sigma}}\to {\Conf{a_2'}{\sigma'}}}{}$
+ 
+
+    \item Pentru alți operatori (artimetici, de comparație, booleeni, condițional)
+    \begin{itemize}
+        \item  Similar cu regulile din IMP
+    \end{itemize}
+    \end{itemize}
+    
+   \begin{block}{Prolog} 
+  \begin{verbatim}
+  step(_, I1 + I2,I):- integer(I1),integer(I2), 
+                       I is I1 + I2.
+                              
+  step(Env, AE + AE1,AE + AE2):- step(Env, AE1,AE2).
+  
+  step(Env, AE1 + AE,AE2 + AE):- step(Env, AE1,AE2).
+  \end{verbatim}
+  \end{block}
+  \end{frame}
+  
+
+
+\begin{frame}[fragile]{Semantica $\lambda$-abstracției}
+	\[\reg{\rho \vdash \Ss{\lambda x. e}{{\it closure}(x, e, \rho)}}{}{}\]
+
+  $\lambda$-abstracția se evaluează la o valoare specială numită closure
+  care capturează valorile curente ale variabilelor pentru a se putea
+  executa în acest mediu atunci când va fi aplicată.
+
+  \begin{block}{Prolog}
+    \begin{asciipl}
+      step(Env, X -> E, closure(X, E, Env)).
+    \end{asciipl}
+  \end{block}
+
+\end{frame}
+
+\begin{frame}[fragile]{Semantica construcției $\terminal{let}$}
+	\[\reg{\rho \vdash \Ss{\terminal{let} x \terminal{=} e_1 \terminal{in} e_2}{(\lambda x . e2)\; e_1}}{}{}\]
+
+  A îi da lui $x$ valoarea lui $e_1$ în $e_2$ este același lucru cu a
+  aplica funcția de $x$ cu corpul $e_2$ expresiei $e_1$.
+
+  \begin{block}{Prolog}
+    \begin{asciipl}
+      step(_, let(X, E1, E2), (X -> E2) $ E1).
+    \end{asciipl}
+  \end{block}
+
+\end{frame}
+
+
+\begin{frame}[fragile]{Semantica operatorului de aplicare}
+	\[\reg{\rho \vdash \Ss{{\it closure}(x, e, \rho_e) \; v}{{\it closure}(x, e', \rho_e) \; v}}{\rho_e[v/x]\vdash \Ss{e}{e'}}{v \mbox{ valoare}}\]
+
+	\[\reg{\rho \vdash \Ss{{\it closure}(x, v, \rho_e) \; e}{v}}{}{v \mbox{ valoare}}\]
+
+  \[\reg{\rho \vdash \Ss{e_1 \; e_2}{e'_1 \; e_2}}{\rho \vdash \Ss{e_1}{e'_1}}{}
+    \hfill
+    \reg{\rho \vdash \Ss{e_1 \; e_2}{e_1 \; e'_2}}{\rho \vdash \Ss{e_2}{e'_2}}{}
+    \]
+
+  \begin{block}{Prolog}
+    \begin{asciipl}
+      step(Env, E $ E1, E $ E2) :- step(Env, E1, E2).
+      step(Env, E1 $ E, E2 $ E) :- step(Env, E1, E2).
+      step(Env, closure(X, E, EnvE) $ V, Result) :-
+          \+ step(Env, V, _),
+          set(EnvE, X, V, EnvEX),
+          step(EnvEX, E, E1)
+          ->  Result = closure(X, E1, EnvE) $ V
+          ;   Result = E.
+    \end{asciipl}
+  \end{block}
+
+\end{frame}
+
+\end{section}
+\begin{section}{Determinarea tipurilor}
+
+\begin{frame}{Problemă: Sintaxa este prea permisivă}
+    \begin{block}{\alert{Problemă:} Mulți termeni acceptați de sintaxă nu pot fi evaluați}
+        \begin{itemize}
+        \item $2\;(\fun{x}{x})$\only<2>{--- expresia din stânga aplicației trebuie să reprezinte o funcție}
+         \item $(\fun{x}{x}) + 1$\only<2>{  --- adunăm funcții cu numere}
+        \item $(\fun{x}{x + 1})\; (\fun{x}{x})$\only<2>{ --- pot face o reducție, dar tot nu pot evalua}
+        \end{itemize}
+     \end{block}
+     \onslide<2>
+     \vfill\begin{block}{Soluție:  Identificarea (precisă) a programelor corecte}
+     \begin{itemize}
+     \item Definim tipuri pentru fragmente de program corecte (e.g., int, bool)
+     \item Definim (recursiv) o relație care să lege fragmente de program de tipurile asociate
+     \[((\fun{x}{x + 1})\; ((\fun{x}{x})\; 3)) : \mbox{int}\]
+     \end{itemize}
+     \end{block}
+\end{frame}
+
+
+    \begin{subsection}{Asociere de tipuri}
+    \begin{frame}{Relația de asociere de tipuri}
+    Definim (recursiv) o relație de forma $\T{\Gamma}{e}{\tau}$, unde
+    \begin{itemize}
+    \item $\tau$ este un tip
+    
+    \vspace{-2ex}
+    \begin{syntaxBlock}{\structure{\tau}}
+    \color<beamer|handout>{black!25!white}{
+    \renewcommand{\syntaxKeyword}{}
+    \syntax{int}{întregi}
+    \syntaxCont{bool}{valori de adevăr}
+    \syntaxCont{\structure{\tau} \rightarrow \structure{\tau}}{funcții}
+    \syntaxCont{\structure{a}}{variabile de tip}
+    }
+    \vspace{-4ex}
+    \end{syntaxBlock}
+    \item $e$ este un termen (potențial cu variabile libere)
+    \item $\Gamma$ este \structure{mediul de tipuri}, o funcție parțială finită care asociază tipuri variabilelor (libere ale lui $e$)
+    \item Variabilele de tip sunt folosite pentru a indica polimorfismul
+    \end{itemize}
+    
+    \begin{block}{Cum citim $\T{\Gamma}{e}{\tau}$?}
+    Dacă variabila $x$ are tipul $\Gamma(x)$ pentru orice $x\in dom(\Gamma)$,\\ atunci termenul $e$ are tipul $\tau$.
+    \end{block}
+    \end{frame}
+    
+    \begin{frame}{Axiome}
+    \begin{itemize}
+    \item[] $\reg[:var]{\T{\Gamma}{x}{\tau}}{}{\Gamma(x) = \tau}$
+    \vitem[] $\reg[:int]{\T{\Gamma}{n}{int}}{}{\mbox{$n$ întreg}}$
+    \vitem[] $\reg[:bool]{\T{\Gamma}{b}{bool}}{}{b = \Strue \mathrel{or} b = \Sfalse}$
+    \end{itemize}
+    \end{frame}
+    
+    
+    \begin{frame}
+    {Expresii}
+    \begin{itemize}
+    \item[]
+    $\reg[:iop]{\T{\Gamma}{e_1\mathrel{o} e_2}{int}}{\T{\Gamma}{e_1}{int} \si \T{\Gamma}{e_2}{int}}{o\in \{+,-,*,/\}}$
+    
+    \vitem[]
+    $\reg[:cop]{\T{\Gamma}{e_1\mathrel{o} e_2}{bool}}{\T{\Gamma}{e_1}{int} \si \T{\Gamma}{e_2}{int}}{o\in \{\leq, \geq, <, >, =\}}$
+    
+    \vitem[]
+    $\reg[:bop]{\T{\Gamma}{e_1\mathrel{o} e_2}{bool}}{\T{\Gamma}{e_1}{bool} \si \T{\Gamma}{e_2}{bool}}{o\in \{\Sand, \Sor\}}$
+    
+    \vitem[]
+    $\reg[:if]{\T{\Gamma}{\Sif e_b \Sthen e_1 \Selse e_2}{\tau}}{\T{\Gamma}{e_b}{bool} \si \T{\Gamma}{e_1}{\tau} \si \T{\Gamma}{e_2}{\tau}}{}$
+    \end{itemize}
+    \end{frame}
+    
+    
+    \begin{frame}{Fragmentul funcțional}
+    \begin{itemize}
+    \item[] 
+    $\displaystyle\reg[:fn]{\T{\Gamma}{\fun{x}{e}}{\tau \rightarrow \tau'}}{\T{\Gamma'}{e}{\tau'}}{\Gamma' = \Gamma[x\mapsto \tau]}$
+    
+    \vitem[]
+    $\displaystyle\reg[:app]{\T{\Gamma}{e_1\; e_2}{\tau}}{\T{\Gamma}{e_1}{\tau' \rightarrow \tau} \si \T{\Gamma}{e_2}{\tau'}}{}$
+    \end{itemize}
+    \end{frame}
+    
+    \end{subsection}
+    
+    \begin{subsection}{Proprietăți}
+    
+    \begin{frame}{Programe în execuție}
+     \begin{alertblock}{Problemă:}
+     \begin{itemize}
+       \item În timpul execuției programul conține valori de tip closure
+       \item Care este tipul lor?
+     \end{itemize}
+     \end{alertblock} 
+    
+     \begin{block}{Soluție}
+     \begin{itemize}
+     \item Adăugam regula $\reg[:cl]{\T{\Gamma}{{\it closure}(x, e, \rho)}{\tau}}{\T{\Gamma_\rho}{\lambda x. e}{\tau}}{} {\it unde}$ 
+     \item Mediul de tipuri $\Gamma_\rho$ asociat unui mediu de execuție $\rho$ satisface:
+     \begin{itemize}
+     \item $\Dom(\Gamma_\rho) = \Dom(\rho)$
+     \item Pentru orice variabilă $x\in \Dom(\rho)$, există $\tau$ tip și $v$ valoare astfel încât $\Gamma_\rho(x) = \tau$, $\rho(x) = v$ și $\T{}{v}{\tau}$
+     \end{itemize}
+     \end{itemize}
+     \end{block}
+    \end{frame}
+    
+    \begin{frame}{Proprietăți}{ale sistemului de tipuri pentru limbajul $\Sfun$-IMP}
+    \begin{theorem}[Proprietatea de a progresa] Dacă $\T{\Gamma_\rho}{e}{\tau}$ atunci $e$ este valoare sau $e$ poate progresa în $\rho$: există $e'$ astfel încât $\rho \vdash \Ss{e}{e'}$.
+    \end{theorem}
+    \vfill
+    
+    \begin{theorem}[Proprietatea de conservare a tipului]
+    Dacă $\T{\Gamma_\rho}{e}{\tau}$ și $\rho\vdash \Ss{e}{e'}$, atunci 
+    $\T{\Gamma_\rho'}{e'}{\tau}$.
+    \end{theorem}
+    
+    \vfill
+    \begin{theorem}[Siguranță---programele bine formate nu se împotmolesc]
+    Dacă $\T{\Gamma_\rho}{e}{\tau}$ și $\rho\vdash {e}\longrightarrow^\ast{e'}$, atunci $e'$ este valoare sau există $e''$, astfel încât $\rho \vdash \Ss{e'}{e''}$.
+    \end{theorem}
+    
+    \end{frame}
+    
+    \begin{frame}{Probleme computaționale}
+    \begin{block}{Verificarea tipului}
+    Date fiind $\Gamma$, $e$ și $\tau$, verificați dacă $\tjud{e}{\tau}$.
+    \end{block}
+    
+    \begin{block}{Determinarea (inferarea) tipului}
+    Date fiind $\Gamma$ și $e$, găsiți (sau arătați ce nu există) un $\tau$ astfel încât $\tjud{e}{\tau}$.
+    \end{block}
+    
+    \begin{itemize}
+    \item A doua problemă e mai grea în general decât prima
+    \item Algoritmi de inferare a tipurilor
+    \begin{itemize}
+    \item Colectează constrângeri asupra tipului
+    \item Folosesc metode de rezolvare a constrângerilor (programare logică)
+    \end{itemize}
+    \end{itemize}
+    \end{frame}
+    
+    \begin{frame}{Probleme computaționale}{Proprietăți}
+    \begin{theorem}[Determinarea tipului este decidabilă]
+    Date fiind $\Gamma$ și $e$, poate fi găsit (sau demonstrat că nu există) un $\tau$ astfel încât 
+    $\tjud{e}{\tau}$.
+    \end{theorem}
+    \vfill
+    
+    \begin{theorem}[Verificarea tipului este decidabilă]
+    Date fiind $\Gamma$, $e$ și $\tau$, problema $\tjud{e}{\tau}$ este decidabilă.
+    \end{theorem}
+    
+    \vfill
+    \begin{theorem}[Unicitatea tipului]
+    Dacă $\tjud{e}{\tau}$ și $\tjud{e}{\tau'}$, atunci $\tau=\tau'$.
+    \end{theorem}
+    \end{frame}
+    
+    \end{subsection}
+
+    \begin{subsection}{Exemplu}
+      \begin{frame}{Exemplu}
+        \begin{block}{Care este tipul expresiei următoare (dacă are)}
+          \[ \lambda x.\lambda y. \lambda z. \Sif {y = 0} \Sthen z \Selse {x / y}\]
+        \end{block}
+
+        \begin{block}{Aplicăm regula 
+    $\displaystyle\reg[:fn]{\T{\Gamma}{\fun{x}{e}}{\tau \rightarrow \tau'}}{\T{\Gamma'}{e}{\tau'}}{\Gamma' = \Gamma[x\mapsto \tau]}$
+    }
+          $\vdash  \lambda x.\lambda y. \lambda z. \Sif {y = 0} \Sthen z \Selse {x / y} : t_x \rightarrow t$ dacă
+          $x \mapsto t_x \vdash \lambda y. \lambda z. \Sif {y = 0} \Sthen z \Selse {x / y} : t$
+
+          \pause Mai departe:
+          $x \mapsto t_x \vdash \lambda y. \lambda z. \Sif {y = 0} \Sthen z \Selse {x / y} : t_y \rightarrow t_0$ dacă
+          $x \mapsto t_x, y\mapsto t_y \vdash \lambda z. \Sif {y = 0} \Sthen z \Selse {x / y} : t_0$ și, de mai sus,
+          $t = t_y \rightarrow t_0$
+
+          \pause Mai departe: 
+          $x \mapsto t_x, y\mapsto t_y \vdash \lambda z. \Sif {y = 0} \Sthen z \Selse {x / y} : t_z\rightarrow t_1$ dacă
+          $x \mapsto t_x, y\mapsto t_y, z \mapsto t_z \vdash \Sif {y = 0} \Sthen z \Selse {x / y} : t_1$ și, de mai sus,
+          $t_0 = t_z \rightarrow t_1$
+        \end{block}
+     
+      \end{frame}
+
+      \begin{frame}{Exemplu}
+      \begin{block}{Unde suntem}
+        $\vdash  \lambda x.\lambda y. \lambda z. \Sif {y = 0} \Sthen z \Selse {x / y} : t_x \rightarrow t$ dacă
+        $x \mapsto t_x, y\mapsto t_y, z \mapsto t_z \vdash \Sif {y = 0} \Sthen z \Selse {x / y} : t_1$ și
+        $t_0 = t_z \rightarrow t_1$, $t = t_y \rightarrow t_0$.
+      \end{block}
+        \begin{block}{Aplicăm regula 
+    $\reg[:if]{\T{\Gamma}{\Sif e_b \Sthen e_1 \Selse e_2}{\tau}}{\T{\Gamma}{e_b}{bool} \si \T{\Gamma}{e_1}{\tau} \si \T{\Gamma}{e_2}{\tau}}{}$
+    }
+        $x \mapsto t_x, y\mapsto t_y, z \mapsto t_z \vdash \Sif {y = 0} \Sthen z \Selse {x / y} : t_1$ dacă
+
+        $x \mapsto t_x, y\mapsto t_y, z \mapsto t_z \vdash {y = 0} : \Sbool$ și
+        $x \mapsto t_x, y\mapsto t_y, z \mapsto t_z \vdash {z} : t_1$ și
+        $x \mapsto t_x, y\mapsto t_y, z \mapsto t_z \vdash {x / y} : t_1$
+
+
+        \end{block}
+      \end{frame}
+      \begin{frame}{Exemplu}
+        \begin{block}{Aplicăm regula 
+    $\reg[:cop]{\T{\Gamma}{e_1\mathrel{o} e_2}{bool}}{\T{\Gamma}{e_1}{int} \si \T{\Gamma}{e_2}{int}}{o\in \{\leq, \geq, <, >, =\}}$
+        }
+        $x \mapsto t_x, y\mapsto t_y, z \mapsto t_z \vdash {y = 0} : \Sbool$ dacă
+
+        $x \mapsto t_x, y\mapsto t_y, z \mapsto t_z \vdash y : \Sint$ \hfill și \hfill
+        $x \mapsto t_x, y\mapsto t_y, z \mapsto t_z \vdash 0 : \Sint$
+        \end{block}
+
+        \begin{block}{Aplicăm regula 
+     $\reg[:int]{\T{\Gamma}{n}{int}}{}{\mbox{$n$ întreg}}$
+        }
+
+        $x \mapsto t_x, y\mapsto t_y, z \mapsto t_z \vdash 0 : \Sint$ este adevărat
+        \end{block}
+
+        \begin{block}{Aplicăm regula 
+    $\reg[:iop]{\T{\Gamma}{e_1\mathrel{o} e_2}{int}}{\T{\Gamma}{e_1}{int} \si \T{\Gamma}{e_2}{int}}{o\in \{+,-,*,/\}}$
+        }
+
+        $x \mapsto t_x, y\mapsto t_y, z \mapsto t_z \vdash {x / y} : \Sint$ dacă
+
+        $x \mapsto t_x, y\mapsto t_y, z \mapsto t_z \vdash x : \Sint$ \hfill și \hfill
+        $x \mapsto t_x, y\mapsto t_y, z \mapsto t_z \vdash y : \Sint$
+
+        și, de mai sus, $t_1 = \Sint$
+        \end{block}
+        
+      \end{frame}
+
+      \begin{frame}{Exemplu}
+      \begin{block}{Recapitulăm}
+        $\vdash  \lambda x.\lambda y. \lambda z. \Sif {y = 0} \Sthen z \Selse {x / y} : t_x \rightarrow t$ dacă
+
+        $x \mapsto t_x, y\mapsto t_y, z \mapsto t_z \vdash y : \Sint$ \hfill și \hfill
+        $x \mapsto t_x, y\mapsto t_y, z \mapsto t_z \vdash {z} : t_1$
+
+        $x \mapsto t_x, y\mapsto t_y, z \mapsto t_z \vdash x : \Sint$ \hfill și \hfill
+        $x \mapsto t_x, y\mapsto t_y, z \mapsto t_z \vdash y : \Sint$
+
+        și
+        $t_0 = t_z \rightarrow t_1$, $t = t_y \rightarrow t_0$, $t_1 = \Sint$.
+      \end{block}
+        \begin{block}{Aplicăm regula 
+     $\reg[:var]{\T{\Gamma}{x}{\tau}}{}{\Gamma(x) = \tau}$
+    }
+
+    $x \mapsto t_x, y\mapsto t_y, z \mapsto t_z \vdash y : t_y$ adevărat și, de mai sus $t_y = \Sint$
+
+    $x \mapsto t_x, y\mapsto t_y, z \mapsto t_z \vdash {z} : t_z$ adevărat și, de mai sus, $t_1 = t_z$
+
+    $x \mapsto t_x, y\mapsto t_y, z \mapsto t_z \vdash x : t_x$ adevărat și, de mai sus, $t_x = \Sint$
+
+        \end{block}
+      \end{frame}
+
+      \begin{frame}{Exemplu}
+      \begin{block}{Finalizăm}
+        $\vdash  \lambda x.\lambda y. \lambda z. \Sif {y = 0} \Sthen z \Selse {x / y} : t_x \rightarrow t$ dacă
+
+        $t_0 = t_z \rightarrow t_1$, $t = t_y \rightarrow t_0$, $t_1 = \Sint$, $t_y = \Sint$,
+        $t_1 = t_z$ și $t_x = \Sint$.
+
+      \end{block}
+       \begin{block}{Rezolvăm constrângerile și obținem}
+
+        $\vdash  \lambda x.\lambda y. \lambda z. \Sif {y = 0} \Sthen z \Selse {x / y} : {\Sint} \rightarrow {\Sint} \rightarrow {\Sint} \rightarrow {\Sint}$
+
+        \end{block}
+      \end{frame}
+
+      
+    \end{subsection}
+
+    \begin{subsection}{Implementare în Prolog}
+
+
+
+    \begin{frame}{Relația de asociere de tipuri în Prolog}
+    Definim (recursiv) o relație de forma {\tt type(Gamma, E, T)}, unde
+    \begin{itemize}
+      \item {\tt Gamma} este o listă de perechi de forma {\tt (X, T)} unde
+       {\tt X} este un identificator și {\tt T} este o expresie de tip cu variabile
+      \item {\tt E} este o $\lambda$-expresie scrisă cu sintaxa descrisă mai sus
+      \item {\tt T} este o expresie de tip cu variabile
+    \end{itemize}
+    \end{frame}
+
+  \begin{frame}[fragile]{Sintaxa limbajului LAMBDA}
+    \begin{block}{BNF}
+    \[
+    \begin{array}{rcl}
+      e & ::= & {\Id} \Smid {\Int} \Smid {\Strue} \Smid {\Sfalse} \\
+        & \Smid & {e + e} \Smid {e < e} \Smid { \terminal{not}(e) } \\
+        & \Smid & \Sif e \Sthen e \Selse e \\
+        & \Smid & {\lambda \Id . e} \Smid {e \; e} \\
+        & \Smid & \terminal{let} \Id \terminal{=} e \terminal{in} e
+    \end{array}
+    \]
+    \end{block}
+
+    \begin{block}{Verificarea sintaxei în Prolog}
+      \begin{asciipl}
+exp(Id) :- atom(Id).                      % identifier
+exp(Lit) :- Lit = true ; Lit = false ; integer(Lit).
+exp(E1 + E2) :- exp(E1), exp(E2).         % same for any op
+exp(if(E1, E2, E3)) :- exp(E1), exp(E2), exp(E3).
+exp(Id -> Exp) :- atom(Id), exp(Exp).     % lambda
+exp(Exp1 $ Exp2) :- exp(Exp1), exp(Exp2). % application
+exp(let(Id, Exp1, Exp2)) :- atom(Id), exp(Exp1), exp(Exp2).
+      \end{asciipl}
+    \end{block}
+ \end{frame}
+
+  \begin{frame}[fragile]{Sintaxa tipurilor }
+    \begin{block}{BNF}
+ \begin{syntaxBlock}{\structure{\tau}}
+ \color<beamer|handout>{black!25!white}{
+ \renewcommand{\syntaxKeyword}{}
+ \syntax{int}{întregi}
+ \syntaxCont{bool}{valori de adevăr}
+ \syntaxCont{\structure{\tau} \rightarrow \structure{\tau}}{funcții}
+ \syntaxCont{\structure{a}}{variabile de tip}
+ }
+ \vspace{-4ex}
+ \end{syntaxBlock}
+\end{block}
+
+    \begin{block}{Verificarea sintaxei tipurilor în Prolog}
+      \begin{asciipl}
+is_type(X) :- variable(X).     % variabile
+is_type(int).                  % intregi
+is_type(bool).                 % valori de adevar
+is_type(T1 -> T2) :-           % functii
+   is_type(T1), is_type(T2).
+      \end{asciipl}
+    \end{block}
+\end{frame}
+
+    \begin{frame}[fragile]{Axiome}
+    \begin{itemize}
+    \item[] $\reg[:var]{\T{\Gamma}{x}{\tau}}{}{\Gamma(x) = \tau}$
+
+    \begin{asciipl}
+      type(Gamma, X, T) :- atom(X), get(Gamma, X, T).
+    \end{asciipl}
+
+    \vitem[] $\reg[:int]{\T{\Gamma}{n}{int}}{}{\mbox{$n$ întreg}}$
+
+    \begin{asciipl}
+      type(_, I, int) :- integer(I).
+    \end{asciipl}
+
+    \vitem[] $\reg[:bool]{\T{\Gamma}{b}{bool}}{}{b = \Strue \mathrel{or} b = \Sfalse}$
+
+    \begin{asciipl}
+      type(_, true, bool).
+      type(_, false, bool).
+    \end{asciipl}
+    \end{itemize}
+    \end{frame}
+    
+    
+    \begin{frame}[fragile]{Expresii}
+    \begin{itemize}
+    \item[]
+    $\reg[:iop]{\T{\Gamma}{e_1\mathrel{o} e_2}{int}}{\T{\Gamma}{e_1}{int} \si \T{\Gamma}{e_2}{int}}{o\in \{+,-,*,/\}}$
+
+    \begin{asciipl}
+type(Gamma, E1 + E2, int) :-
+    type(Gamma, E1, int), type(Gamma, E2, int).
+    \end{asciipl}
+    
+    \vitem[]
+    $\reg[:cop]{\T{\Gamma}{e_1\mathrel{o} e_2}{bool}}{\T{\Gamma}{e_1}{int} \si \T{\Gamma}{e_2}{int}}{o\in \{\leq, \geq, <, >, =\}}$
+
+    \begin{asciipl}
+type(Gamma, E1 < E2, bool) :-
+    type(Gamma, E1, int), type(Gamma, E2, int).
+    \end{asciipl}
+    
+    \vitem[]
+    $\reg[:bop]{\T{\Gamma}{e_1\mathrel{o} e_2}{bool}}{\T{\Gamma}{e_1}{bool} \si \T{\Gamma}{e_2}{bool}}{o\in \{\Sand, \Sor\}}$
+
+    \begin{asciipl}
+type(Gamma, and(E1, E2), bool) :-
+    type(Gamma, E1, bool), type(Gamma, E2, bool).
+    \end{asciipl}
+    \end{itemize}
+    \end{frame}
+
+    \begin{frame}[fragile]{Expresia condițională}
+    \begin{itemize}
+    
+    \vitem[]
+    $\reg[:if]{\T{\Gamma}{\Sif e_b \Sthen e_1 \Selse e_2}{\tau}}{\T{\Gamma}{e_b}{bool} \si \T{\Gamma}{e_1}{\tau} \si \T{\Gamma}{e_2}{\tau}}{}$
+
+    \vitem[]
+    \begin{asciipl}
+type(Gamma, if(E, E1, E2), T) :-
+    type(Gamma, E, bool),
+    type(Gamma, E1, T),
+    type(Gamma, E2, T).
+    \end{asciipl}
+    
+    \end{itemize}
+    \end{frame}
+    
+    \begin{frame}[fragile]{Fragmentul funcțional}
+    \begin{itemize}
+    \item[] 
+    $\displaystyle\reg[:fn]{\T{\Gamma}{\fun{x}{e}}{\tau \rightarrow \tau'}}{\T{\Gamma'}{e}{\tau'}}{\Gamma' = \Gamma[x\mapsto \tau]}$
+    
+    \begin{asciipl}
+type(Gamma, X -> E, TX -> TE) :-
+    atom(X), set(Gamma, X, TX, GammaX), type(GammaX, E, TE).
+    \end{asciipl}
+ 
+
+    \vitem[]
+    $\displaystyle\reg[:app]{\T{\Gamma}{e_1\; e_2}{\tau}}{\T{\Gamma}{e_1}{\tau' \rightarrow \tau} \si \T{\Gamma}{e_2}{\tau'}}{}$
+    
+    \begin{asciipl}
+type(Gamma, E1 $ E2, T) :-
+    type(Gamma, E, TE2 -> T), type(Gamma, E2, TE2).
+    \end{asciipl}
+     \end{itemize}
+    \end{frame}
+
+      
+    \end{subsection}
+  \end{section}
+
+  \begin{section}{Funcții polimorfice}
+    \begin{frame}{Tipurile variabile nu sunt suficiente}
+      \begin{block}{Tipurile variabile sunt destul de flexibile}
+      \begin{itemize}
+        \item $\vdash {\lambda x . x} : t \rightarrow t$ pentru orice $t$
+        \item $\vdash {\Sif (\lambda x.x)\; {\Strue} \Sthen (\lambda x. x)\; 3} \Selse 4 : \Sint$
+      \end{itemize}
+      \end{block}
+      \pause 
+      \begin{alertblock}{ Dar tipul unei expresii este fixat:}
+       \[\not\vdash (\lambda {id}. {\Sif {id}\; {\Strue} \Sthen {id}\; 3} \Selse 4) (\lambda x. x) : \Sint\]
+      \end{alertblock}
+      \pause
+      \begin{block}{Soluție}
+        Pentru funcțiile cu nume, am vrea să fie ca și cum am calcula mereu tipul
+       \[\vdash \Slet {id} = (\lambda x. x) \Sin {\Sif {id}\; {\Strue} \Sthen {id}\; 3} \Selse 4)  : \Sint\]
+
+       \structure{Operațional:} redenumim variabilele de tip când instanțiem numele funcției
+
+      \end{block}
+      
+    \end{frame}
+
+    \begin{frame}{Scheme de tipuri}
+      \begin{itemize}
+        \item Numim schemă de tipuri o expresie de forma $\c{\tau}$,
+         
+        unde $\tau$ este e un expresie tip  cu variabile
+
+        \item variabilele dintr-o schemă nu pot fi constrânse 
+        
+        e ca și cum ar fi cuantificate universal
+
+        \item O schemă poate fi concretizată la un tip obișnuit
+        substituindu-i fiecare variabilă cu orice tip (poate fi și variabilă)
+
+        \begin{itemize}
+          \item Pentru orice substituție $\theta$ de la variabile de tip la tipuri cu variabile
+        \end{itemize}
+      \end{itemize}
+    \end{frame}
+
+
+    \begin{frame}[fragile]{Reguli pentru scheme}
+      
+      \begin{block}{$\displaystyle \reg[:let]{\T{\Gamma}{\Slet {x = e_1} \Sin e2}{\tau}}{\T{\Gamma}{e_1}{\tau_1} \si \T{\Gamma_1}{e_2}{\tau}}{\Gamma_1 = \Gamma[\c{\tau_1} / x]}$}
+\pause
+        \begin{asciipl}
+type(Gamma, let(X, E1, E2), T) :-
+    type(Gamma, E1, T1),
+    copy_term(T1, FreshT1),   % redenumeste variabilele
+                              % ca sa nu poata fi constranse
+    set(Gamma, X, scheme(FreshT1), GammaX),
+    type(GammaX, E2, T).
+        \end{asciipl}
+      \end{block}
+
+\pause
+      \begin{block}{$\displaystyle \reg[:sch]{\T{\Gamma}{x}{\tau'}}{}{\Gamma(x) = \c{\tau} \mbox{ și } \tau' = \theta(\tau)}$}
+        \begin{asciipl}
+type(Gamma, X, T) :-
+    atom(X), get(Gamma, X, T), is_type(T), !.         
+type(Gamma, X, T) :-
+    atom(X), get(Gamma, X, scheme(TX)),
+    copy_term(TX, T).         % redenumeste variabilele
+                              % ca sa poata fi constranse
+        \end{asciipl}
+      \end{block}
+    \end{frame}
+
+
+
+  \end{section}
+
+    
+%---------------------------------------------------------------------
+ 
+\begin{frame}
+\begin{center}
+\intens{Pe săptămâna viitoare!}
+\end{center}
+\end{frame}
+
+%------------------------------------------------------------------------
+
+\end{document}
+
+
+
+

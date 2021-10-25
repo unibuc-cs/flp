@@ -1,0 +1,933 @@
+%\documentclass[handout,xcolor=x11names,compress,10pt]{beamer}
+\documentclass[xcolor=x11names,compress,10pt]{beamer}
+%\documentclass[xcolor=pdftex,romanian,colorlinks]{beamer}
+
+\usepackage{../tslides}
+%\usepackage{comment}
+
+%% General document %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%\newcommand{\plus}[1] {{\color{Green4} #1}}
+%\newcommand{\intens}[1] {{\color{DeepSkyBlue3} #1}}
+%\newcommand{\egf}[1]{\stackrel{\cdot}{=}_{#1}}
+%\newcommand{\regR}{\mbox{R}}
+%\newcommand{\regS}{\mbox{S}}
+%\newcommand{\regT}{\mbox{T}}
+%\newcommand{\regCS}{\mbox{C}\Sigma}
+%\newcommand{\regSub}{\mbox{Sub}_\Gamma}
+%\newcommand{\te}[1]{\mbox{\texttt{#1}}}
+\newcommand{\Conf}[2]{\ensuremath{\langle #1\ ,\ #2\rangle}}
+%\newcommand{\cc}[1]{\ensuremath{\langle #1 \rangle}}
+%
+%
+%
+%\newcommand{\parrow}{\rightharpoonup}
+%\makeatletter
+%\newcommand{\vo}{\vec{o}\@ifnextchar{^}{\,}{}}
+%\makeatother
+\renewcommand{\to}{}
+%=========================================
+
+\begin{document}
+\title{\\Curs 9}
+\author{Fundamentele limbajelor de programare} 
+\date{2020-2021} 
+
+
+\frame{\titlepage} 
+
+
+\frame{\frametitle{Cuprins}\tableofcontents
+
+} 
+
+%=========================================
+\section{Limbajul IMP} \sectionframe
+%=========================================
+
+
+%------------------------------------------------------------------------
+
+
+%------------------------------------------------------------------------
+\begin{frame}{Limbajul IMP}
+Vom implementa un limbaj care conține:
+
+\medskip
+
+\begin{itemize}
+\item \intens{Expresii}
+	\begin{itemize}
+		  \item \intens{Aritmetice} \hfill \texttt{x + 3}
+		  \item \intens{Booleene} \hfill \texttt{x >= 7}
+	\end{itemize}
+\item \intens{Instrucțiuni}
+	\begin{itemize}
+ 		 \item \intens{De atribuire} \hfill \texttt{x = 5}
+ 		 \item \intens{Condiționale} \hfill \texttt{if(x >= 7,
+ 		  x =5, x = 0)}
+		  \item \intens{De ciclare}  \hfill \texttt{while(x >= 7,x = x - 1)}
+		  \end{itemize}
+		  \item \intens{Compunerea instruțiunilor}
+		  \hfill\texttt{x=7;while(x>=0,x=x-1)}
+		  \item \intens{Blocuri de instrucțiuni}
+		  \hfill\texttt{\{x=7;while(x>=0,x=x-1)\}}
+\end{itemize}
+
+
+\end{frame}
+
+
+%------------------------------------------------------------------------
+\begin{frame}[fragile]{Limbajul IMP}
+
+\begin{example}
+Un program în limbajul IMP
+
+\begin{verbatim}
+  {x = 10 ; sum = 0;
+  while(0 =< x,
+       {sum = sum + x; x = x-1}
+       )},sum
+       
+\end{verbatim}
+
+%x = 10 ; 
+%sum = 0; 
+%while(0 =< x) {
+%               sum = sum + x;
+%                 x =  x -1   
+%               }
+
+\end{example}
+
+\begin{itemize}
+\item \intens{Semantica}
+
+după execuția programului, se evaluează  \texttt{sum} 
+\end{itemize}
+
+\end{frame}
+
+%------------------------------------------------------------------------
+%\begin{frame}{Sintaxa BNF a limbajului IMP}
+%\vspace{-5ex}\begin{syntaxBlock}{\AExp}
+%\alert{
+%\begin{itemize}
+%\item[]\renewcommand{\syntaxKeyword}{}
+%\syntax{\Int\Smid\Id}{}
+%\syntaxCont{\AExp\terminal{+}\AExp\Smid\AExp\terminal{*}\AExp\Smid\AExp\terminal{/}\AExp}{}
+%\item[]\renewcommand{\defSort}{\BExp}
+%\syntax{\Bool}{}
+%\syntaxCont{\AExp\terminal{<=}\AExp}{}
+%\syntaxCont{\Snot\BExp \Smid \BExp \terminal{\&\&} \BExp}{}
+%\item[]\renewcommand{\defSort}{\Block}
+%\syntax{\terminal{\{}\Stmt\terminal{\}} \Smid \terminal{\{}\terminal{\}}}{}
+%\syntaxCont{\Stmt\terminal{}\Stmt}{}
+%\syntaxCont{\Id\terminal{=}\AExp\terminal{;}}{}
+%\syntaxCont{\Sif\;\terminal{(}\BExp\terminal{)}\Block\Selse\Block}{}
+%\syntaxCont{\Swhile\;\terminal{(}\BExp\terminal{)}\Block}{}
+%\item[]\renewcommand{\defSort}{\Pgm}
+%\syntax{\Sint \Id \terminal{=} \Int \terminal{;} \Pgm\Smid \Stmt}{}
+%\end{itemize}
+%}
+%\end{syntaxBlock}
+%\end{frame}
+
+
+
+
+  \begin{frame}{Sintaxa BNF a limbajului IMP}
+  \vspace{-5ex}\begin{syntaxBlock}{\AExp}
+  \alert{
+  \begin{itemize}
+  \item[]\renewcommand{\syntaxKeyword}{}
+    \syntax{\Int\Smid\Id}{}
+%  \syntaxCont{\terminal{++}(\AExp)}{}
+  \syntaxCont{\AExp\terminal{+}\AExp\Smid\AExp\terminal{-}\AExp\Smid\AExp\terminal{*}\AExp}{}
+     \item[]\renewcommand{\defSort}{\BExp}
+  \syntax{\terminal{true}\Smid\terminal{false}}{}
+  \syntaxCont{\AExp\terminal{=<}\AExp\Smid \AExp\terminal{>=}\AExp \Smid \AExp\terminal{==}\AExp}{}
+  \syntaxCont{\texttt{not}(\BExp) \Smid \texttt{and}(\BExp \terminal{,}\BExp)\Smid \texttt{or}(\BExp \terminal{,}\BExp)}{}
+  
+  \item[]\renewcommand{\defSort}{\Block}
+  \syntax{\terminal{skip}}{}
+  \syntaxCont{\Id\terminal{=}\AExp}{}
+  \syntaxCont{\Sif\terminal{(}\BExp\terminal{,}\Block\terminal{,}\Block\terminal{)}}{}
+  \syntaxCont{\Swhile\terminal{(}\BExp\terminal{,}\Block\terminal{)}}{}
+  \syntaxCont{\terminal{\{}\Block\terminal{\}}\Smid \Block\terminal{;}\Block}{}
+  \item[]\renewcommand{\defSort}{\Pgm}
+  \syntax{\terminal{\{}\Block\terminal{\}}\terminal{,}\AExp}{}
+  \end{itemize}
+  }
+  \end{syntaxBlock}
+  \end{frame}
+
+%-------------------------------------------------------------
+\section{O implementare a limbajului IMP \^{\i}n Prolog} \sectionframe
+%-------------------------------------------------------------
+
+%------------------------------------------------------------------------
+\begin{frame}[fragile]{Decizii de implementare}
+\vspace*{0.5cm}
+
+\begin{itemize}
+\item  \intens{\texttt{$\{\}$}} și \intens{\texttt{;}} sunt operatori
+\begin{verbatim}
+:- op(100, xf, {}).
+:- op(1100, yf, ;).
+\end{verbatim}
+\medskip
+
+\item definim un predicat pentru fiecare categorie 
+sintactică
+
+\begin{verbatim}
+stmt(while(BE,St)) :- bexp(BE),  stmt(St).
+\end{verbatim}
+\medskip
+
+\item \intens{\texttt{while}}, \intens{\texttt{if}}, 
+\intens{\texttt{and}}, etc  sunt functori \^{\i}n Prolog 
+
+{\texttt{ while(true,skip)}} este un termen compus
+
+\medskip
+
+\item \intens{,} are semnificația obișnuită
+\medskip
+
+\item  pentru valori numerice folosim \^{\i}ntregii din Prolog
+\begin{verbatim}
+aexp(I) :- integer(I).
+\end{verbatim}
+\medskip
+
+\item  pentru identificatori folosim atomii din Prolog
+\begin{verbatim}
+aexp(X) :- atom(X).
+\end{verbatim}
+
+\end{itemize}
+
+
+\end{frame}
+
+
+\begin{frame}[fragile]{Expresiile aritmetice}
+
+ \vspace{-5ex}\begin{syntaxBlock}{\AExp}
+  \alert{
+  \begin{itemize}
+  \item[]\renewcommand{\syntaxKeyword}{}
+  \syntax{\Int\Smid\Id}{}
+%  \syntaxCont{\terminal{++}(\AExp)}{}
+  \syntaxCont{\AExp\terminal{+}\AExp\Smid\AExp\terminal{-}\AExp\Smid\AExp\terminal{*}\AExp}{}
+  \end{itemize}}
+  \end{syntaxBlock}
+  
+\begin{block}{Prolog}
+
+%aexp(++(X)):- atom(X).
+\begin{verbatim}
+aexp(I) :- integer(I).
+aexp(X) :- atom(X).
+aexp(A1 + A2) :- aexp(A1), aexp(A2).
+aexp(A1 - A2) :- aexp(A1), aexp(A2).
+aexp(A1 * A2) :- aexp(A1), aexp(A2).
+\end{verbatim}
+\end{block}
+\end{frame}
+
+\begin{frame}[fragile]{Expresiile aritmetice}
+\begin{example}
+?- aexp(1000).\\
+true.\\
+
+?- aexp(id).\\
+true.\\
+
+?- aexp(id + 1000).\\
+true. \\
+
+
+?- aexp(2 + 1000).\\
+true. \\
+
+
+?- aexp(x * y).\\
+true.\\
+
+?- aexp(- x).\\
+\textcolor{red}{false.}
+\end{example}
+\end{frame}
+
+\begin{frame}[fragile]{Expresiile booleene}
+
+ \vspace{-5ex}\begin{syntaxBlock}{\AExp}
+  \alert{
+  \begin{itemize}
+  \item[]\renewcommand{\syntaxKeyword}{}
+   \item[]\renewcommand{\defSort}{\BExp}
+  \syntax{\terminal{true}\Smid\terminal{false}}{}
+  \syntaxCont{\AExp\terminal{=<}\AExp\Smid \AExp\terminal{>=}\AExp \Smid \AExp\terminal{==}\AExp}{}
+  \syntaxCont{\texttt{not}(\BExp) \Smid \texttt{and}(\BExp \terminal{,}\BExp)\Smid \texttt{or}(\BExp \terminal{,}\BExp)}{}
+  \end{itemize}}
+  \end{syntaxBlock}
+  
+\begin{block}{Prolog}
+
+
+\begin{verbatim}
+bexp(true). bexp(false).
+bexp(and(BE1,BE2)) :- bexp(BE1), bexp(BE2).
+bexp(or(BE1,BE2)) :-  bexp(BE1), bexp(BE2).
+bexp(not(BE)) :-  bexp(BE).
+
+bexp(A1 =< A2) :- aexp(A1), aexp(A2).
+bexp(A1 >= A2) :- aexp(A1), aexp(A2).
+bexp(A1 == A2) :- aexp(A1), aexp(A2).
+\end{verbatim}
+\end{block}
+\end{frame}
+
+\begin{frame}[fragile]{Expresiile booleene}
+\begin{example}
+?- bexp(true).\\
+true.\\
+
+?- bexp(id).\\
+\textcolor{red}{false.}\\
+
+
+?- bexp(not(1 =< 2)).\\
+true.\\
+
+?- bexp(or(1 =< 2,true)).\\
+true.\\
+
+?- bexp(or(a =< b,true)).\\
+true.\\
+
+
+?- bexp(not(a)).\\
+\textcolor{red}{false.}\\ 
+?- bexp(!(a)).\\
+\textcolor{red}{false.}
+\end{example}
+\end{frame}
+
+\begin{frame}[fragile]{Instrucțiunile}
+
+ \vspace{-5ex}\begin{syntaxBlock}{\AExp}
+  \alert{
+  \begin{itemize}
+  \item[]\renewcommand{\syntaxKeyword}{}
+  \item[]\renewcommand{\defSort}{\Block}
+  \syntax{\terminal{skip}}{}
+  \syntaxCont{\Id\terminal{=}\AExp\terminal{;}}{}
+  \syntaxCont{\Sif\terminal{(}\BExp\terminal{)}\Block\Selse\Block}{}
+  \syntaxCont{\Swhile\terminal{(}\BExp\terminal{)}\Block}{}
+  \syntaxCont{\terminal{\{}\Block\terminal{\}}\Smid \Block\terminal{;}\Block}{}
+  \end{itemize}}
+  \end{syntaxBlock}
+  
+\begin{block}{Prolog}
+
+
+\begin{verbatim}
+stmt(skip).
+stmt(X = AE) :- atom(X), aexp(AE).
+stmt(St1;St2) :- stmt(St1), stmt(St2).  
+stmt((St1;St2)) :- stmt(St1), stmt(St2).  
+stmt({St}) :- stmt(St).
+stmt(if(BE,St1,St2)) :-  bexp(BE), stmt(St1), stmt(St2).
+stmt(while(BE,St)) :- bexp(BE), stmt(St).
+\end{verbatim}
+\end{block}
+\end{frame}
+
+\begin{frame}[fragile]{Instrucțiunile}
+\begin{example}
+?- stmt(id = 5).\\
+true.\\
+
+?- stmt(id = a).\\
+true.\\
+
+?- stmt(3 = 6).\\
+false.\\
+
+?- stmt(if(true, x=2;y=3, x=1;y=0)).\\
+true.\\
+
+?- stmt(while(x =< 0,skip)).\\
+true.\\
+
+
+?- stmt(while(x =< 0,{})).\\
+\textcolor{red}{false.}\\
+
+?- stmt(while(x =< 0,{skip})).\\
+true .
+\end{example}
+\end{frame}
+
+
+\begin{frame}[fragile]{Programele}
+
+ \vspace{-5ex}\begin{syntaxBlock}{\AExp}
+  \alert{
+  \begin{itemize}
+  \item[]\renewcommand{\syntaxKeyword}{}
+  \item[]\renewcommand{\defSort}{\Pgm}
+  \syntax{ \terminal{\{}\Block\terminal{\}}\terminal{,}\AExp}{}
+  \end{itemize}}
+  \end{syntaxBlock}
+  
+\begin{block}{Prolog}
+\begin{verbatim}
+program(St,AE) :- stmt(St), aexp(AE).
+\end{verbatim}
+\end{block}
+
+\begin{example}
+\begin{verbatim}
+ test0 :- program( {x = 10 ; sum = 0; 
+                   while(0 =< x, 
+                          {sum = sum + x; x = x-1}
+                         )}
+                   , sum).
+\end{verbatim}  
+                  
+?- test0.\\
+true.                  
+
+\end{example}
+
+\end{frame}
+
+%=========================================
+\section{O implementare a semanticii small-step} \sectionframe
+%=========================================
+
+\begin{frame}{Semantica small-step}
+  \medskip
+  \begin{itemize}
+  \item Introdusă de Gordon Plotkin (1981) 
+  \smallskip
+  \item Denumiri alternative: 
+  \begin{itemize}
+	\item  \structure{S}emantică \structure{O}perațională \structure{S}tructurală
+	\item  semantică prin tranziții
+	\item  semantică prin reducere
+  \end{itemize}
+   \smallskip
+  \item Definește cel mai mic pas de execuție ca o relație „de tranziție” între configurații:
+  \begin{center}
+	$\Ss{\Conf{cod}{\sigma}}{\Conf{cod}{\sigma'}}$
+  \end{center}
+%  \item Fiecare pas de execuție este concluzia unei demonstrații
+ \smallskip \pause
+  \item Execuția se obține ca o succesiune de astfel de tranziții:
+  
+   \smallskip
+  \begin{tabular}{rcl}
+  $\Conf{\alert{\Sint x \terminal{=} 0 \terminal{;}}  x \terminal{=} x \terminal{+} 1 \terminal{;}}{\bot}$ & $\longrightarrow$ & $\Conf{x \terminal{=} \alert{x} \terminal{+} 1 \terminal{;}}{x \mapsto 0}$ \\ \pause
+  &$\longrightarrow$& $\Conf{x \terminal{=} \alert{0 \terminal{+} 1} \terminal{;}}{x \mapsto 0}$ \\ \pause
+  &$\longrightarrow$& $\Conf{\alert{x \terminal{=} 1 \terminal{;}}}{x \mapsto 0}$ \\  \pause
+  &$\longrightarrow$& $\Conf{\terminal{\{}\terminal{\}}}{x \mapsto 1}$
+  \end{tabular}
+  
+    \end{itemize}
+  \end{frame}
+
+
+\begin{frame}[fragile]{Semantica small-step}
+\vspace*{0.5cm}
+\begin{itemize}
+  \item Definește cel mai mic pas de execuție ca o relație de tranziție  \^{\i}ntre configurații:
+  \begin{center}
+	$\Ss{\Conf{cod}{\sigma}}{\Conf{cod\,'}{\sigma'}}$ \hfill\intens{\texttt{step(Cod,S1,Cod',S2)}}
+  \end{center}
+%  \item Fiecare pas de execuÈie este concluzia unei demonstraÈii
+
+  \item Execuția se obține ca o succesiune de astfel de tranziții.
+  \item Starea executiei unui program IMP la un moment dat este o funcție parțială: $\sigma = n \mapsto 10, sum \mapsto 0$, etc.
+\end{itemize}
+ \begin{block}{Reprezentarea stărilor \^{\i}n Prolog}
+\begin{verbatim} 
+get(S,X,I) :- member(vi(X,I),S).
+get(_,_,0).
+set(S,X,I,[vi(X,I)|S1]) :- del(S,X,S1).
+
+del(S,X,S1) :- select(vi(X,_), S, S1), !.
+del(S, _, S).
+\end{verbatim}
+\end{block}
+\end{frame}
+
+  
+\begin{frame}[fragile]{Semantica expresiilor aritmetice}
+ 
+\begin{itemize}
+  
+   \item \intens{Semantica unei variabile}
+	\item[] $\reg{\Ss{\Conf{x}{\sigma}}{\Conf{i}{\sigma}}}{}{i = \sigma(x)}$
+   \end{itemize}
+ \begin{block}{Prolog}
+\begin{verbatim}  
+step(X,S,I,S) :-
+  atom(X),
+  get(S,X,I).
+\end{verbatim}
+\end{block}   
+  \end{frame}
+  
+
+  
+\begin{frame}[fragile]{Semantica expresiilor aritmetice}
+  \begin{itemize}
+  \item \intens{Semantica adunării a două expresii aritmetice}	
+   \item[] $\reg{\Ss{\Conf{i_1 + i_2}{\sigma}}{\Conf{i}{\sigma}}}{}{i = i_1 + i_2}$
+  
+  \item[] $\reg{\Ss{\Conf{a_1 + a_2}{\sigma}}{\Conf{a_1' + a_2}{\sigma'}}}{\Ss{\Conf{a_1}{\sigma}}{\Conf{a_1'}{\sigma'}}}{}$\hfill$\reg{\Ss{\Conf{a_1 + a_2}{\sigma}}\to{\Conf{a_1 + a_2'}{\sigma'}}}{\Ss{\Conf{a_2}{\sigma}}\to {\Conf{a_2'}{\sigma'}}}{}$
+%  \vitem Ordine nespecificată de evaluare a argumentelor
+  \end{itemize}
+  
+ \begin{block}{Prolog} 
+\begin{verbatim}
+step(I1 + I2,S,I,S):- integer(I1),integer(I2), 
+                            I is I1 + I2.
+                            
+step(AE + AE1,S1,AE + AE2,S1):- step(AE1,S1,AE2,S2).
+
+step(AE1 + AE,S1,AE2 + AE,S2):- step(AE1,S1,AE2,S2).
+\end{verbatim}
+\end{block}
+\end{frame}
+
+
+
+\begin{frame}{Semantica expresiilor aritmetice}
+\begin{example}
+
+?- step(a + b, [vi(a,1),vi(b,2)],AE, S).\\
+AE = 1+b,\\
+S = [vi(a, 1), vi(b, 2)] .\\
+
+\medskip
+
+?- step(1 + b, [vi(a,1),vi(b,2)],AE, S).\\
+AE = 1+2,\\
+S = [vi(a, 1), vi(b, 2)] .\\
+
+\medskip
+
+?- step(1 + 2, [vi(a,1),vi(b,2)],AE, S).\\
+AE = 3,\\
+S = [vi(a, 1), vi(b, 2)] 
+\end{example}
+
+\pause
+  \begin{itemize}
+   \item \intens{Semantica \texttt{*} și \texttt{-} se definesc similar.}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Semantica expresiilor booleene}
+%  {Expresii Booleene. Constante și operatorul de comparaÈie.}
+\vspace*{0.5cm}
+ 
+  \begin{itemize}
+ 
+
+ \item \intens{Semantica operatorului de comparație}
+ 
+    $\reg{\Ss{\Conf{i_1 \terminal{=<} i_2}{\sigma}}\to{\Conf{\terminal{false}}{\sigma}}}{}{i_1 > i_2}$
+    
+   $\reg{\Ss{\Conf{i_1 \terminal{=<} i_2}{\sigma}}\to {\Conf{\terminal{true}}{\sigma}}}{}{i_1 \leq i_2}$
+
+\medskip
+
+ $\reg{\Ss{\Conf{a_1 \terminal{=<} a_2}{\sigma}}\to{\Conf{a_1' \terminal{=<} a_2}{\sigma'}}}{\Ss{\Conf{a_1}{\sigma}}\to{\Conf{a_1'}{\sigma'}}}{}\,\,\reg{\Ss{\Conf{a_1 \terminal{=<} a_2}{\sigma}}\to{\Conf{a_1 \terminal{=<} a_2'}{\sigma'}}}{\Ss{\Conf{a_2}{\sigma}}\to{\Conf{a_2'}{\sigma'}}}{}$
+ 
+\end{itemize}
+ 
+  \begin{block}{Prolog}  
+  \begin{verbatim}
+step(I1 =< I2,S,true,S):- integer(I1),integer(I2),
+                                (I1 =< I2).
+step(I1 =< I2,S,false,S):- integer(I1),integer(I2),
+                                 (I1 > I2).
+step(AE =< AE1,S1,AE =< AE2,S2):- step(AE1,S1,AE2,S2).
+step(AE1 =< AE,S1,AE2 =< AE,S2):- step(AE1,S1,AE2,S2).
+  \end{verbatim}
+  \end{block}
+  \end{frame}
+  
+\begin{frame}[fragile]{Semantica expresiilor Booleene}
+%  {Expresii Booleene. Constante și operatorul de comparaÈie.}
+\vspace*{0.5cm}
+ 
+ 
+    \begin{itemize}
+  \item \intens{Semantica negației} 
+   
+  \item[] $\reg{\Ss{\Conf{\terminal{not(} \terminal{true)}}{\sigma}}\to{\Conf{\terminal{false}}{\sigma}}}{}{}$
+    
+  \item[] $\reg{\Ss{\Conf{\terminal{not(} \terminal{false)}}{\sigma}}\to{\Conf{\terminal{true}}{\sigma}}}{}{}$
+   \medskip
+  \item[] $\reg{\Ss{\Conf{\terminal{not}(a)}{\sigma}}\to{\Conf{\terminal{not}(a')}{\sigma'}}}{\Ss{\Conf{a}{\sigma}}\to{\Conf{a'}{\sigma'}}}{}$
+\end{itemize}
+ 
+  \begin{block}{Prolog}  
+  \begin{verbatim}
+step(not(true),S,false,S) .
+step(not(false),S,true,S) .
+
+step(not(BE1),S1,not(BE2),S2) :- step(BE1,S1,BE2,S2).
+  \end{verbatim}
+  \end{block}
+  \end{frame}
+  \begin{frame}[fragile]{Semantica compunerii și a blocurilor}
+%  {Expresii Booleene. Constante și operatorul de comparaÈie.}
+\vspace*{0.5cm}
+ 
+ 
+    \begin{itemize}
+  \item \intens{Semantica blocurilor} 
+  
+  $\Ss{\Conf{\terminal{\{} s \terminal{\}}}{\sigma}}\to{\Conf{ s}{\sigma}}$
+  
+  
+  
+   \item \intens{Semantica compunerii secvențiale }
+   
+   $\reg{\Ss{\Conf{\terminal{\{}\terminal{\}} ; s_2}{\sigma}}\to{\Conf{s_2}{\sigma}}}{}{}\,\,\reg{\Ss{\Conf{s_1 ; s_2}{\sigma}}\to{\Conf{s_1' ; s_2}{\sigma'}}}{\Ss{\Conf{s_1}{\sigma}}\to{\Conf{s_1'}{\sigma'}}}{}$
+\end{itemize}
+ 
+  \begin{block}{Prolog}  
+  \begin{verbatim}
+step({E},S,E,S).
+
+step((skip;St2),S,St2,S).
+step((St1;St),S1,(St2;St),S2) :-
+                              step(St1,S1,St2,S2) .
+  \end{verbatim}
+  \end{block}
+  \end{frame}  
+
+\begin{frame}[fragile]{Semantica atribuirii}
+%  {Expresii Booleene. Constante și operatorul de comparaÈie.}
+\vspace*{0.5cm}
+ 
+ 
+    \begin{itemize}
+  \item \intens{Semantica atribuirii} 
+    \item[] $\reg{\Ss{\Conf{x \terminal{=} i}{\sigma}}\to{\Conf{\terminal{\{\}}}{\sigma'}}}{}{\sigma'=\sigma[i/x]}$
+   \medskip
+  \item[] $\reg{\Ss{\Conf{x \terminal{=} a}{\sigma}}\to{\Conf{x \terminal{=} a' \terminal{;}}{\sigma'}}}{\Ss{\Conf{a}{\sigma}}\to{\Conf{a'}{\sigma'}}}{}$
+  
+\end{itemize}
+ 
+  \begin{block}{Prolog}  
+  \begin{verbatim}
+step(X = I,S,skip,S1) :- integer(I),set(S,X,I,S1).
+
+step(X = AE1,S1,X = AE2,S2) :- 
+                                step(AE1,S1,AE2,S2).
+  \end{verbatim}
+  \end{block}
+  \end{frame}  
+
+
+\begin{frame}[fragile]{Semantica lui \texttt{if}}
+%  {Expresii Booleene. Constante și operatorul de comparaÈie.}
+\vspace*{0.5cm}
+ 
+ 
+    \begin{itemize}
+  \item \intens{Semantica lui \texttt{if}} 
+ \item[]
+  $\reg{\Ss{\Conf{\Sif (\terminal{true},{\it bl}_1, {\it bl}_2)}{\sigma}}\to{\Conf{{\it bl}_1}{\sigma}}}{}{}$
+   
+  \item[]
+  $\reg{\Ss{\Conf{\Sif (\terminal{false},{\it bl}_1,{\it bl}_2)}{\sigma}}\to{\Conf{{\it bl}_2}{\sigma}}}{}{}$
+   \medskip   
+  \item[]
+  $\reg{
+   \Ss{\Conf{\Sif ({b},{\it bl}_1, {\it bl}_2)}{\sigma}}\to{\Conf{\Sif ({b'}, {\it bl}_1, {\it bl}_2)}{\sigma'}}
+  }{
+    \Ss{\Conf{b}{\sigma}}\to{\Conf{b'}{\sigma'}}
+  }
+  {}$
+  
+\end{itemize}
+ 
+  \begin{block}{Prolog}  
+  \begin{verbatim}
+step(if(true,St1,_),S,St1,S).
+step(if(false,_,St2),S,St2,S).
+
+step(if(BE1,St1,St2),S1,if(BE2,St1,St2),S2) :- 
+                                  step(BE1,S1,BE2,S2) .
+  \end{verbatim}
+  \end{block}
+  \end{frame}
+  
+ \begin{frame}[fragile]{Semantica lui \texttt{while}}
+%  {Expresii Booleene. Constante și operatorul de comparaÈie.}
+\vspace*{0.5cm}
+ 
+ 
+    \begin{itemize}
+  \item \intens{Semantica lui \texttt{while}} 
+  \item[]
+  $\reg{
+   \Ss{\Conf{\Swhile ({b},{\it bl})}{\sigma}}\to{\Conf{\Sif({b},  {\it bl}\terminal{;}\Swhile({b},{\it bl}),\terminal{skip})}{\sigma}}
+  }{}
+  {}$
+  
+\end{itemize}
+ 
+  \begin{block}{Prolog}  
+  \begin{verbatim}
+step(while(BE,St),S,if(BE,(St;while(BE,St)),skip),S).
+  \end{verbatim}
+  \end{block}
+  \end{frame}  
+   
+   
+ \begin{frame}[fragile]{Semantica programelor}
+%  {Expresii Booleene. Constante și operatorul de comparaÈie.}
+\vspace*{0.5cm}
+ 
+ 
+    \begin{itemize}
+  \item \intens{Semantica programelor} 
+  \item[] $\reg{\Ss{\Conf{(\terminal{skip}, a_1)}{\sigma_1}}\to{\Conf{(\terminal{skip}, a_2)}{\sigma_2}}}{\Ss{\Conf{a_1}{\sigma_1}}\to{\Conf{a_2}{\sigma_2}}}{}$
+
+ \item[] $\reg{\Ss{\Conf{(s_1, a)}{\sigma_1}}\to{\Conf{(s_2, a)}{\sigma_2}}}{\Ss{\Conf{s_1}{\sigma_1}}\to{\Conf{s_2}{\sigma_2}}}{}$  
+
+  
+  
+\end{itemize}
+ 
+  \begin{block}{Prolog}  
+  \begin{verbatim}
+step((skip,AE1),S1,(skip,AE2),S2) :- 
+                           step(AE1,S1,AE2,S2) .
+step((St1,AE),S1,(St2,AE),S2) :-
+                           step(St1,S1,St2,S2).
+  \end{verbatim}
+  \end{block}
+  \end{frame} 
+  
+  
+ \begin{frame}[fragile]{Execuția programelor}
+%  {Expresii Booleene. Constante și operatorul de comparaÈie.}
+%\vspace*{0.5cm}
+ 
+ \begin{block}{Prolog}  
+  \begin{verbatim}
+all_steps(P1, S1, PF, SF) :-
+    step(P1, S1, P2, S2)
+    ->  all_steps(P2, S2, PF, SF)
+    ;   PF = P1, SF = S1.
+                     
+run_program(Name) :- defpg(Name,{P},E),
+                     all_steps((P,E), [],(skip, I), _),
+                     write(I).
+  \end{verbatim}
+  \vspace*{-0.5cm}
+  \end{block}
+    \vspace*{-0.5cm}
+     \begin{example}  
+  \begin{verbatim}
+defpg(pg2, {x = 10 ; sum = 0; while(0 =< x, {
+                                  sum = sum + x;
+                                  x = x - 1})},sum)
+\end{verbatim}
+
+?- run\_program(pg2).\\
+55\\
+true
+  \end{example}
+  \vspace*{0.3cm}
+  \end{frame}  
+  
+    
+
+ \begin{frame}[fragile]{Execuția programelor: \texttt{trace}}
+ 
+ \medskip
+ 
+ Putem defini o funcție care ne permite să urmărim execuția unui program \^{\i}n implementarea noastră?
+ 
+ \medskip\pause
+ 
+ \begin{block}{Prolog}
+ 
+ \begin{verbatim}
+all_steps(P1, S1, PF, SF, [(P1, S1)| Trace]) :-
+    step(P1, S1, P2, S2)
+    ->  all_steps(P2, S2, PF, SF, Trace)
+    ;   PF = P1, SF = S1, Trace=[].
+
+trace_program(Name) :- defpg(Name,{P},E), 
+                       all_steps((P,E), [],_, _, Trace),
+                       write(Trace).
+\end{verbatim}
+\end{block}
+\end{frame}
+
+ \begin{frame}{Execuția programelor: \texttt{trace\_program}}
+
+ \begin{example}
+?- trace\_program(pg2).
+
+$\cdots$\\
+{\small
+((if(0=<x,({sum=sum+x;x=x-1};while(0=<x,{sum=sum+x;x=x-1})),skip), sum),
+[vi(x,-1),vi(sum,55)]),
+
+((if(0=<-1,({sum=sum+x;x=x-1};while(0=<x,{sum=sum+x;x=x-1})),skip), sum),
+[vi(x,-1),vi(sum,55)]),
+
+((if(false,({sum=sum+x;x=x-1};while(0=<x,{sum=sum+x;x=x-1})),skip), sum),
+[vi(x,-1),vi(sum,55)]),
+
+((skip, sum),
+[vi(x,-1),vi(sum,55)]),
+
+((skip, 55),
+[vi(x,-1),vi(sum,55)]),
+}
+ \end{example}
+ 
+ \end{frame}
+%---------------------------------------------------------------------
+
+\section{Semantica Small-Step pentru Lambda Calcul}
+
+  \begin{frame}[fragile]{Sintaxa limbajului LAMBDA}
+    \begin{block}{BNF}
+    \[
+    \begin{array}{rcl}
+      e & ::= & \Id \\
+        & \Smid & \lambda \Id . e \\
+        & \Smid & e\; e \\
+        & \Smid & \terminal{let} \Id \terminal{=} e \terminal{in} e
+    \end{array}
+    \]
+    \end{block}
+
+    \begin{block}{Verificarea sintaxei în Prolog}
+      \begin{asciipl}
+exp(Id) :- atom(Id).                      % identifier
+exp(Id -> Exp) :- atom(Id), exp(Exp).     % lambda
+exp(Exp1 $ Exp2) :- exp(Exp1), exp(Exp2). % application
+exp(let(Id, Exp1, Exp2)) :- atom(Id), exp(Exp1), exp(Exp2).
+      \end{asciipl}
+    \end{block}
+ \end{frame}
+
+\begin{frame}[fragile]{Semantica small-step pentru Lambda}
+\vspace*{0.5cm}
+\begin{itemize}
+  \item Definește cel mai mic pas de execuție ca o relație de tranziție  \^{\i}ntre expresii
+    dată fiind o stare cu valori pentru variabilele libere
+  \begin{center}
+	$\rho \vdash \Ss{cod}{cod\,'}$ \hfill\intens{\texttt{step(Env, Cod1,Cod2)}}
+  \end{center}
+%  \item Fiecare pas de execuÈie este concluzia unei demonstraÈii
+
+  \item Execuția se obține ca o succesiune de astfel de tranziții.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Semantica variabilelor}
+	\[\reg{\rho \vdash \Ss{x}{v}}{}{\rho(x) = v}\]
+  \begin{block}{Prolog}
+    \begin{asciipl}
+      step(Env, X, V) :- atom(X), get(Env, X, V).
+    \end{asciipl}
+  \end{block}
+
+\end{frame}
+
+\begin{frame}[fragile]{Semantica $\lambda$-abstracției}
+	\[\reg{\rho \vdash \Ss{\lambda x. e}{{\it closure}(x, e, \rho)}}{}{}\]
+
+  $\lambda$-abstracția se evaluează la o valoare specială numită closure
+  care capturează valorile curente ale variabilelor pentru a se putea
+  executa în acest mediu atunci când va fi aplicată.
+
+  \begin{block}{Prolog}
+    \begin{asciipl}
+      step(Env, X -> E, closure(X, E, Env)).
+    \end{asciipl}
+  \end{block}
+
+\end{frame}
+
+\begin{frame}[fragile]{Semantica construcției $\terminal{let}$}
+	\[\reg{\rho \vdash \Ss{\terminal{let} x \terminal{=} e_1 \terminal{in} e_2}{(\lambda x . e2)\; e_1}}{}{}\]
+
+  A îi da lui $x$ valoarea lui $e_1$ în $e_2$ este același lucru cu a
+  aplica funcția de $x$ cu corpul $e_2$ expresiei $e_1$.
+
+  \begin{block}{Prolog}
+    \begin{asciipl}
+      step(_, let(X, E1, E2), (X -> E2) $ E1).
+    \end{asciipl}
+  \end{block}
+
+\end{frame}
+
+
+\begin{frame}[fragile]{Semantica operatorului de aplicare}
+	\[\reg{\rho \vdash \Ss{{\it closure}(x, e, \rho_e) \; v}{{\it closure}(x, e', \rho_e) \; v}}{\rho_e[v/x]\vdash \Ss{e}{e'}}{v \mbox{ valoare}}\]
+
+	\[\reg{\rho \vdash \Ss{{\it closure}(x, v, \rho_e) \; e}{v}}{}{v \mbox{ valoare}}\]
+
+  \[\reg{\rho \vdash \Ss{e_1 \; e_2}{e'_1 \; e_2}}{\rho \vdash \Ss{e_1}{e'_1}}{}
+    \hfill
+    \reg{\rho \vdash \Ss{e_1 \; e_2}{e_1 \; e'_2}}{\rho \vdash \Ss{e_2}{e'_2}}{}
+    \]
+
+  \begin{block}{Prolog}
+    \begin{asciipl}
+      step(Env, E $ E1, E $ E2) :- step(Env, E1, E2).
+      step(Env, E1 $ E, E2 $ E) :- step(Env, E1, E2).
+      step(Env, closure(X, E, EnvE) $ V, Result) :-
+          \+ step(Env, V, _),
+          set(EnvE, X, V, EnvEX),
+          step(EnvEX, E, E1)
+          ->  Result = closure(X, E1, EnvE) $ V
+          ;   Result = E.
+    \end{asciipl}
+  \end{block}
+
+\end{frame}
+
+
+
+\begin{frame}
+\begin{center}
+\intens{Pe săptămâna viitoare!}
+\end{center}
+\end{frame}
+%---------------------------------------------------------------------
+
+
+
+%------------------------------------------------------------------------
+
+\end{document}
+
+
+
