@@ -137,3 +137,22 @@ pentru a elimina expresiile cu tipuri greșite.
 - [`maximum :: [Natural] -> Natural`](https://hackage.haskell.org/package/base/docs/GHC-List.html#v:maximum)
 
 ## Exerciții
+
+### 0. Interpretorul
+
+Executați interpretorul `miniHaskell`. Dacă nu aveți probleme în executarea lui
+(de genul _missing libraries_, _bad architecture_) ar trebui să vedeți un prompt:
+```
+miniHaskell>
+```
+
+Acum puteți scrie orice expresie folosind limbajul descris mai sus și interpretorul va încerca să o evalueze. De exemplu:
+```
+miniHaskell> letrec fct = \n -> if (isZero n) 1 (* n (fct (pred n))) in fct 4
+24
+miniHaskell>
+```
+
+*Important:* fiecare expresie pe care o vrem evaluată trebuie să fie scrisă pe o singură linie
+
+Pentru a ieși din interpretor trebuie sa folosiți comanda `:q` sau `:quit` ca în `ghci`
