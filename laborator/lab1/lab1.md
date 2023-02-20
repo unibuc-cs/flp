@@ -42,7 +42,7 @@ Expresiile pot fi formate prin una din următoarele operații:
   *Atenție:* operatorii vor fi folosiți tot ca funcții, dar fără a îi mai înconjura între paranteze. De exemplu, 
   compunerea a două funcții va fi `. f g`
   în loc de `f . g` sau `(.) f g`
-- λ-abstracții, care folosesc sintaxa din Haskell
+- lambda-abstracții, care folosesc sintaxa din Haskell
 - aplicarea unei expresii altei expresii
 - legarea unui nume la o expresie în scopul folosirii sale în evaluarea altei
   expresii (`let`)
@@ -156,3 +156,39 @@ miniHaskell>
 *Important:* fiecare expresie pe care o vrem evaluată trebuie să fie scrisă pe o singură linie
 
 Pentru a ieși din interpretor trebuie sa folosiți comanda `:q` sau `:quit` ca în `ghci`
+
+### 1. Recursie 
+Definiți prin recursie o funcție `revRange :: Natural -> [Natural]` care primește un număr natural ca argument și întoarce lista numerelor naturale mai mici decât `n`,
+în ordine descrescătoare.
+
+Exemplu: 
+```
+miniHaskell> letrec revRange = ... in revRange 4 
+[3, 2, 1, 0]
+```
+Folosind funcția anterioară, definiția funcția `range` care întoarce numerele mai mici ca `n` în ordine crescătoare. 
+```
+miniHaskell> let range = ... in range 4 
+[0, 1, 2, 3]
+```
+
+### 2. Filter, map 
+Definiți, fără a folosi explicit recursie, o funcție `justList :: [Maybe Natural] -> [Natural]` care primește o listă cu elemente `Maybe Natural` și întoarce lista formată din acei `n`
+pentru care `Just n` apare în listă, păstrând ordinea și multiplicitatea. 
+
+Exemplu: 
+```
+miniHaskell> let justList = ... in justList [Just 4, Nothing, Just 5, Just 7, Nothing]
+[4, 5, 7]
+```
+
+### 3. Fold
+Fără a folosie explicit recursie, scrieți funcția `all :: (Natural -> Bool) -> [Natural] -> Bool` care verifică dacă toate elementele unei liste satisfac un predicat.
+
+Exemplu: 
+```
+miniHaskell> let all = ... in all isZero [0, 0, 0]
+True 
+miniHaskell> let all = ... in all isZero [0, 1]
+False
+```
