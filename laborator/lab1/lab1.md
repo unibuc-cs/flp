@@ -11,7 +11,7 @@ interpretor `miniHaskell`.
 
 ## Limbajul `miniHaskell`
 
-`miniHaskell` este un limbaj funcțional minimalist, având la bază doar λ-calcul
+`miniHaskell` este un limbaj funcțional minimalist, având la bază doar $\lambda$-calcul
 (variabile, abstracții de funcții, aplicație), și folosind extensii _sintactice_
 pentru Booleeni, nr naturale, optiuni, perechi, liste și definiții (inclusiv
 definiții recursive).
@@ -42,7 +42,7 @@ Expresiile pot fi formate prin una din următoarele operații:
   *Atenție:* operatorii vor fi folosiți tot ca funcții, dar fără a îi mai înconjura între paranteze. De exemplu, 
   compunerea a două funcții va fi `. f g`
   în loc de `f . g` sau `(.) f g`
-- lambda-abstracții, care folosesc sintaxa din Haskell
+- $\lambda$-abstracții, care folosesc sintaxa din Haskell
 - aplicarea unei expresii altei expresii
 - legarea unui nume la o expresie în scopul folosirii sale în evaluarea altei
   expresii (`let`)
