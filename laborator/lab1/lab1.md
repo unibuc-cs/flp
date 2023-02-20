@@ -158,7 +158,7 @@ miniHaskell>
 Pentru a ieși din interpretor trebuie sa folosiți comanda `:q` sau `:quit` ca în `ghci`
 
 ### 1. Functii lambda
-Definiti o funcție `squareSum :: Natural -> Natural` care primește două numere naturale ca argument și întoarce suma pătratelor celor două numere.
+Definiti o funcție `squareSum :: Natural -> Natural -> Natural` care primește două numere naturale ca argument și întoarce suma pătratelor celor două numere.
 
 Exemplu:
 ```
