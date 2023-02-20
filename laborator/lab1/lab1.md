@@ -157,7 +157,16 @@ miniHaskell>
 
 Pentru a ieși din interpretor trebuie sa folosiți comanda `:q` sau `:quit` ca în `ghci`
 
-### 1. Recursie 
+### 1. Functii lambda
+Definiti o funcție `squareSum :: Natural -> Natural` care primește două numere naturale ca argument și întoarce suma pătratelor celor două numere.
+
+Exemplu:
+```
+miniHaskell> let squareSum = ... in squareSum 2 3
+13
+```
+
+### 2. Recursie 
 Definiți prin recursie o funcție `revRange :: Natural -> [Natural]` care primește un număr natural ca argument și întoarce lista numerelor naturale mai mici decât `n`,
 în ordine descrescătoare.
 
@@ -172,7 +181,7 @@ miniHaskell> let range = ... in range 4
 [0, 1, 2, 3]
 ```
 
-### 2. Filter, map 
+### 3. Filter, map 
 Definiți, fără a folosi explicit recursie, o funcție `justList :: [Maybe Natural] -> [Natural]` care primește o listă cu elemente `Maybe Natural` și întoarce lista formată din acei `n`
 pentru care `Just n` apare în listă, păstrând ordinea și multiplicitatea. 
 
@@ -182,7 +191,7 @@ miniHaskell> let justList = ... in justList [Just 4, Nothing, Just 5, Just 7, No
 [4, 5, 7]
 ```
 
-### 3. Fold
+### 4. Fold
 Fără a folosie explicit recursie, scrieți funcția `all :: (Natural -> Bool) -> [Natural] -> Bool` care verifică dacă toate elementele unei liste satisfac un predicat.
 
 Exemplu: 
