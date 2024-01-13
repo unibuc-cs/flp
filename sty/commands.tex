@@ -1,0 +1,135 @@
+
+\usepackage{proof}
+\usepackage{multirow}
+\usepackage{alltt}
+\usepackage{mathpartir}
+\usepackage{ulem}
+
+\newcommand{\structured}[1]{#1}
+
+\definecolor{IntensColor}{HTML}{2E86C1}
+\definecolor{StateTransition}{HTML}{D6EAF8}
+\definecolor{MedianLightOrange}{RGB}{216,178,92}
+\definecolor{Orchid}{HTML}{8E44AD}
+\definecolor{True}{HTML}{229954}
+\definecolor{False}{HTML}{CB4335}
+
+\newcommand{\cin}[1]{{\color{cobalt} #1}}
+\newcommand{\sel}[1]{{\color{Orchid} #1}}
+
+\newcommand{\intens}[1] {{\color{IntensColor} #1}}
+\newcommand{\exe}[1] {{\color{True} #1}}
+
+\newcommand{\la}{\lambda}
+
+\setlength{\leftmargini}{0pt}
+
+\newcommand{\app}[2]{#1\, #2}
+\newcommand{\abs}[2]{\lambda #1.\,#2}
+
+\newcommand{\type}[2]{{\color{True}#1\hspace{-.05cm}:}\,{\color{Orchid}#2}}
+
+\newcommand{\sub}[3]{#1\langle#2/#3\rangle}
+\newcommand{\subt}[3]{#1[#2/#3]}
+\newcommand{\equiva}{=_\alpha}
+
+\newcommand{\trueL}{\mathbf{T}}
+\newcommand{\falseL}{\mathbf{F}}
+\newcommand{\notL}{\mathbf{not}}
+\newcommand{\andL}{\mathbf{and}}
+\newcommand{\orL}{\mathbf{or}}
+\newcommand{\ifL}{\mathbf{if}}
+\newcommand{\boolL}{\mathbf{bool}}
+
+\newcommand{\maybeL}{\mathbf{maybe}}
+\newcommand{\nothingL}{\mathbf{Nothing}}
+\newcommand{\justL}{\mathbf{Just}}
+\newcommand{\Maybe}[1]{\mathop{\mathbf{Maybe}}{#1}}
+
+\newcommand{\foldrL}{\mathbf{foldr}}
+\newcommand{\nilL}{\mathbf{Nil}}
+\newcommand{\consL}{\mathbf{Cons}}
+\newcommand{\ListL}[1]{\mathop{\mathbf{List}}{#1}}
+
+\newcommand{\unpairL}{\mathbf{uncons}}
+\newcommand{\pairL}{\mathbf{Pair}}
+\newcommand{\firstL}{\mathbf{first}}
+\newcommand{\secondL}{\mathbf{second}}
+\newcommand{\Pair}[2]{\mathop{\mathop{\mathbf{Pair}}{#1}}{#2}}
+
+\newcommand{\succL}{\mathbf{Succ}}
+\newcommand{\zeroL}{\mathbf{Zero}}
+\newcommand{\iterateL}{\mathbf{iterate}}
+\newcommand{\addL}{\mathbf{add}}
+\newcommand{\mulL}{\mathbf{mul}}
+\newcommand{\expL}{\mathbf{exp}}
+\newcommand{\isZero}{\mathbf{isZero}}
+\newcommand{\pred}{\mathbf{pred}}
+\newcommand{\factL}{\mathbf{fact}}
+
+\newcommand{\BoolT}{\ensuremath{\texttt{Bool}}}
+%\newcommand{\BoolT}{\ensuremath{\texttt{Bool}}}
+\newcommand{\ifT}[3]{\mathrm{if}\ #1\ \mathrm{then}\ #2\ \mathrm{else}\ #3}
+
+\newcommand{\UnitT}{\ensuremath{\texttt{Unit}}}
+\newcommand{\unit}{\mathrm{unit}}
+
+\newcommand{\VoidT}{\ensuremath{\texttt{Void}}}
+\newcommand{\void}{\mathrm{void}}
+
+
+\newcommand{\ProductT}[2]{#1 \times #2}
+\newcommand{\PairL}[2]{\langle #1,#2\rangle}
+\newcommand{\ProjOne}[1]{fst\ #1}
+\newcommand{\ProjTwo}[1]{snd\ #1}
+
+\newcommand{\SumT}[2]{#1 + #2}
+\newcommand{\Left}[1]{\mathrm{Left}\ #1}
+\newcommand{\Right}[1]{\mathrm{Right}\ #1}
+\newcommand{\Case}[3]{\mathrm{case}\ #1\ \mathrm{of}\ #2\ ;\ #3}
+
+%----------------------------------------------
+
+\newcommand{\SSnot}{\terminal{not}}
+
+\newcommand{\Sand}{\terminal{and}}
+\newcommand{\Sor}{\terminal{or}}
+\newcommand{\Splus}{\terminal{+}}
+\newcommand{\Smul}{\terminal{*}}
+\newcommand{\Ssucc}{\terminal{S}}
+\newcommand{\Spow}{\terminal{pow}}
+\newcommand{\Spred}{\terminal{pred}}
+\newcommand{\Seq}{\terminal{eq}}
+\newcommand{\Sneq}{\terminal{neq}}
+
+\newcommand{\SisZero}{\terminal{isZero}}
+\newcommand{\Slte}{\terminal{<=}}
+\newcommand{\Sgte}{\terminal{>=}}
+\newcommand{\Slt}{\terminal{<}}
+\newcommand{\Sgt}{\terminal{>}}
+\newcommand{\Spair}{\terminal{pair}}
+\newcommand{\Sfst}{\terminal{fst}}
+\newcommand{\Ssnd}{\terminal{snd}}
+\newcommand{\Sminus}{\terminal{-}}
+
+\newcommand{\Snull}{\terminal{null}}
+\newcommand{\Scons}{\terminal{cons}}
+%\newcommand{\c sead}{\terminal{head}}
+\newcommand{\SisNull}{\terminal{?null}}
+\newcommand{\Stail}{\terminal{tail}}
+\newcommand{\Ssum}{\terminal{sum}}
+\newcommand{\Sfoldr}{\terminal{foldr}}
+\newcommand{\Smap}{\terminal{map}}
+\newcommand{\Sfilter}{\terminal{filter}}
+
+\newcommand{\const}[1]{\triangleright {\color{False} #1}}
+
+\newcommand{\egf}[1]{\stackrel{\cdot}{=}_{#1}}
+
+\newcommand{\Conf}[2]{\ensuremath{\langle #1\ ,\ #2\rangle}}
+\newcommand{\plus}[1] {{\color{True} #1}}
+\newcommand{\te}[1]{\mbox{\texttt{#1}}}
+
+\newcommand{\vexp}{\ensuremath{\mathbb{E}}}
+\newcommand{\bexp}{\ensuremath{\mathbb{B}}}
+\newcommand{\cmd}{\ensuremath{\mathbb{C}}}

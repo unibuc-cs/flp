@@ -1,0 +1,163 @@
+\documentclass[xcolor=pdftex,romanian,colorlinks]{beamer}
+%\documentclass[xcolor=pdftex,handout,romanian,colorlinks]{beamer}
+
+\usepackage[export]{adjustbox}
+\usepackage{../sty/tslides}
+\usepackage[all]{xy}
+\usepackage{pgfplots}
+\usepackage{flowchart}
+\usepackage{todonotes}
+\usetikzlibrary{arrows,positioning,calc}
+\lstset{language=Haskell}
+\lstset{escapeinside={(*@}{@*)}}
+\PrerenderUnicode{ăĂîÎȘșȚțâÂ}
+
+%\usepackage{xcolor}
+%\definecolor{IntensColor}{HTML}{2E86C1}
+%\definecolor{StateTransition}{HTML}{D6EAF8}
+%\definecolor{MedianLightOrange}{RGB}{216,178,92}
+%\definecolor{Orchid}{HTML}{8E44AD}
+%\definecolor{True}{HTML}{229954}
+%\definecolor{False}{HTML}{CB4335}
+
+\input{../sty/commands}
+\definecolor{section-color}{HTML}{23373b} %mDarkTeal
+%\AtBeginSection[]{
+%  \begin{frame}
+%  \vfill
+%  \centering
+%  \begin{beamercolorbox}[sep=8pt,center,shadow=true,rounded=true]{title}
+%    \usebeamerfont{title}\insertsectionhead\par%
+%  \end{beamercolorbox}
+%  \vfill
+%  \end{frame}
+%}
+
+
+\title[FLP]{Fundamentele limbajelor de programare}
+\subtitle{C12}
+\date{}
+
+
+\begin{document}
+\begin{frame}
+  \titlepage
+\end{frame}
+
+%================================================
+\section{\color{section-color} Imagine de ansamblu}
+%================================================
+%------------------------------------------------
+\begin{frame}{Ce am parcurs la acest curs}
+\begin{itemize}
+	\item \intens{Lambda calcul fără tipuri}
+		\begin{itemize}
+			\item Terminologie
+			\item $\beta$-reducții
+			\item Strategii de evaluare
+			\item Expresivitate (codări)
+			\item Puncte fixe (combinatori de punct fix)			
+		\end{itemize}
+\end{itemize}
+\end{frame}
+
+%------------------------------------------------
+\begin{frame}{Ce am parcurs la acest curs}
+\begin{itemize}
+	\item \intens{Lambda calcul cu tipuri simple}
+		\begin{itemize}
+			\item Terminologie
+			\item Church-typing vs. Curry-typing
+			\item Sistem de deducție $(\la\hspace{-.1cm}\to)$ pentru calculul Church 
+			\item Alte tipuri (unit, void, produs, suma)
+			\item Corespondența Curry-Howard
+			\item Type checking/ Type inference
+			\item Sistem de deducție $(\la\hspace{-.1cm}\to)$ cu constrângeri pentru calculul Church 
+		\end{itemize}
+\end{itemize}
+\end{frame}
+
+%------------------------------------------------
+\begin{frame}{Ce am parcurs la acest curs}
+\begin{itemize}
+	\item \intens{Unificare}
+	\begin{itemize}
+			\item Terminologie
+			\item Algoritmul de unificare	
+	\end{itemize}
+	
+	\vspace{.6cm}
+	\item \intens{Programare logică}
+	\begin{itemize}
+			\item Terminologie
+			\item Prolog
+			\item Logica clauzelor Horn
+			\item Sistem de deducție pentru logica clauzelor Horn (regula backchain)
+			\item Strategia de căutare din Prolog
+			\item Rezoluția SLD (arbori de căutare)
+	\end{itemize}
+\end{itemize}
+\end{frame}
+%------------------------------------------------
+
+%------------------------------------------------
+\begin{frame}{Ce am parcurs la acest curs}
+\begin{itemize}
+	\item \intens{Semantica limbajelor de programare}
+	\begin{itemize}
+			\item Terminologie
+			\item Semantica operațională small-step
+			\item Semantica axiomatică
+	\end{itemize}
+	
+\end{itemize}
+\end{frame}
+%------------------------------------------------
+
+%================================================
+\section{\color{section-color} Examen}
+%================================================
+
+%------------------------------------------------
+\begin{frame}{Examen final}
+\begin{itemize}
+	\item valorează \intens{4 puncte} din nota finală
+	\item durata 1 oră
+	\item în sesiune, fizic
+	\item acoperă toată materia
+	\item exerciții asemănătoare cu exemplele de la curs (nu grile)
+	\item \sout{materiale ajutătoare: suporturile de curs și de laborator} \\
+		un material pus la dispoziție de noi și \textbf{o foaie} cu ce notițe vreți voi
+ 	\item \textbf{aparatele electronice nu sunt permise la examen}
+\end{itemize}
+\end{frame}
+%------------------------------------------------
+
+%------------------------------------------------
+\begin{frame}{Model examen}
+
+\begin{center}
+\includegraphics[scale=.4]{images/fun.jpeg}
+\end{center}
+\end{frame}
+%------------------------------------------------
+
+
+%---------------------------------------------
+\begin{frame}
+  \vfill
+  \centering
+
+\textbf{Mulțumim că ați participat la acest curs!}
+
+\textbf{Baftă la examen și mai departe!}
+
+  \vfill
+\end{frame}
+\end{document}
+
+
+
+
+
+

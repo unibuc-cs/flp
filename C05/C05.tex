@@ -1,0 +1,737 @@
+\documentclass[xcolor=pdftex,romanian,colorlinks]{beamer}
+%\documentclass[xcolor=pdftex,handout,romanian,colorlinks]{beamer}
+
+\usepackage[export]{adjustbox}
+\usepackage{../sty/tslides}
+\usepackage[all]{xy}
+\usepackage{pgfplots}
+\usepackage{flowchart}
+\usepackage{todonotes}
+\usetikzlibrary{arrows,positioning,calc}
+\lstset{language=Haskell}
+\lstset{escapeinside={(*@}{@*)}}
+\PrerenderUnicode{ăĂîÎȘșȚțâÂ}
+\usepackage{amsmath}
+
+%\usepackage{xcolor}
+%\definecolor{IntensColor}{HTML}{2E86C1}
+%\definecolor{StateTransition}{HTML}{D6EAF8}
+%\definecolor{MedianLightOrange}{RGB}{216,178,92}
+%\definecolor{Orchid}{HTML}{8E44AD}
+%\definecolor{True}{HTML}{229954}
+%\definecolor{False}{HTML}{CB4335}
+
+\input{../sty/commands}
+\definecolor{section-color}{HTML}{23373b} %mDarkTeal
+%\AtBeginSection[]{
+%  \begin{frame}
+%  \vfill
+%  \centering
+%  \begin{beamercolorbox}[sep=8pt,center,shadow=true,rounded=true]{title}
+%    \usebeamerfont{title}\insertsectionhead\par%
+%  \end{beamercolorbox}
+%  \vfill
+%  \end{frame}
+%}
+
+
+
+\title[FLP]{Fundamentele limbajelor de programare}
+\subtitle{C05}
+\date{}
+
+
+\begin{document}
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\setlength{\leftmargini}{12pt}
+
+
+%================================================
+\section{\color{section-color} Lambda calcul cu tipuri simple}
+%================================================
+
+%------------------------------------------------
+\begin{frame}{Probleme cu lambda calculul fără tipuri}
+
+\intens{Proprietăți negative ale lambda calculului fără tipuri:}
+
+\hspace{.4cm}{\color{False} - } Aplicări de forma $\app{x}{x}$ sau $\app{M}{M}$ sunt pemise, \\ \hspace{.7cm}deși sunt contraintuitive.
+
+\hspace{.4cm}{\color{False} - } Existența formelor normale pentru $\lambda$-termeni nu este garantată \\ \hspace{.7cm}și putem avea "calcule infinite" nedorite
+
+\hspace{.4cm}{\color{False} - } Orice $\lambda$-termen are un punct fix ceea ce nu este în armonie cu \\ \hspace{.7cm}ceea ce știam despre funcții oarecare
+
+Vrem să eliminăm aceste proprietăți negative, păstrându-le pe cele pozitive.
+
+Proprietățile negative sunt eliminate prin adăugarea de \intens{tipuri} ceea ce induce restricțiile dorite pe termeni.
+
+\end{frame}
+
+%------------------------------------------------
+\begin{frame}{Tipuri simple}
+
+Fie \intens{$\mathbb{V} = \{\alpha, \beta, \gamma, \ldots\}$} o mulțime infinită de \alert{tipuri variabilă}. \\
+Mulțimea tuturor \alert{tipurilor simple} $\mathbb{T}$ este definită prin
+\vspace{-.3cm}
+\begin{center}
+\intens{$\mathbb{T} = \mathbb{V}\ |\ \mathbb{T} \rightarrow \mathbb{T}$}
+\end{center}
+\vspace{-.5cm}
+\begin{itemize}
+	\item \alert{(Tipul variabilă)} Dacă $\alpha \in \mathbb{V}$, atunci $\alpha \in \mathbb{T}$.
+	\item \alert{(Tipul săgeată)} Dacă $\sigma,\tau \in \mathbb{T}$, atunci  $(\sigma \rightarrow \tau) \in \mathbb{T}$.
+\end{itemize}
+\vspace{-.2cm}
+Câteodată vom nota tipurile simple și cu litere $A,B,\ldots$.
+
+%\medskip
+%{\color{True} Exemple de tipuri simple:}  $\gamma$, $(\beta \to \gamma)$, $((\gamma \to \alpha) \to (\alpha \to (\beta \to \gamma)))$.
+
+\smallskip
+Tipurile variabilă sunt reprezentări abstracte pentru \intens{tipuri de bază} cum ar fi $Nat$ pentru numere naturale, $List$ pentru liste etc. 
+
+\smallskip
+Tipurile săgeată reprezintă \intens{tipuri pentru funcții}  cum ar fi 
+\vspace{-.2cm}
+\begin{itemize}
+	\item $Nat \to Real$, mulțimea tuturor funcțiilor de la numere naturale la numere reale
+	\item $(Nat \to Int) \to (Int \to Nat)$, mulțimea tuturor funcțiilor care au ca intrare o funcție de la numere naturale la întregi și produce o funcție de la întregi la numere naturale.
+\end{itemize}
+\end{frame}
+
+%------------------------------------------------
+\begin{frame}{Tipuri simple}
+
+\begin{center}
+ \alert{Mulțimea tipurilor simple} \hspace{.2cm} \intens{$\mathbb{T} = \mathbb{V}\ |\ \mathbb{T} \rightarrow \mathbb{T}$}
+\end{center}
+
+{\color{True} Exemple de tipuri simple:}  
+\vspace{-.2cm}
+\begin{itemize}
+	\item $\gamma$
+	\item $(\beta \to \gamma)$
+	\item $((\gamma \to \alpha) \to (\alpha \to (\beta \to \gamma)))$
+\end{itemize}
+
+\medskip
+În tipurile săgeată, parantezele exterioare pot fi omise.
+
+\medskip
+\intens{Parantezele în tipurile săgeată sunt asociative la dreapta.} \\
+De exemplu,
+\vspace{-.2cm}
+\begin{itemize}
+	\item $\alpha_1 \to \alpha_2 \to \alpha_3 \to \alpha_4$ este abreviere pentru $(\alpha_1 \to (\alpha_2 \to (\alpha_3 \to \alpha_4)))$
+	\item $\app{\app{\app{x_1}{x_2}}{x_3}}{x_4}$ este abreviere pentru $(\app{(\app{(\app{x_1}{x_2})}{x_3})}{x_4})$
+\end{itemize}
+\end{frame}
+
+%------------------------------------------------
+\begin{frame}{Termeni și tipuri}
+
+\intens{Ce înseamnă că un termen $M$ are un tip $\sigma$?} \\
+Vom nota acest lucru cu \intens{$\type{M}{\sigma}$}.
+
+\pause
+\smallskip
+\intens{Variabilă.} Dacă o variabilă $x$ are un tip $\sigma$, notăm cu \alert{$\type{x}{\sigma}$}. \\
+	\alert{Convenția Barendregt:} variabilele legate sunt distincte.\\
+	Presupunem că \alert{orice variabilă din $M$ are un unic tip}. \\
+	Dacă $\type{x}{\sigma}$ și $\type{x}{\tau}$, atunci $\sigma \equiv \tau$.
+
+\pause
+\smallskip
+\intens{Aplicare.} Pentru $\app{M}{N}$ este clar că vrem să știm tipurile lui $M$ și $N$. \\
+Intuitiv, $\app{M}{N}$ înseamnă că ("funcția") $M$ este aplicată ("intrării") $N$. \\
+Atunci $M$ trebuie să aibă un tip funcție, adică $\type{M}{\sigma \to \tau}$, iar $N$ trebuie să fie "adecvat" pentru această funcție, adică $\type{N}{\sigma}$.
+\vspace{-.2cm}
+\begin{center}
+Dacă $\type{M}{\sigma \to \tau}$ și $\type{N}{\sigma}$, atunci $\type{\app{M}{N}}{\tau}$.
+\end{center}
+
+\pause
+\smallskip
+\intens{Abstractizare.} Dacă $\type{M}{\tau}$, ce tip trebuie sa aibă $\abs{x}{M}$?\\
+\vspace{-.2cm}
+\begin{center}
+Dacă $\type{x}{\sigma}$ și $\type{M}{\tau}$, atunci $\type{\abs{x}{M}}{\sigma \to \tau}$.
+\end{center}
+
+
+\end{frame}
+
+%------------------------------------------------
+\begin{frame}{Termeni și tipuri}
+
+\intens{Variabilă.} $\type{x}{\sigma}$. \\
+\intens{Aplicare.} Dacă $\type{M}{\sigma \to \tau}$ și $\type{N}{\sigma}$, atunci $\type{\app{M}{N}}{\tau}$. \\
+\intens{Abstractizare.} Dacă $\type{x}{\sigma}$ și $\type{M}{\tau}$, atunci $\type{\abs{x}{M}}{\sigma \to \tau}$.
+
+$M$ \intens{\textit{are tip}} (este \intens{\textit{typeable}}) dacă există un tip $\sigma$ astfel încât $\type{M}{\sigma}$.
+
+\pause
+{\color{True} Exemple.}
+\vspace{-.2cm}
+\begin{itemize}
+	\item Dacă {\color{True}$\type{x}{\sigma}$}, atunci funcția identitate are tipul {\color{True}$\type{\abs{x}{x}}{\sigma \to \sigma}$}.
+	\smallskip
+	\pause
+	\item Conform convențiilor de la aplicare, {\color{True}$\app{y}{x}$} poate avea un tip doar dacă $y$ are un tip săgeată de forma $\sigma \to \tau$ și tipul lui $x$ se potrivește cu tipul domeniu $\sigma$. În acest caz, tipul lui {\color{True}$\type{\app{y}{x}}{\tau}$}.
+	\smallskip
+	\pause
+	\item {\color{False}Termenul $\app{x}{x}$ nu poate avea nici un tip}  (nu este typeable). \\ 
+	Pe de o parte, $x$ ar trebui să aibă tipul $\sigma \to \tau$ (pentru prima apariție), pe de altă ar trebui să aibă tipul $\sigma$ (pentru a doua apariție). Cum am stabilit că orice variabilă are un unic tip, obținem $\sigma \to \tau \equiv \sigma$, ceea ce este imposibil.
+\end{itemize} 
+\end{frame}
+
+
+%------------------------------------------------
+\begin{frame}{Discuție despre asocitativitate}
+
+\intens{Asociativitatea la dreapta pentru tipurile săgeată vs. asociativitatea la stânga pentru aplicare:}
+\begin{itemize}
+	\item Să presupunem că {\color{True}$\type{f}{\rho \to (\sigma \to \tau)}$}, {\color{True}$\type{x}{\rho}$} și {\color{True}$\type{y}{\sigma}$}.
+	\item Atunci {\color{True}$\type{\app{f}{x}}{\sigma \to \tau}$} și {\color{True}$\type{\app{(\app{f}{x})}{y}}{\tau}$}.
+	\pause
+	\item Folosind ambele convenții pentru asociativitate pentru a elimina parantezele, avem
+	\begin{center}
+	\begin{tabular}{l}
+	{\color{True}$\type{f}{\rho \to \sigma \to \tau}$} \\
+	{\color{True}$\type{\app{\app{f}{x}}{y}}{\tau}$}
+	\end{tabular}
+	\end{center}
+	Convențiile pentru asociativitate sunt în armonie una cu cealaltă.
+\end{itemize}
+\end{frame}
+
+%------------------------------------------------
+\begin{frame}{Church-typing vs. Curry-typing}
+
+A găsi tipul unui termen începe cu a găsi tipurile pentru variabile. \\
+Există două metode prin care putem asocia tipuri variabilelor.
+
+\intens{Asociere explicită \textit{(Church-typing)}.}
+\vspace{-.2cm}
+\begin{itemize}
+	\item Constă în prescrierea unui unic tip pentru fiecare variabilă, la introducerea acesteia.
+	\item Presupune că tipurile variabilelor sunt explicit stabilite.
+	\item Tipurile termenilor mai complecși se obțin natural, ținând cont de convențiile pentru aplicare și abstractizare.
+\end{itemize}
+
+\intens{Asociere implicită \textit{(Curry-typing)}.}
+\vspace{-.2cm}
+\begin{itemize}
+	\item Constă în a nu prescriere un tip pentru fiecare variabilă, ci în a le lăsa "deschise" (implicite).
+	\item În acest caz, termenii \textit{typeable} sunt descoperiți printr-un proces de căutare, care poate presupune "ghicirea" anumitor tipuri.
+\end{itemize}
+
+\end{frame}
+
+%------------------------------------------------
+\begin{frame}{Church-typing vs. Curry-typing}
+
+{\color{True} Exemplu.}
+\intens{Asociere explicită \textit{(Church-typing)}.}
+
+Vrem să calculăm tipul expresiei $\app{(\abs{zu}{z})}{(\app{y}{x})}$ știind că
+\begin{minipage}{.45\columnwidth}
+\begin{enumerate}
+\item {\color{True}$\type{x}{\alpha \to \alpha}$}
+\item {\color{True}$\type{y}{(\alpha \to \alpha) \to \beta}$}
+\item ${\color{True}\type{z}{\beta}}$
+\item ${\color{True}\type{u}{\gamma}}$
+\end{enumerate}
+\end{minipage} \hfill
+\begin{minipage}{.54\columnwidth}
+\intens{Aplicare.} \hfill Dacă $\type{M}{\sigma \to \tau}$ și $\type{N}{\sigma}$,
+
+\hfill atunci $\type{\app{M}{N}}{\tau}$.
+
+\intens{Abstractizare.} \hfill Dacă $\type{x}{\sigma}$ și $\type{M}{\tau}$,
+
+\hfill atunci $\type{\abs{x}{M}}{\sigma \to \tau}$.
+\end{minipage}
+\pause
+
+Din (2) și (1), prin aplicare obținem (5): ${\color{True}\type{\app{y}{x}}{\beta}}$.
+
+Din (4) și (3), prin abstractizare obținem (6): ${\color{True}\type{\abs{u}{z}}{\gamma \to \beta}}$.
+
+Din (3) și (6), prin abstractizare obținem (7): ${\color{True}\type{\abs{zu}{z}}{\beta \to \gamma \to \beta}}$. \\
+Nu uitați că $\beta \to \gamma \to \beta$ înseamnă $\beta \to (\gamma \to \beta)$.
+
+Atunci, din (7) și (5), prin aplicare, avem {\color{True}$\type{\app{(\abs{zu}{z})}{(\app{y}{x})}}{\gamma \to \beta}$}.
+\end{frame}
+
+%------------------------------------------------
+\begin{frame}{Church-typing vs. Curry-typing}
+
+{\color{True} Exemplu.}
+\intens{Asociere implicită \textit{(Curry-typing)}.}
+
+Considerăm termenul de mai devreme \intens{$M = \app{(\abs{zu}{z})}{(\app{y}{x})}$}.
+
+Putem să "ghicim" tipurile variabilelor astfel încât $M$ să \textit{aibă tip}?
+
+\intens{Aplicare.} \hfill Dacă $\type{M}{\sigma \to \tau}$ și $\type{N}{\sigma}$,
+\hfill atunci $\type{\app{M}{N}}{\tau}$.
+
+\intens{Abstractizare.} \hfill Dacă $\type{x}{\sigma}$ și $\type{M}{\tau}$,
+\hfill atunci $\type{\abs{x}{M}}{\sigma \to \tau}$.
+
+\pause\vspace{-.2cm}
+\begin{itemize}
+	\item Observăm că $M$ este o aplicare a lui {$\abs{zu}{z}$} termenului {$\app{y}{x}$}. 
+	\item Atunci {$\abs{zu}{z}$} trebuie să aibă un tip săgeată, de exemplu {\color{True}$\type{\abs{zu}{z}}{A \to B}$}, și {$\app{y}{x}$} să se potrivească, adică {\color{True}$\type{\app{y}{x}}{A}$}. 
+	\item În acest caz, avem {\color{True}$\type{M}{B}$}.
+\end{itemize}
+\end{frame}
+
+%------------------------------------------------
+\begin{frame}{Church-typing vs. Curry-typing}
+
+{\color{True} Exemplu.}
+\intens{Asociere implicită \textit{(Curry-typing)} (cont.)}
+
+Știm \intens{$M = \app{(\abs{zu}{z})}{(\app{y}{x})}$} și am dedus până acum:
+\vspace{-.3cm}
+\begin{center}
+{\color{True}$\type{\abs{zu}{z}}{A \to B}$} \hspace{.4cm} 
+{\color{True}$\type{\app{y}{x}}{A}$} \hspace{.4cm} 
+{\color{True}$\type{M}{B}$}  \hspace{.4cm} 
+%{\color{True}$\type{z}{A}$} \hspace{.4cm} 
+%{\color{True}$\type{\abs{u}{z}}{B}$}
+\end{center}
+\vspace{-.3cm}
+
+\begin{itemize}
+	\item Faptul că {\color{True}$\type{\abs{zu}{z}}{A \to B}$} implică că {\color{True}$\type{z}{A}$} și {\color{True}$\type{\abs{u}{z}}{B}$}.
+	\item Deducem că $B$ este tipul unei abstractizări, deci $B \equiv C \to D$, și obținem că {\color{True}$\type{u}{C}$} și {\color{True}$\type{z}{D}$}.
+	\item Pe de altă parte, {$\app{y}{x}$} este o aplicare, deci trebuie să existe $E$ și $F$ astfel încât {\color{True}$\type{y}{E \to F}$} și {\color{True}$\type{x}{E}$}. Atunci {\color{True}$\type{\app{y}{x}}{F}$}.
+\end{itemize}
+\end{frame}
+
+%------------------------------------------------
+\begin{frame}{Church-typing vs. Curry-typing}
+
+{\color{True} Exemplu.}
+\intens{Asociere implicită \textit{(Curry-typing)} (cont.)}
+
+Știm \intens{$M = \app{(\abs{zu}{z})}{(\app{y}{x})}$}. Am dedus următoarele:
+\vspace{-.2cm}
+\begin{itemize}
+	\item {\color{True}$\type{x}{E}$}
+	\item {\color{True}$\type{y}{E \to F}$}
+	\item {\color{True}$\type{z}{A}$} și {\color{True}$\type{z}{D}$}, deci $A \equiv D$
+	\item {\color{True}$\type{u}{C}$} 
+	\item $B \equiv C \to D$ 
+	\item {\color{True}$\type{\app{y}{x}}{A}$} și {\color{True}$\type{\app{y}{x}}{F}$}, deci $A \equiv F$.
+\end{itemize}
+În concluzie, $A \equiv D \equiv F$, și eliminând redundanțele obținem
+\vspace{-.2cm}
+\begin{center}
+$(*)$ \hspace{.3cm}
+{\color{True}$\type{x}{E}$} \hspace{.3cm}
+{\color{True}$\type{y}{E \to A}$}  \hspace{.3cm}
+{\color{True}$\type{z}{A}$}  \hspace{.3cm}
+{\color{True}$\type{u}{C}$} 
+\end{center}
+\vspace{-.2cm}
+Reamintim că aveam {\color{True}$\type{M}{B}$}, adică {\color{True}$\type{M}{C \to A}$}.
+
+Am obținut o schemă generală $(*)$ pentru tipurile lui $x,y,z,u$ care induc un tip pentru $M$.
+\end{frame}
+
+%------------------------------------------------
+\begin{frame}{Church-typing vs. Curry-typing}
+
+{\color{True} Exemplu.}
+\intens{Asociere implicită \textit{(Curry-typing)} (cont.)}
+
+Știm \intens{$M = \app{(\abs{zu}{z})}{(\app{y}{x})}$}. Am obținut schema generală
+\vspace{-.2cm}
+\begin{center}
+$(*)$ \hspace{.3cm}
+{\color{True}$\type{x}{E}$} \hspace{.3cm}
+{\color{True}$\type{y}{E \to A}$}  \hspace{.3cm}
+{\color{True}$\type{z}{A}$}  \hspace{.3cm}
+{\color{True}$\type{u}{C}$} \hspace{.3cm}
+{\color{True}$\type{M}{C \to A}$}
+\end{center}
+\vspace{-.2cm}
+
+În schema de mai sus, putem considera tipuri "reale":
+\begin{itemize}
+	\item {\color{True}$\type{x}{\beta}$}, \hspace{.1cm}
+{\color{True}$\type{y}{\beta \to \alpha}$},  \hspace{.1cm}
+{\color{True}$\type{z}{\alpha}$},  \hspace{.1cm}
+{\color{True}$\type{u}{\delta}$}, \hspace{.1cm}
+{\color{True}$\type{M}{\delta \to \alpha}$}
+\pause
+	\item {\color{True}$\type{x}{\alpha \to \alpha}$}, \hspace{.1cm}
+{\color{True}$\type{y}{(\alpha \to \alpha) \to \beta}$},  \hspace{.1cm}
+{\color{True}$\type{z}{\beta}$},  \hspace{.1cm}
+{\color{True}$\type{u}{\gamma}$}, \hspace{.1cm}
+{\color{True}$\type{M}{\gamma \to \beta}$} \\
+(soluția discutată la Church-typing)
+\pause
+	\item {\color{True}$\type{x}{\alpha}$}, \hspace{.1cm}
+{\color{True}$\type{y}{\alpha \to \alpha \to \beta}$},  \hspace{.1cm}
+{\color{True}$\type{z}{\alpha \to \beta}$},  \hspace{.1cm}
+{\color{True}$\type{u}{\alpha \to \alpha}$}, \hspace{.1cm}
+{\color{True}$\type{M}{(\alpha \to \alpha) \to \alpha \to \beta}$} \\
+\end{itemize}
+\end{frame}
+
+%------------------------------------------------
+\begin{frame}{Church-typing vs. Curry-typing}
+
+Asocierea implicită de tipuri \textit{(Curry-typing)} are proprietăți interesante, cum am văzut în exemplul anterior.
+
+\medskip
+Totuși, în continuare vom folosi asocierea explicită \textit{(Church-typing)} deoarece de obicei tipurile sunt cunoscute dinainte (și declararea tipurilor pentru argumentele unei funcții este o bună-practică).
+
+\medskip
+Marcăm tipurile \alert{variabilelor legate} imediat după introducerea lor cu o abstractizare.
+Tipurile \alert{variabilelor libere} sunt date de un \alert{context}.
+
+
+\end{frame}
+
+%------------------------------------------------
+\begin{frame}{Church-typing}
+
+
+{\color{True}Exemplu.} Să considerăm exemplul anterior \intens{$\app{(\abs{zu}{z})}{(\app{y}{x})}$}.
+
+Observați că $z$ și $u$ sunt legate, iar $x$ și $y$ sunt libere. 
+
+Presupunând că $\type{z}{\beta}$ și $\type{u}{\gamma}$, scriem termenul astfel
+\vspace{-.3cm}
+\begin{center}
+$\app{(\abs{\type{z}{\beta}}{\abs{\type{u}{\gamma}}{z}})}{(\app{y}{x})}$
+\end{center}
+\vspace{-.3cm}
+
+\pause
+Dacă presupunem un context în care despre variabilele libere știm, de exemplu, că $\type{x}{\alpha \to \alpha}$ și $\type{y}{(\alpha \to \alpha) \to \beta}$, atunci folosim notația:
+\vspace{-.3cm}
+\begin{center}
+$\type{x}{\alpha \to \alpha}, \type{y}{(\alpha \to \alpha) \to \beta} \vdash \app{(\abs{\type{z}{\beta}}{\abs{\type{u}{\gamma}}{z}})}{(\app{y}{x})}$
+\end{center}
+\vspace{-.3cm}
+
+\pause
+Încă nu avem o noțiune de $\beta$-reducție pentru termeni cu tipuri, dar ne-am putea gândi că am avea:
+\vspace{-.3cm}
+\begin{center}
+$\app{(\abs{\type{z}{\beta}}{\abs{\type{u}{\gamma}}{z}})}{(\app{y}{x})} \to_\beta \abs{\type{u}{\gamma}}{\app{y}{x}}$.
+\end{center}
+\vspace{-.3cm}
+
+Observați că am dori să deducem că $\type{(\abs{\type{u}{\gamma}}{\app{y}{x}})}{\gamma \to \beta}$.
+
+\end{frame}
+
+%------------------------------------------------
+\begin{frame}{Sistem de deducție pentru Church $\lambda\hspace{-.1cm}\to$}
+
+Deoarece am convenit cum să decorăm cu informații despre tipuri variabilele legate, trebuie să actualizăm definiția $\lambda$-termenilor.
+
+\medskip
+Mulțimea \alert{$\lambda$-termenilor cu pre-tipuri $\Lambda_\mathbb{T}$} este 
+\vspace{-.3cm}
+\begin{center}
+\intens{$\Lambda_\mathbb{T} = x\ |\ \app{\Lambda_\mathbb{T}}{\Lambda_\mathbb{T}}\ |\ \abs{\type{x}{\mathbb{T}}}{\Lambda_\mathbb{T}}$}
+\end{center}
+
+O \alert{afirmație} este o expresie de forma $\type{M}{\sigma}$, unde $M \in \Lambda_\mathbb{T}$ și $\sigma\in \mathbb{T}$.\\
+Într-o astfel de afirmație, $M$ se numește \alert{subiect} și $\sigma$ \alert{tip}.
+
+\medskip
+O \alert{declarație} este o afirmație în care subiectul este o variabilă ($\type{x}{\sigma}$).
+
+\medskip
+Un \alert{context} este o listă de declarații cu subiecți diferiți.
+
+\medskip
+O \alert{judecată} este o expresie de forma $\Gamma \vdash \type{M}{\sigma}$, unde $\Gamma$ este context și $\type{M}{\sigma}$ este o afirmație.
+
+\end{frame}
+
+%------------------------------------------------
+\begin{frame}{Sistem de deducție pentru Church $\lambda\hspace{-.1cm}\to$}
+
+Deoarece suntem în general interesați de termeni \textit{typeable}, am dori să avem o metodă prin care să putem stabili dacă un termen $t \in \Lambda_\mathbb{T}$ este \textit{typeable} și dacă da, să calculăm un tip pentru $t$.
+
+Vom da niște reguli care să ne permită să stabilim dacă o judecată $\Gamma \vdash \type{M}{\sigma}$ poate fi dedusă, adică dacă $M$ are tipul $\sigma$ în contextul $\Gamma$.
+\end{frame}
+
+%------------------------------------------------
+\begin{frame}{Sistem de deducție pentru calculul Church $\lambda\hspace{-.1cm}\to$}
+
+\begin{center}
+\begin{tabular}{c}
+\infer[\mbox{dacă $\type{x}{\sigma}\in \Gamma$ }(var)]
+	{\Gamma \vdash \type{x}{\sigma}}
+	{}
+\\[1cm] 
+%------------------
+\infer[(app)]
+	{\Gamma \vdash \type{\app{M}{N}}{\tau}}
+	 {\Gamma \vdash \type{M}{\sigma \to \tau} \hspace{.5cm} \Gamma \vdash \type{N}{\sigma}}
+ \\[1cm] 
+%------------------
+\infer[(abs)]
+	{\Gamma \vdash \type{(\abs{\type{x}{\sigma}}{M})}{\sigma \to \tau} }
+	 {\Gamma, \type{x}{\sigma} \vdash \type{M}{\tau}}
+\end{tabular}
+\end{center}
+
+Un termen $M$  în calculul $\lambda\hspace{-.1cm}\to$ este \alert{legal} dacă există un context $\Gamma$ și un tip $\rho$ astfel încât $\Gamma \vdash \type{M}{\rho}$.
+\end{frame}
+
+%------------------------------------------------
+\begin{frame}{Sistem de deducție pentru calculul Church $\lambda\hspace{-.1cm}\to$}
+\begin{center}
+{\footnotesize
+\begin{tabular}{lll}
+\infer[(var)]
+	{\Gamma \vdash \type{x}{\sigma}}
+	{}
+%------------------
+&
+\infer[(app)]
+	{\Gamma \vdash \type{\app{M}{N}}{\tau}}
+	 {\Gamma \vdash \type{M}{\sigma \to \tau} \hspace{.5cm} \Gamma \vdash \type{N}{\sigma}}
+%------------------
+&
+\infer[(abs)]
+	{\Gamma \vdash \type{(\abs{\type{x}{\sigma}}{M})}{\sigma \to \tau} }
+	 {\Gamma, \type{x}{\sigma} \vdash \type{M}{\tau}}\\
+ dacă $\type{x}{\sigma}\in \Gamma$ 	 & &\\	 
+\end{tabular}
+}	 
+\end{center}
+
+{\color{True} Exemplu.} Să arătăm că termenul $\abs{\type{y}{\alpha \to \beta}}{\abs{\type{z}{\alpha}}{\app{yz}}}$ are tipul $(\alpha \to \beta)\to \alpha \to \beta$ în contextul vid.
+\[\emptyset \vdash \type{(\abs{\type{y}{\alpha \to \beta}}{\abs{\type{z}{\alpha}}{\app{yz}}})}{(\alpha \to \beta)\to \alpha \to \beta}\]
+
+\vspace{-.4cm}\pause
+\[
+\infer[(abs)]
+{
+\emptyset \vdash \type{(\abs{\type{y}{\alpha \to \beta}}{\abs{\type{z}{\alpha}}{\app{yz}}})}{(\alpha \to \beta)\to \alpha \to \beta}
+}
+{
+\infer[(abs)]
+{\type{y}{\alpha \to \beta} \vdash \type{(\abs{\type{z}{\alpha}}{\app{yz}})}{\alpha \to \beta}}
+{
+{
+\infer[(app)]
+{\type{y}{\alpha \to \beta}, \type{z}{\alpha} \vdash \type{(\app{yz})}{\beta}}
+{
+\infer[(var)]
+{\type{y}{\alpha \to \beta}, \type{z}{\alpha} \vdash \type{y}{\alpha\to \beta}}{} \hspace{.5cm} 
+\infer[(var)]{\type{y}{\alpha \to \beta}, \type{z}{\alpha} \vdash \type{z}{\alpha}}{}
+}
+}
+}
+}
+\]
+\end{frame}
+
+%------------------------------------------------
+\begin{frame}{Diferite stiluri pentru a scrie deducții}
+
+În exemplul anterior, am scris derivarea în \alert{stilul arbore}.
+
+În \alert{stilul liniar}, derivarea precedentă ar arăta astfel:
+\vspace{-.6cm}
+\begin{center}
+\begin{tabular}{rll}
+1. & $\type{y}{\alpha \to \beta}, \type{z}{\alpha} \vdash \type{y}{\alpha\to \beta}$ & (var) \\
+2. & $\type{y}{\alpha \to \beta}, \type{z}{\alpha} \vdash \type{z}{\alpha}$ & (var) \\
+3. & $\type{y}{\alpha \to \beta}, \type{z}{\alpha} \vdash \type{(\app{yz})}{\beta}$ & (app) cu 1 și 2 \\
+4. & $\type{y}{\alpha \to \beta} \vdash \type{(\abs{\type{z}{\alpha}}{\app{yz}})}{\alpha \to \beta}$ & (abs) cu 3 \\
+5. & $\emptyset \vdash \type{(\abs{\type{y}{\alpha \to \beta}}{\abs{\type{z}{\alpha}}{\app{yz}}})}{(\alpha \to \beta)\to \alpha \to \beta}$ & (abs) cu 4 \\
+\end{tabular}
+\end{center}
+
+\end{frame}
+
+%------------------------------------------------
+\begin{frame}{Diferite stiluri pentru a scrie deducții}
+
+În \alert{stilul cu cutii}, afișăm fiecare declarație la începutul unei cutii  și considerăm că declarația respectivă face parte din contextul pentru toate afirmațiile din cutia respectivă.
+
+Când închidem o cutie, abstractizăm după variabila din declarația de la începutul cutiei.
+
+\vspace{-.3cm}
+\[
+\onslide<4>{\begin{array}{r}
+1. \\
+2. \\
+3. \\
+4. \\
+5. \\
+\end{array}}
+\begin{array}{ll}
+\only<2->{
+\begin{array}{|ll}
+\hline
+\type{y}{\alpha\to \beta} & (context) \\
+\only<3->{
+\begin{array}{|ll}
+\hline
+\type{z}{\alpha} & (context) \\
+\type{(\app{yz})}{\beta} & \only<4->{(app) \mbox{ cu }1 \mbox{ și } 2} \\
+\hline
+\end{array} \\
+}
+\type{(\abs{\type{z}{\alpha}}{\app{yz}})}{\alpha \to \beta} & \only<3->{(abs)\only<4>{\mbox{ cu } 3}} \\
+\hline
+\end{array} & \\
+}
+\type{(\abs{\type{y}{\alpha \to \beta}}{\abs{\type{z}{\alpha}}{\app{yz}}})}{(\alpha \to \beta)\to \alpha \to \beta} & \only<2->{(abs) \only<4>{\mbox{ cu  } 4}} \\
+\end{array}
+\]
+
+%\begin{center}
+%\begin{tabular}{rll}
+%1. & $\type{y}{\alpha\to \beta}$ & (var) \\
+%2. & $\type{z}{\alpha}$ & (var) \\
+%3. & $\type{(\app{yz})}{\beta}$ & (app) cu 1 și 2 \\
+%4. & $\type{(\abs{\type{z}{\alpha}}{\app{yz}})}{\alpha \to \beta}$ & (abs) cu 3 \\
+%5. & $\type{(\abs{\type{y}{\alpha \to \beta}}{\abs{\type{z}{\alpha}}{\app{yz}}})}{(\alpha \to \beta)\to \alpha \to \beta}$ & (abs) cu 4 \\
+%\end{tabular}
+%\end{center}
+%
+\end{frame}
+
+%------------------------------------------------
+\begin{frame}{Sistem de deducție pentru Church $\lambda\hspace{-.1cm}\to$}
+
+{\color{True} Exercițiu.} Arătăți că termenul $\abs{\type{x}{((\alpha \to \beta)\to \alpha)}}{\app{x}{({\abs{\type{z}{\alpha}}{y})}}}$ are tipul $((\alpha \to \beta)\to \alpha) \to \alpha$ în contextul $\type{y}{\beta}$.
+
+
+\end{frame}
+%%------------------------------------------------
+%\begin{frame}{Ce probleme putem să rezolvăm în teoria tipurilor?}
+%
+%\intens{1. \textit{Well-typedness (Typability)}}\\
+%Se reduce la a verifica că un termen este \alert{legal}.
+%Concret, trebuie să găsim un context și un tip dacă termenul este legal, altfel să arătăm de ce nu se poate.
+%\vspace{-.3cm}
+%\begin{center}
+%$? \vdash \type{term}{?}$
+%\end{center}
+%O variațiune a problemei este \intens{\textit{Type Assignment}} în care contextul este dat și trebuie să găsim tipul.
+%\vspace{-.3cm}
+%\begin{center}
+%$context \vdash \type{term}{?}$
+%\end{center}
+%
+%\end{frame}
+%
+%%------------------------------------------------
+%\begin{frame}{Ce probleme putem să rezolvăm în teoria tipurilor?}
+%
+%\intens{2. \textit{Type Checking}} \\
+%Se reduce la a verifica că putem găsi o derivare pentru
+%
+%\vspace{-.3cm}
+%\begin{center}
+%$context \vdash \type{term}{type}$
+%\end{center}
+%
+%
+%\intens{3. \textit{Term Finding (Inhabitation)}} \\
+%Dându-se un context și un tip, să stabilim dacă există un termen cu acel tip, în contextul dat.
+%\vspace{-.3cm}
+%\begin{center}
+%$context \vdash \type{?}{type}$
+%\end{center}
+%
+%\begin{center}
+%\alert{Toate aceste probleme sunt decidabile pentru calculul $\lambda\hspace{-.1cm}\to$!}
+%\end{center}
+%\end{frame}
+%
+%%------------------------------------------------
+%\begin{frame}[fragile]{Limitări ale lambda-calculului cu tipuri simple}
+%
+%\begin{block}{Nu mai avem recursie nelimitată}
+%\begin{itemize}
+%\item Deoarece combinatorii de punct fix nu sunt \textit{typeable}
+%
+%e.g., \intens{$\mathbf{Y} \triangleq \abs{y}{\app{(\abs{x}{\app{y}{(\app{x}{x})}})}{(\abs{x}{\app{y}{(\app{x}{x})}})}}$}
+%\item Dar avem recursie primitivă (limitată, ca aceea cu care definim operații pe numere naturale)
+%
+%e.g., 
+%\intens{$\expL \triangleq \abs{mn}{\app{\app{m}{(\app{\mulL}{n})}}{\overline{1}}}$}  
+%\item Faptul că orice evaluare se termină este important pentru implementări ale logicilor folosind lambda-calculul
+%\end{itemize}
+%\end{block}
+%
+%\end{frame}
+%
+%%------------------------------------------------
+%\begin{frame}[fragile]{Limitări ale lambda-calculului cu tipuri simple}
+%
+%\begin{block}{Tipurile pot fi prea restrictive}
+%\[\app{(\abs{f}{\app{\app{\app{\ifL}{(\app{f}{\trueL})}}{(\app{f}{3})}}{(\app{f}{5})}})}{(\abs{x}{x})}\]
+%am putea zice că expresia de sus ar trebui să aibă un tip.
+%
+%Soluții posibile:
+%\begin{itemize}
+%\item Let-polymorphism 
+%\(\begin{array}[t]{l}
+%	\mathop{\mathbf{let}} f \mathrel{\mathbf{=}} \abs{x}{x} \mathrel{\mathbf{in}} \\
+%	\app{\app{\app{\ifL}{(\app{f}{\trueL})}}{(\app{f}{3})}}{(\app{f}{5})}
+%\end{array}\)
+%
+%variabilele libere din tipul lui $f$ se redenumesc la fiecare folosire
+%\item Cuantificatori de tipuri
+%\[\abs{x}{x} : \Pi\alpha\mathrel{.}\alpha \to \alpha\]
+%Asemănător ca mai sus. Operatorul de legare $\Pi$ face explicit faptul că
+%variabila de tip $\alpha$ nu este rigidă.
+%\end{itemize}
+%\end{block}
+%
+%\end{frame}
+
+%------------------------------------------------
+\begin{frame}
+  \vfill
+  \centering
+
+\textbf{\large \alert{Quiz time!}}
+
+\includegraphics[scale=.35]{../Quiz/C05-Q1.png}
+
+ \url{https://tinyurl.com/2p9xf67e}
+  \vfill
+\end{frame}
+
+%---------------------------------------------
+\begin{frame}
+  \vfill
+  \centering
+
+\textbf{Pe săptămâna viitoare!}
+
+  \vfill
+\end{frame}
+\end{document}
+
+
+
+
+
+
+

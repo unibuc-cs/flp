@@ -1,0 +1,613 @@
+\documentclass[xcolor=pdftex,romanian,colorlinks]{beamer}
+%\documentclass[xcolor=pdftex,handout,romanian,colorlinks]{beamer}
+
+\usepackage[export]{adjustbox}
+\usepackage{../sty/tslides}
+\usepackage[all]{xy}
+\usepackage{pgfplots}
+\usepackage{flowchart}
+\usepackage{todonotes}
+\usetikzlibrary{arrows,positioning,calc}
+\lstset{language=Haskell}
+\lstset{escapeinside={(*@}{@*)}}
+\PrerenderUnicode{ăĂîÎȘșȚțâÂ}
+\usepackage{amsmath}
+
+%\usepackage{xcolor}
+%\definecolor{IntensColor}{HTML}{2E86C1}
+%\definecolor{StateTransition}{HTML}{D6EAF8}
+%\definecolor{MedianLightOrange}{RGB}{216,178,92}
+%\definecolor{Orchid}{HTML}{8E44AD}
+%\definecolor{True}{HTML}{229954}
+%\definecolor{False}{HTML}{CB4335}
+
+\input{../sty/commands}
+\definecolor{section-color}{HTML}{23373b} %mDarkTeal
+%\AtBeginSection[]{
+%  \begin{frame}
+%  \vfill
+%  \centering
+%  \begin{beamercolorbox}[sep=8pt,center,shadow=true,rounded=true]{title}
+%    \usebeamerfont{title}\insertsectionhead\par%
+%  \end{beamercolorbox}
+%  \vfill
+%  \end{frame}
+%}
+
+
+
+\title[FLP]{Fundamentele limbajelor de programare}
+\subtitle{C04}
+\date{}
+
+
+\begin{document}
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\setlength{\leftmargini}{12pt}
+
+
+%================================================
+\section{\color{section-color} Expresivitatea $\lambda$-calculului}
+%================================================
+
+\begin{frame}{Expresivitatea $\lambda$-calculului}
+
+Deși lambda calculul constă doar în $\lambda$-termeni, putem reprezenta și manipula tipuri de date comune.
+
+Vom vedea cum putem reprezenta:
+\begin{itemize}
+	\item valori booleene
+	\item numere naturale
+%	\item liste
+%	\item maybe 
+\end{itemize}
+\end{frame}
+
+%================================================
+\section{\color{section-color} \large Booleeni}
+%================================================
+
+%------------------------------------------------
+\begin{frame}{Booleeni}
+
+Vrem să definim $\lambda$-termeni care să reprezinte constantele booleene.
+
+Sunt mai multe modalități, una dintre ele fiind:
+
+\begin{itemize}
+	\item \intens{$\trueL \triangleq \abs{xy}{x}$}  \hfill (dintre cele două alternative o alege pe prima)
+	\item \intens{$\falseL \triangleq \abs{xy}{y}$} \hfill (dintre cele două alternative o alege pe a doua)
+\end{itemize}
+
+\end{frame}
+
+%------------------------------------------------
+\begin{frame}{Booleeni}
+
+\begin{center}
+ \intens{$\trueL \triangleq \abs{xy}{x}$} \hspace{1cm} \intens{$\falseL \triangleq \abs{xy}{y}$}
+\end{center}
+
+\vspace{-.2cm}
+Acum am vrea să definim un test condiționat $\ifL$. 
+
+Am vrea ca $\ifL$ să ia trei argumente $b,t,f$, unde $b$ este o valoare booleană, iar $t,f$ sunt $\lambda$-termeni oarecare. 
+
+Funcția ar trebui să returneze $t$ dacă $b = true$ și $f$ dacă $b = false$
+\begin{center}
+$\ifL = \abs{btf}{\left\{ \begin{array}{ll}
+         t, & \mbox{if $b = true$},\\
+        f, & \mbox{if $b = false$}.\end{array} \right.}$
+\end{center}
+
+Deoarece $\app{\app{\trueL}{t}}{f} \twoheadrightarrow_\beta t$ și $\app{\app{\falseL}{t}}{f} \twoheadrightarrow_\beta f$, $\ifL$ trebuie doar să aplice argumentul său boolean celorlalte argumente:
+\begin{center}
+\intens{$\ifL \triangleq \abs{btf}{\app{\app{b}{t}}{f}}$}
+\end{center}
+\end{frame}
+
+%------------------------------------------------
+\begin{frame}{Booleeni}
+
+\vspace{-.2cm}
+\begin{center}
+ \intens{$\trueL \triangleq \abs{xy}{x}$} \hspace{1cm} \intens{$\falseL \triangleq \abs{xy}{y}$ \hspace{1cm} $\ifL \triangleq \abs{btf}{\app{\app{b}{t}}{f}}$}
+\end{center}
+
+\vspace{-.2cm}
+Celelalte operații booleene pot fi definite folosind $\ifL$:
+
+\vspace{-.2cm}
+\begin{center}
+\begin{tabular}{rcl}
+\intens{$\andL$} & \hspace{-.3cm} \intens{$\triangleq$} & \hspace{-.3cm} \intens{$\abs{b_1b_2}{\app{\app{\app{\ifL}{b_1}}{b_2}}{\falseL}}$} \\
+\intens{$\orL$} & \hspace{-.3cm} \intens{$\triangleq$} & \hspace{-.3cm} \intens{$\abs{b_1b_2}{\app{\app{\app{\ifL}{b_1}}{\trueL}}{b_2}}$} \\
+\intens{$\notL$} & \hspace{-.3cm} \intens{$\triangleq$} & \hspace{-.3cm} \intens{$\abs{b_1}{\app{\app{\app{\ifL}{b_1}}{\falseL}}{\trueL}}$} \\
+\end{tabular}
+\end{center}
+
+\vspace{-.2cm}
+Observați că aceste operații lucrează corect doar dacă primesc ca argumente valori booleene. 
+
+Nu există nicio garanție să se comporte rezonabil pe orice alți $\lambda$-termeni.
+
+Folosind lambda calcul fără tipuri, avem \intens{\textit{garbage in, garbage out}}.
+
+Codările nu sunt unice. De exemplu, pentru $\andL$ am fi putut folosi codarile {$\abs{b_1b_2}{\app{\app{b_2}{b_1}}{b_2}}$} sau  {$\abs{b_1b_2}{\app{\app{b_1}{b_2}}{\falseL}}$}.
+\end{frame}
+
+%------------------------------------------------
+\begin{frame}{Booleeni}
+
+\begin{center}
+ \intens{$\trueL \triangleq \abs{xy}{x}$} \hspace{.4cm} \intens{$\falseL \triangleq \abs{xy}{y}$ \hspace{.4cm} $\ifL \triangleq \abs{btf}{\app{\app{b}{t}}{f}}$}
+ 
+ \begin{tabular}{rcl}
+\intens{$\andL$} & \hspace{-.3cm} \intens{$\triangleq$} & \hspace{-.3cm} \intens{$\abs{b_1b_2}{\app{\app{\app{\ifL}{b_1}}{b_2}}{\falseL}}$} \\
+\intens{$\orL$} & \hspace{-.3cm} \intens{$\triangleq$} & \hspace{-.3cm} \intens{$\abs{b_1b_2}{\app{\app{\app{\ifL}{b_1}}{\trueL}}{b_2}}$} \\
+\intens{$\notL$} & \hspace{-.3cm} \intens{$\triangleq$} & \hspace{-.3cm} \intens{$\abs{b_1}{\app{\app{\app{\ifL}{b_1}}{\falseL}}{\trueL}}$} \\
+\end{tabular}
+
+\end{center}
+
+
+\intens{\textbf{Exercițiu.}} Aduceți la o formă normală următorii termenii:
+\begin{itemize}
+	\item \alert{$\app{\app{\andL}{\trueL}{\falseL}}$}
+	\item \alert{$\app{\app{\orL}{\falseL}{\trueL}}$}
+	\item \alert{$\app{\notL}{\trueL} $}
+\end{itemize}
+\end{frame}
+
+%------------------------------------------------
+\begin{frame}{Booleeni}
+
+\begin{center}
+ \intens{$\trueL \triangleq \abs{xy}{x}$} \hspace{.4cm} \intens{$\falseL \triangleq \abs{xy}{y}$ \hspace{.4cm} $\ifL \triangleq \abs{btf}{\app{\app{b}{t}}{f}}$}
+ 
+ \begin{tabular}{rcl}
+\intens{$\andL$} & \hspace{-.3cm} \intens{$\triangleq$} & \hspace{-.3cm} \intens{$\abs{b_1b_2}{\app{\app{\app{\ifL}{b_1}}{b_2}}{\falseL}}$} \\
+\intens{$\orL$} & \hspace{-.3cm} \intens{$\triangleq$} & \hspace{-.3cm} \intens{$\abs{b_1b_2}{\app{\app{\app{\ifL}{b_1}}{\trueL}}{b_2}}$} \\
+\intens{$\notL$} & \hspace{-.3cm} \intens{$\triangleq$} & \hspace{-.3cm} \intens{$\abs{b_1}{\app{\app{\app{\ifL}{b_1}}{\falseL}}{\trueL}}$} \\
+\end{tabular}
+
+\end{center}
+
+\textbf{Soluții:}
+
+$\app{\app{\andL}{\trueL}{\falseL}} = \app{\app{(\abs{b_1b_2}{\app{\app{\app{\ifL}{b_1}}{b_2}}{\falseL}})}{\trueL}{\falseL}} \twoheadrightarrow_\beta \app{\app{\app{\ifL}{\trueL}}{\falseL}}{\falseL} = \app{\app{\app{(\abs{btf}{\app{\app{b}{t}}{f}})}{\trueL}}{\falseL}}{\falseL}$\\
+\hspace{1.2cm} $\twoheadrightarrow_\beta  \app{\app{\trueL}{\falseL}}{\falseL} = \app{\app{(\abs{xy}{x})}{\falseL}}{\falseL} \twoheadrightarrow_\beta \falseL$
+
+$\app{\app{\orL}{\falseL}{\trueL}} = \app{\app{(\abs{b_1b_2}{\app{\app{\app{\ifL}{b_1}}{\trueL}}{b_2}})}{\falseL}{\trueL}} \twoheadrightarrow_\beta \app{\app{\app{\ifL}{\falseL}}{\trueL}}{\trueL} = \app{\app{\app{(\abs{btf}{\app{\app{b}{t}}{f}})}{\falseL}}{\trueL}}{\trueL}$ \\
+\hspace{1.2cm} $\twoheadrightarrow_\beta \app{\app{\falseL}{\trueL}}{\trueL} =  \app{\app{(\abs{xy}{y})}{\trueL}}{\trueL} \twoheadrightarrow_\beta  \trueL$
+
+$\app{\notL}{\trueL} = \app{(\abs{b_1}{\app{\app{\app{\ifL}{b_1}}{\falseL}}{\trueL}})}{\trueL} \twoheadrightarrow_\beta \app{\app{\app{\ifL}{\trueL}}{\falseL}}{\trueL} = \app{\app{\app{(\abs{btf}{\app{\app{b}{t}}{f}})}{\trueL}}{\falseL}}{\trueL}$ \\
+\hspace{1.2cm} $\twoheadrightarrow_\beta \app{\app{\trueL}{\falseL}}{\trueL} = \app{\app{(\abs{xy}{x})}{\falseL}}{\trueL} \twoheadrightarrow_\beta \falseL $
+
+\end{frame}
+
+%================================================
+\section{\color{section-color} \large Numere naturale}
+%================================================
+
+%------------------------------------------------
+\begin{frame}{Numere naturale}
+
+Vom reprezenta numerele naturale $\mathbb{N}$ folosind \alert{numeralii Church}.
+
+Numeralul Church pentru numărul $n \in \mathbb{N}$ este notat \intens{$\overline{n}$}.
+
+Numeralul Church $\overline{n}$ este $\lambda$-termenul \intens{$\abs{fx}{\app{f^n}{x}}$}, unde $f^n$ reprezintă compunerea lui $f$ cu ea însăși de $n$ ori:
+
+\begin{center}
+\begin{tabular}{rcccl}
+\intens{$\overline{0}$} & $\triangleq$ & $\abs{fx}{\app{f^0}{x}}$ & $=$ & $\abs{fx}{x}$ \\
+\intens{$\overline{1}$} & $\triangleq$ & $\abs{fx}{\app{f^1}{x}}$ & $=$ & $\abs{fx}{\app{f}{x}}$ \\
+\intens{$\overline{2}$} & $\triangleq$ & $\abs{fx}{\app{f^2}{x}}$ & $=$ & $\abs{fx}{\app{f}{(\app{f}{x})}}$ \\
+\intens{$\overline{3}$} & $\triangleq$ & $\abs{fx}{\app{f^3}{x}}$ & $=$ & $\abs{fx}{\app{f}{(\app{f}{(\app{f}{x})})}}$ \\
+& $\vdots$ && \\
+\intens{$\overline{n}$} & $\triangleq$ & $\abs{fx}{\app{f^n}{x}}$ & $=$ & $\abs{fx}{\underbrace{f(f(\ldots(f}_{n}\,x)\ldots))}$ \\
+\end{tabular}
+\end{center}
+
+
+\end{frame}
+
+%------------------------------------------------
+\begin{frame}{Numere naturale}
+
+\begin{center}
+\intens{$\overline{n} \triangleq \abs{fx}{\app{f^n}{x}}$}
+\end{center}
+
+\vspace{-.4cm}
+Acum putem defini funcția \alert{succesor} prin
+\vspace{-.2cm}
+\begin{center}
+\intens{$\succL \triangleq \abs{nfx}{\app{f}{(\app{\app{n}{f}}{x})}}$}
+\end{center}
+
+\vspace{-.2cm}
+Observați că $\succL$ pe argumentul $\overline{n}$ returnează o funcție care primește ca argument o funcție $f$, îi aplică $\overline{n}$ pentru a obține compunerea de $n$ ori a lui $f$ cu ea însăși, apoi aplică iar $f$ pentru a obține compunerea de $n+1$ ori a lui $f$ cu ea însăși.
+
+\vspace{-.2cm}
+\begin{center}
+\begin{tabular}{rcl}
+$\app{\succL}{\overline{n}}$ & $=$ & $\app{(\abs{nfx}{\app{f}{(\app{\app{n}{f}}{x})}})}{\overline{n}}$ \\
+& $\twoheadrightarrow_\beta$ & $\abs{fx}{\app{f}{(\app{\app{\overline{n}}{f}}{x})}}$ \\
+& $\twoheadrightarrow_\beta$ & $\abs{fx}{\app{f}{(\app{f^n}{x})}}$ \\
+& $=$ & $\abs{fx}{\app{f^{n+1}}{x}}$ \\
+& $=$ & $\overline{n+1}$ 
+\end{tabular}
+\end{center}
+
+\end{frame}
+
+
+%------------------------------------------------
+\begin{frame}{Numere naturale}
+
+\begin{center}
+\intens{$\overline{n} \triangleq \abs{fx}{\app{f^n}{x}}$ \hspace{1cm} $\succL \triangleq \abs{nfx}{\app{f}{(\app{\app{n}{f}}{x})}}$}
+\end{center}
+
+\vspace{-.2cm}
+
+Putem face operații aritmetice de bază cu numeralii Church.
+
+Pentru \alert{adunare}, putem defini
+\vspace{-.2cm}
+\begin{center}
+\intens{$\addL \triangleq \abs{mnfx}{\app{\app{m}{f}}{(\app{\app{n}{f}}{x})}}$}
+\end{center}
+
+\vspace{-.2cm}
+Pentru argumentele $\overline{m}$ și $\overline{n}$, obținem:
+
+\vspace{-.2cm}
+\begin{center}
+\begin{tabular}{rcl}
+$\app{\app{\addL}{\overline{m}}}{\overline{n}}$ & $=$ & $\app{\app{(\abs{mnfx}{\app{\app{m}{f}}{(\app{\app{n}{f}}{x})}})}{\overline{m}}}{\overline{n}}$ \\
+& $\twoheadrightarrow_\beta$ & $\abs{fx}{\app{\app{\overline{m}}{f}}{(\app{\app{\overline{n}}{f}}{x})}}$ \\
+& $\twoheadrightarrow_\beta$ & $\abs{fx}{\app{f^m}{(\app{f^n}{x})}}$ \\
+& $=$ & $\abs{fx}{\app{f^{m+n}}{x}}$ \\
+& $=$ & $\overline{m+n}$ 
+\end{tabular}
+\end{center}
+
+\vspace{-.2cm}
+Am folosit compunerea lui $f^m$ cu $f^n$ pentru a obține $f^{m+n}$.
+\end{frame}
+
+%------------------------------------------------
+\begin{frame}{Numere naturale}
+
+\begin{center}
+\intens{$\overline{n} \triangleq \abs{fx}{\app{f^n}{x}}$ \hspace{1cm} $\succL \triangleq \abs{nfx}{\app{f}{(\app{\app{n}{f}}{x})}}$}
+\end{center}
+
+\vspace{-.2cm}
+Putem defini \alert{adunarea} și ca aplicarea repetată a funcției succesor:
+\vspace{-.2cm}
+\begin{center}
+\intens{$\addL' \triangleq \abs{mn}{\app{\app{m}{\succL}}{n}}$}
+\end{center}
+
+\vspace{-.2cm}
+\begin{center}
+\begin{tabular}{rcl}
+$\app{\app{\addL'}{\overline{m}}}{\overline{n}}$ & $=$ & $\app{\app{(\abs{mn}{\app{\app{m}{\succL}}{n}})}{\overline{m}}}{\overline{n}}$  \\
+& $\twoheadrightarrow_\beta$ & $\app{\app{\overline{m}}{\succL}}{\overline{n}}$ \\
+& $=$ & $\app{\app{(\abs{fx}{\app{f^m}{x}})}{\succL}}{\overline{n}}$ \\
+& $\twoheadrightarrow_\beta$ & $\app{\succL^m}{\overline{n}}$ \\
+& $=$ & $\underbrace{\succL(\succL(\ldots(\succL}_{m}\,\overline{n})\ldots))$ \\
+& $\twoheadrightarrow_\beta$ & $\underbrace{\succL(\succL(\ldots(\succL}_{m-1}\,\overline{n+1})\ldots))$ \\
+& $\twoheadrightarrow_\beta$ & $\overline{m+n}$
+\end{tabular}
+\end{center}
+
+\end{frame}
+
+%------------------------------------------------
+\begin{frame}{Numere naturale}
+
+\begin{center}
+\intens{$\overline{n} \triangleq \abs{fx}{\app{f^n}{x}}$ \hspace{1cm} $\succL \triangleq \abs{nfx}{\app{f}{(\app{\app{n}{f}}{x})}}$} \\[.6em]
+\intens{$\addL' \triangleq \abs{mn}{\app{\app{m}{\succL}}{n}}$}
+\end{center}
+
+\vspace{-.2cm}
+Similar \alert{înmulțirea} este adunare repetată, iar ridicarea la putere este înmulțire repetată:
+\vspace{-.2cm}
+\begin{center}
+\begin{tabular}{rcl}
+\intens{$\mulL$} & \intens{$\triangleq$} & \intens{$\abs{mn}{\app{\app{m}{(\app{\addL}{n})}}{\overline{0}}}$}  \\[.6em]
+\intens{$\expL$} & \intens{$\triangleq$} & \intens{$\abs{mn}{\app{\app{m}{(\app{\mulL}{n})}}{\overline{1}}}$}  
+\end{tabular}
+\end{center}
+
+\end{frame}
+
+%------------------------------------------------
+\begin{frame}{Numere naturale}
+
+Putem defini o funcție de la numere naturale la booleeni care verifică dacă un număr natural este $0$ sau nu
+\begin{center}
+\begin{tabular}{rcl}
+$\isZero(0)$ & $=$ & $true$ \\
+$\isZero(n)$ & $=$ & $false$ \hspace{.4cm} dacă $n \neq 0$ \\
+\end{tabular}
+\end{center}
+O codare în lambda calcul a unei astfel de funcții este
+\begin{center}
+\intens{$\isZero \triangleq  \abs{nxy}{\app{\app{n}{(\abs{z}{y})}}{x}}$}
+\end{center}
+
+\intens{\textbf{Exercițiu.}}  Verificați afirmația de mai sus.
+
+\medskip
+Putem să definim și codarea  \intens{$\pred$} pentru predecesorul unui număr natural. Această codare nu este deloc ușoară și alegem să lucrăm cu ea ca cu o cutie neagră.
+\end{frame}
+
+%%------------------------------------------------
+%\begin{frame}{Perechi}
+%
+%Vrem funcții pentru perechi  și  proiecții care să respecte legile:
+%\vspace{-.2cm}
+%\begin{center}
+%\begin{tabular}{l}
+%$\app{\firstL}{(\app{\app{\pairL}{e_1}}{e_2})} = e_1$ \\ 
+%$\app{\secondL}{(\app{\app{\pairL}{e_1}}{e_2})} = e_2$ \\
+% $\app{\app{\pairL}{(\app{\firstL}{p})}}{(\app{\secondL}{p})} = p$,
+% \end{tabular}
+%\end{center}
+%\vspace{-.2cm}
+%dacă $p$ este o pereche.
+%
+%Definim \intens{$\pairL \triangleq \abs{abf}{\app{\app{f}{a}}{b}}$}.
+%
+%Atunci $\app{\app{\pairL}{e_1}}{e_2} \twoheadrightarrow_\beta \abs{f}{\app{\app{f}{e_1}}{e_2}}$. Pentru a obține $e_1$, putem aplica acest termen lui $\trueL$:
+%\vspace{-.2cm}
+%\[
+%\app{(\abs{f}{\app{\app{f}{e_1}}{e_2}})}{\trueL} \twoheadrightarrow_\beta \app{\app{\trueL}{e_1}}{e_2} = \app{\app{(\abs{xy}{x})}{e_1}}{e_2}  \twoheadrightarrow_\beta e_1
+%\]
+%
+%\vspace{-.2cm}
+%În concluzie, putem defini \intens{$\firstL \triangleq \abs{p}{\app{p}{\trueL}}$} și \intens{$\secondL \triangleq \abs{p}{\app{p}{\falseL}}$}.
+%
+%În definițiile de mai sus, dacă $p$ nu este un termen de forma $\app{\app{\pairL}{a}}{b}$, nu putem garanta nimic!
+%
+%
+%\end{frame}
+
+%------------------------------------------------
+\begin{frame}{Putem exprima mai mult?}
+
+Avem văzut  codari simple pentru booleeni și numere naturale. 
+
+Totuși nu avem o metodă pentru a construi astfel de $\lambda$-termeni.
+
+Ne trebuie un mecanism care să ne permită să construim funcții mai complicate din funcții mai simple.
+
+De exemplu, să considerăm funcția factorial
+\vspace{-.2cm}
+\begin{center}
+\begin{tabular}{rcl}
+$0!$ & $=$ & $1$ \\
+$n!$ & $=$ & $n \cdot (n-1)!$, \hspace{.4cm} dacă $n \neq 0$ 
+\end{tabular}
+\end{center}
+
+\end{frame}
+
+%================================================
+\section{\color{section-color} \large Puncte fixe}
+%================================================
+
+%------------------------------------------------
+\begin{frame}{Puncte fixe}
+
+Fie $f$ o funcție. 
+%
+Spunem că $x$ este un \alert{punct fix} al lui $f$ dacă \intens{f(x) = x}.
+
+În matematică, unele funcții au puncte fixe, altele nu au.
+
+De exemplu, $f(x) = x^2$ are două puncte fixe $0$ și $1$, dar $f(x) = x+1$ nu are puncte fixe.
+
+Mai mult, unele funcții au o infinitate de puncte fixe, cum ar fi $f(x)=x$.
+
+\end{frame}
+
+%------------------------------------------------
+\begin{frame}{$\beta$-echivalență}
+
+
+Am notat cu \intens{$M \twoheadrightarrow_\beta M'$} faptul că $M$ poate fi $\beta$-redus până la $M'$ în $0$ sau mai mulți pași  de $\beta$-reducție.
+
+\intens{$\twoheadrightarrow_\beta$}  este închiderea reflexivă și tranzitivă a relației $\rightarrow_\beta$.
+
+\medskip
+Notăm cu \intens{$M =_\beta M'$} faptul că $M$ poate fi transformat în $M'$ în $0$ sau mai mulți pași de $\beta$-reducție, transformare în care pașii de reducție pot fi  și întorși. 
+
+ \intens{$=_\beta$} este închiderea reflexivă, simetrică și tranzitivă a relației $\rightarrow_\beta$.
+
+De exemplu, avem \intens{$\app{(\abs{y}{\app{y}{v}})}{z} =_\beta \app{(\abs{x}{\app{z}{x}})}{v}$} deoarece avem
+\vspace{-.2cm}
+\begin{center}
+$\app{(\abs{y}{\app{y}{v}})}{z} \rightarrow_\beta \app{z}{v} \leftarrow_\beta \app{(\abs{x}{\app{z}{x}})}{v}$
+\end{center}
+\vspace{-.2cm}
+Notăm cu $\leftarrow_\beta$ inversul relației $\rightarrow_\beta$.
+
+\end{frame}
+
+%------------------------------------------------
+\begin{frame}{Puncte fixe în lambda-calcul}
+
+Dacă $F$ și $M$ sunt $\lambda$-termeni, spunem că $M$ este un \alert{punct fix} al lui $F$ dacă \intens{$\app{F}{M} =_\beta M$}.
+
+\medskip
+\alert{\textbf{Thm.} În lambda calculul fără tipuri, orice termen are un punct fix.}
+
+\pause
+\smallskip \textbf{Dem.} Vrem să arătăm că pentru orice termen $F$ există un termen $M$ astfel încât $\app{F}{M} =_\beta M$.
+
+Fie $F$ un termen. Considerăm  \intens{$M \triangleq \app{(\abs{x}{\app{F}{(\app{x}{x})}})}{(\abs{x}{\app{F}{(\app{x}{x})}})}$}. Avem
+\vspace{-.2cm}
+\begin{center}
+\begin{tabular}{rcl}
+$M$ & $=$ & $\app{(\abs{x}{\app{F}{(\app{x}{x})}})}{(\abs{x}{\app{F}{(\app{x}{x})}})}$ \\
+& $\rightarrow_\beta$ & $\app{F}{(\app{(\abs{x}{\app{F}{(\app{x}{x})}})}{(\abs{x}{\app{F}{(\app{x}{x})}})})}$ \\
+& $=$ & $\app{F}{M}$
+\end{tabular}
+\end{center}
+\vspace{-.2cm}
+Deci avem $\app{F M} =_\beta M$.
+\end{frame}
+
+%------------------------------------------------
+\begin{frame}{Combinatori de punct fix}
+
+\alert{Combinatorii de puncte fixe} sunt termeni închiși care "construiesc" un punct fix pentru un termen arbitrar. 
+
+\medskip
+Câteva exemple:
+\begin{itemize}
+	\item  \intens{Combinatorul de punct fix al lui Curry} \intens{$\mathbf{Y} \triangleq \abs{y}{\app{(\abs{x}{\app{y}{(\app{x}{x})}})}{(\abs{x}{\app{y}{(\app{x}{x})}})}}$} 
+
+Pentru orice termen $F$, $\app{\mathbf{Y}{F}}$ este un punct fix al lui $F$ deoarece $\app{\mathbf{Y}{F}} \twoheadrightarrow_\beta \app{F}{(\app{\mathbf{Y}}{F})}$.
+
+	\smallskip
+	\item \intens{Combinatorul de punct fix al lui Turing} \intens{$\Theta \triangleq \app{(\abs{xy}{\app{y}{(\app{\app{x}{x}}{y})}})}(\abs{xy}{\app{y}{(\app{\app{x}{x}}{y})}}) $}
+	
+	Pentru orice termen $F$, $\app{\Theta{F}}$ este un punct fix al lui $F$ deoarece $\app{\Theta{F}} \twoheadrightarrow_\beta \app{F}{(\app{\Theta}{F})}$.
+\end{itemize}
+\end{frame}
+
+%------------------------------------------------
+\begin{frame}{Rezolvarea de ecuații în lambda calcul}
+
+Punctele fixe ne permit să rezolvăm ecuații. A găsi un punct fix pentru $f$ este același lucru cu a rezolva o ecuație de forma
+\vspace{-.2cm}
+\begin{center}
+$x = f(x)$
+\end{center}
+\vspace{-.2cm}
+
+Am văzut că în lambda calcul există mereu o soluție pentru astfel de ecuații.
+\end{frame}
+
+%------------------------------------------------
+\begin{frame}{Rezolvarea de ecuații în lambda calcul}
+
+Să aplicăm această idee pentru funcția factorial. 
+
+Cea mai naturală definiție a funcției factorial este cea recursivă și o putem scrie în lambda calcul prin
+\begin{center}
+\intens{$\app{\factL}{n} = \app
+					{\ifL}
+					{\app
+						{(\app{\isZero}{n})}
+						{\app{(\overline{1})}{(\app{\mulL}{\app{n}{(\app{\factL{(\app{\pred}{n})})}})}}}
+					}
+					$}
+\end{center}
+
+În ecuația de mai sus, $\factL$ apare și în stânga, și în dreapta. Pentru a găsi cine este $\factL$, trebuie să rezolvăm o ecuație.
+\end{frame}
+
+%------------------------------------------------
+\begin{frame}{Rezolvarea de ecuații în lambda calcul}
+
+Să rezolvăm ecuația de mai sus. Rescriem problema puțin
+
+\begin{center}
+\begin{tabular}{rcl}
+$\factL$ & $=$ & $\abs{n}
+			  {\app
+					{\ifL}
+					{\app
+						{(\app{\isZero}{n})}
+						{\app{(\overline{1})}{(\app{\mulL}{\app{n}{(\app{\factL{(\app{\pred}{n})})}})}}}
+					}
+			  }
+			$ \\
+$\factL$ & $=$ & $\app{
+			(\abs{fn}
+			  {\app
+					{\ifL}
+					{\app
+						{(\app{\isZero}{n})}
+						{\app{(\overline{1})}{(\app{\mulL}{\app{n}{(\app{f{(\app{\pred}{n})})}})}}}
+					}
+			  })}\factL
+			$ \\
+\end{tabular}
+\end{center}
+Notăm termenul $\abs{fn}
+			  {\app
+					{\ifL}
+					{\app
+						{(\app{\isZero}{n})}
+						{\app{(\overline{1})}{(\app{\mulL}{\app{n}{(\app{f{(\app{\pred}{n})})}})}}}
+					}
+			  }$ cu $F$.
+			  
+Ultima ecuație devine $\factL = \app{F}\factL$, o ecuație de punct fix.	  
+
+Am văzut că $\app{\mathbf{Y}}{F}$ este un punct fix pentru $F$ (adică $\app{\mathbf{Y}}{F} \twoheadrightarrow_\beta \app{F}{(\app{\mathbf{Y}}{F})}$), \\de aceea putem rezolva ecuația de mai sus luând 
+\begin{center}
+\begin{tabular}{rcl}
+\intens{$\factL$} & \intens{$\triangleq$} & \intens{$\app{\mathbf{Y}}{F}$}  \\
+\intens{$\factL$} & \intens{$\triangleq$} & \intens{$\app{\mathbf{Y}}{(\abs{fn}
+			  {\app
+					{\ifL}
+					{\app
+						{(\app{\isZero}{n})}
+						{\app{(\overline{1})}{(\app{\mulL}{\app{n}{(\app{f{(\app{\pred}{n})})}})}}}
+					}
+			  })}$}   
+\end{tabular}
+\end{center}
+
+Observați că $\factL$ a dispărut din partea dreaptă.
+
+\intens{\textbf{Exercițiu.}} Evaluați $\app{\factL}{\overline{2}}$ ținând cont că $\factL \twoheadrightarrow_\beta \app{F}{\factL}$.
+\end{frame}
+
+
+
+%------------------------------------------------
+\begin{frame}
+  \vfill
+  \centering
+
+\textbf{\large \alert{Quiz time!}}
+
+\includegraphics[scale=.35]{../Quiz/C04-Q1.png}
+
+ \url{https://tinyurl.com/C04-Quiz1}
+  \vfill
+\end{frame}
+
+%---------------------------------------------
+\begin{frame}
+  \vfill
+  \centering
+
+\textbf{Pe săptămâna viitoare!}
+
+  \vfill
+\end{frame}
+\end{document}
+
+
+
+
+
+
+

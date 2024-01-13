@@ -1,0 +1,349 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{tdefinition}[2012/02/14 Package for typesetting articles.]
+\usepackage{bookmark}
+\usepackage[romanian]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{ae,aecompl}
+\usepackage[beamer,tight]{../sty/k}
+\usepackage{xspace}
+\usepackage[numbers]{natbib}
+\bibliographystyle{plainnat}
+\usepackage{enumerate}
+\usepackage{fancyvrb}
+\usepackage{wasysym}
+%\usepackage{mathrsfs}
+\usepackage{arydshln}
+\usepackage{amsthm}
+\usepackage[factor=700]{microtype}
+
+\PrerenderUnicode{ȘșțȚăĂîÎâÂîÎ}
+\newcommand{\sh}{ș}
+\newcommand{\Sh}{Ș}
+\newcommand{\ts}{ț}
+\newcommand{\Ts}{Ț}
+
+
+%\usepackage{helvet}
+%\usepackage{courier} 
+%\usepackage{textcomp}	 % additional symbols (Text Companion font extension)
+\usepackage{txfonts}
+%\usepackage{stmaryrd}
+%\usepackage{mathrsfs}
+\usepackage{ulem}
+\usepackage[final]{pdfpages}
+\usepackage{etex} 
+%\usetikzlibrary{shapes,snakes}
+\usepackage{ifdraft}
+
+
+
+\usepackage{tkz-graph}
+
+
+\newlength{\deltay}
+\setlength{\deltay}{1em}
+\newlength{\deltax}
+\setlength{\deltax}{1em}
+
+
+%\newcommand{\so}[4][]{\Vertex[position={below=\deltay of #2},L={#4},#1]{#3}}
+\newcommand{\no}[4][]{\Vertex[position={above=\deltay of #2},L={#4},#1]{#3}}
+\newcommand{\ea}[4][]{\Vertex[position={right=\deltay of #2},L={#4},#1]{#3}}
+\newcommand{\we}[4][]{\Vertex[position={left=\deltay of #2},L={#4},#1]{#3}}
+\newcommand{\soea}[4][]{\Vertex[position={below right=\deltay and \deltax of #2},L={#4},#1]{#3}}
+\newcommand{\sowe}[4][]{\Vertex[position={below left=\deltay and \deltax of #2},L={#4},#1]{#3}}
+\newcommand{\noea}[4][]{\Vertex[position={above right=\deltay and \deltax of=#2},L={#4},#1]{#3}}
+\newcommand{\nowe}[4][]{\Vertex[position={above left=\deltay and \deltax of=#2},L={#4},#1]{#3}}
+\newcommand{\edge}[4][]{\Edge[label={#4},#1](#2)(#3)}
+
+
+\newcommand{\graph}[1]{
+
+\begin{tikzpicture}
+\pgfsetarrowsstart{latex} 
+  \GraphInit[vstyle=Normal]
+ \SetUpEdge[lw         = .5pt,
+            style={-latex'},
+%            color      = orange,
+%            labelcolor = red!30,
+            labelstyle = {above=2pt,midway,inner sep=0pt,minimum size=.1pt}
+            ]
+  \tikzset{VertexStyle/.style={draw=none,inner sep=.5pt,minimum size=.1pt}}
+%  \tikzset{EdgeStyle/.style={-latex}}
+  #1
+\end{tikzpicture}
+}
+
+
+
+%\usenavigationsymbolstemplate{}
+%\usepackage[all]{xy}
+
+
+\newcommand{\cites}[1]{{\color{black!25}\small[\textit{#1}]}}
+
+\newcommand{\vitem}{\vfill\item}
+
+\newcommand{\Nat}{\mathbb{N}}
+\newcommand{\Dom}{\mathop{\it Dom}}
+\newcommand{\Ran}{\mathop{\it Im}}
+\newcommand{\subst}[1]{[#1]}
+\newcommand{\substpair}[2]{#1/#2}
+\newcommand{\substapp}[2]{#1\mathrel{}#2}
+\newcommand{\substcomp}[2]{#1\mathrel{}#2}
+\newcommand{\Th}[1]{\structure{Th}({\ensuremath #1})}
+\newcommand{\R}{{\cal R}}
+\newcommand{\stare}{s}
+\newcommand{\Smatch}{\terminal{match}}
+\newcommand{\Swith}{\terminal{with}}
+\newcommand{\SInjL}{\terminal{InjL}}
+\newcommand{\SInjR}{\terminal{InjR}}
+\newcommand{\Sif}{\terminal{if}}
+\newcommand{\Sthen}{\terminal{then}}
+\newcommand{\Selse}{\terminal{else}}
+\newcommand{\Swhile}{\terminal{while}}
+\newcommand{\Sdone}{\terminal{done}}
+\newcommand{\Slet}{\terminal{let}}
+\newcommand{\Sfun}{\terminal{fun}}
+\newcommand{\Sletrec}{\terminal{let rec}}
+\newcommand{\Sref}{\terminal{ref}}
+\newcommand{\Sin}{\terminal{in}}
+\newcommand{\Sbegin}{\terminal{begin}}
+\newcommand{\Send}{\terminal{end}}
+\newcommand{\Sloc}{\terminal{loc}}
+\newcommand{\Sdo}{\terminal{do}}
+\newcommand{\Sskip}{\terminal{()}}
+\newcommand{\Sget}{\terminal{read}}
+\newcommand{\Sput}{\terminal{print}}
+\newcommand{\Sint}{\terminal{int}}
+\newcommand{\Sbool}{\terminal{bool}}
+\newcommand{\Sunit}{\terminal{unit}}
+\newcommand{\Sintref}{\terminal{intref}}
+\newcommand{\List}[2][]{\textrm{List\{}{#2}\ifthenelse{\equal{#1}{}}{}{, "#1"}\/\textrm{\}}}
+\newcommand{\Snot}{\terminal{!}}
+\newcommand{\Strue}{{\it true}}
+\newcommand{\Sfalse}{{\it false}}
+\newcommand{\op}{\mathrel{\structure{\nonTerminal{op}}}}
+\newcommand{\iop}{\mathrel{\structure{\nonTerminal{iop}}}}
+\newcommand{\bop}{\mathrel{\structure{\nonTerminal{bop}}}}
+\newcommand{\var}{\mathop{var}}
+\newcommand{\Exp}{\structure{\nonTerminal{e}}}
+\newcommand{\Tip}{\structure{\nonTerminal{T}}}
+\newcommand{\Val}{\structure{\nonTerminal{v}}}
+\newcommand{\Eticheta}{\structure{\nonTerminal{eticheta}}}
+\newcommand{\AExp}{\structure{\nonTerminal{E}}}
+\newcommand{\BExp}{\structure{\nonTerminal{B}}}
+\newcommand{\Block}{\structure{\nonTerminal{C}}}
+\newcommand{\Channel}{\structure{\nonTerminal{c}}}
+\newcommand{\Variable}{\structure{\nonTerminal{x}}}
+\newcommand{\Proc}{\structure{\nonTerminal{P}}}
+\newcommand{\Stmt}{\structure{\nonTerminal{C}}}
+\newcommand{\Pgm}{\structure{\nonTerminal{P}}}
+\newcommand{\Id}{\structure{\nonTerminal{x}}}
+\newcommand{\Loc}{\structure{\nonTerminal{l}}}
+\newcommand{\Int}{\structure{\nonTerminal{n}}}
+\newcommand{\SInt}{{\nonTerminal{Int}}}
+\newcommand{\stip}{\mathrel{<:}}
+\newcommand{\Bool}{\structure{\nonTerminal{b}}}
+\newcommand{\Spar}{\parallel}
+\newcommand{\Smid}{\;\alert{\mid}\;}
+\newcommand{\defeq}{\stackrel{\mbox{def}}{=}}
+\newcommand{\zero}{\mathbf{0}}
+\newcommand{\out}[2]{\overline{#1}\langle{#2}\rangle}
+\newcommand{\SnewChannel}{\terminal{newChannel\;of}}
+\newcommand{\Sreceive}{\terminal{receive\;on}}
+\newcommand{\Ssend}{\terminal{send}}
+\newcommand{\Son}{\terminal{on}}
+\newcommand{\Scin}{\terminal{cin}}
+\newcommand{\Scout}{\terminal{cout}}
+\newcommand{\Schannel}{\terminal{channel}}
+\newcommand{\Asnd}[2]{#1\,!\,#2}
+\newcommand{\Arcv}[2]{#1\,?\,#2}
+\newcommand{\Anew}[1]{\nu\,#1}
+
+
+\lstdefinelanguage{JavaScript}{
+  keywords={typeof, new, true, false, catch, function, return, null, catch, switch, var, if, in, while, do, else, case, break},
+  keywordstyle=\color{blue}\bfseries,
+  ndkeywords={class, export, boolean, throw, implements, import, this},
+  ndkeywordstyle=\color{darkgray}\bfseries,
+  identifierstyle=\color{black},
+  sensitive=false,
+  comment=[l]{//},
+  morecomment=[s]{/*}{*/},
+  commentstyle=\color{purple}\ttfamily,
+  stringstyle=\color{red}\ttfamily,
+  morestring=[b]',
+  morestring=[b]"
+}
+
+
+\lstnewenvironment{asciijs}{
+\lstset{
+   language=JavaScript,
+   extendedchars=true,
+   basicstyle=\small,
+   showstringspaces=false,
+   showspaces=false,
+   tabsize=2,
+   breaklines=false,
+   showtabs=false,
+   captionpos=b
+}
+}{}
+
+
+\lstnewenvironment{asciihs}{
+\lstset{
+   language=Haskell,
+   extendedchars=true,
+   basicstyle=\small,
+   showstringspaces=false,
+   showspaces=false,
+   tabsize=2,
+   breaklines=true,
+   showtabs=false,
+   captionpos=b,
+%   escapechar=\#
+}
+}{}
+
+\lstnewenvironment{asciihss}{
+\lstset{
+   language=Haskell,
+   extendedchars=true,
+   basicstyle=\footnotesize,
+   showstringspaces=false,
+   showspaces=false,
+   tabsize=2,
+   breaklines=true,
+   showtabs=false,
+   captionpos=b,
+%   escapechar=\#
+}
+}{}
+
+\lstnewenvironment{asciiml}{
+    \lstset{
+           language=Caml,
+  keywordstyle=\color{blue}\bfseries,
+           morekeywords={val,ref,send,receive,on,newChannel},
+  ndkeywords={int,float,bool,channel,true,false,cin,cout,read_int,print_int},
+  ndkeywordstyle=\color{blue},
+               basicstyle=\small,
+               tabsize=2,
+               %frame=tb,
+               columns=flexible,
+               mathescape=false,
+	      upquote=true,
+    }
+}{}
+
+\lstnewenvironment{asciijava}{
+    \lstset{
+           language=Java,
+  keywordstyle=\color{blue}\bfseries,
+               basicstyle=\small,
+               tabsize=2,
+               %frame=tb,
+               columns=flexible,
+               mathescape=false,
+	      upquote=true,
+    }
+}{}
+
+
+\lstnewenvironment{asciics}{
+    \lstset{
+           language=[Sharp]C,
+  keywordstyle=\color{blue}\bfseries,
+               basicstyle=\small,
+               tabsize=2,
+               %frame=tb,
+               columns=flexible,
+               mathescape=false,
+	      upquote=true,
+    }
+}{}
+
+\lstnewenvironment{asciic}{
+       \lstset{
+               language=c,
+  keywordstyle=\color{blue}\bfseries,
+               morekeywords={done},
+               basicstyle=\small,
+               tabsize=2,
+               %frame=tb,
+               columns=flexible,
+               mathescape=false,
+			   upquote=true,
+ 				literate=
+                                {l1}{$l_1$}2
+                                {l2}{$l_2$}2
+                                {l3}{$l_3$}2
+                                {l4}{$l_4$}2
+                                {l5}{$l_5$}2
+                                {l6}{$l_6$}2
+% 	   			{"}{\textquotedbl}1
+       }
+}{}
+
+
+
+\lstnewenvironment{asciimaude}{
+       \lstset{
+               language=maude,
+               basicstyle=\small,
+               tabsize=2,
+               %frame=tb,
+               columns=flexible,
+               mathescape=false,
+			   upquote=true,
+% 				literate=
+% 	   			{"}{\textquotedbl}1
+       }
+}{}
+\lstdefinelanguage{maude}{
+		upquote=true,
+       morekeywords={fmod, mod, omod, endm, endfm, op, ops, rl, crl, eq, ceq, sorts, subsorts, var, strat, frozen, assoc comm, id:, 
+	   search, rewrite, reduce, red, rew, prec, gather, if, metadata, including, protecting, is},
+        emph={[3]Map, Set, List, Int, Bool, String, Id},
+       emphstyle={[3]\textit},
+       literate=
+       {=>}{$\;=\!>$}5 
+       {->}{{${-}{>}$}}3 
+       {~>}{{$\sim\!\!>$}}3  
+       {|->}{$\;|-\!\!>$}5 
+}
+
+\newcommand{\si}{\hspace{1em}}
+
+\newcommand{\lra}{\longrightarrow}
+\newcommand{\Sdaca}{\mathrel{\textit{dacă}}}
+\newcommand{\done}{\checked}
+\newcommand{\s}[2]{{\ensuremath {#1} \Downarrow {#2}}}
+\renewcommand{\S}{\displaystyle\s}
+
+\newcommand{\T}[3]{{\ensuremath\displaystyle {#1} \vdash {#2} : {#3}}}
+
+\renewcommand{\ss}[3][]{{\ensuremath {#2} \xrightarrow{#1} {#3}}}
+\newcommand{\Ss}{\displaystyle\ss}
+\renewcommand{\c}[1]{{\ensuremath \langle{#1}\rangle}}
+\newcommand{\tjud}[3][\Gamma]{{\displaystyle #1\vdash \; #2 \; : \; #3}}
+\newcommand{\reg}[4][]{\ifthenelse{\equal{#1}{}}{}{{\scriptstyle(\textsc{#1})}\si}\ifthenelse{\equal{#3}{}}{#2}{\frac{#3}{#2}}\si{\ifthenelse{\equal{#4}{}}{}{\Sdaca #4\si}}}
+\newcommand{\bottom}{\perp}
+\newcommand{\Snil}{{\textit{nil}}}
+\newcommand{\wkrule}[6]{\begin{minipage}{#1\columnwidth}\krule{#2}{#3}{#4}{#5}{#6}\end{minipage}}
+
+\newcommand{\arbore}[4]{%
+\graph{%
+  \Vertex[L={\;#1\;}]{R}%
+  \SOWE[L={\;#2\;}](R){S1}%
+  \SOEA[L={\;#4\;}](R){S3}% 
+  \SO[L={\;#3\;}](R){S2} %
+  \ifthenelse{\equal{#2}{}}{}{\Edge(R)(S1)}%
+  \ifthenelse{\equal{#3}{}}{}{\Edge(R)(S2)}%
+  \ifthenelse{\equal{#4}{}}{}{\Edge(R)(S3)}%
+}%
+}

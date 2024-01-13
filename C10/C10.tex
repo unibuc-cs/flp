@@ -1,712 +1,1112 @@
-%\documentclass[handout,xcolor=x11names,compress,10pt]{beamer}
+\documentclass[xcolor=pdftex,romanian,colorlinks]{beamer}
+%\documentclass[xcolor=pdftex,handout,romanian,colorlinks]{beamer}
 
-\documentclass[xcolor=x11names,compress,10pt]{beamer}
-%\documentclass[xcolor=pdftex,romanian,colorlinks]{beamer}
+\usepackage[export]{adjustbox}
+\usepackage{../sty/tslides}
+\usepackage[all]{xy}
+\usepackage{pgfplots}
+\usepackage{flowchart}
+\usepackage{todonotes}
+\usepackage{multicol}  
+\usetikzlibrary{arrows,positioning,calc}
+\lstset{language=Haskell}
+\lstset{escapeinside={(*@}{@*)}}
+\PrerenderUnicode{ăĂîÎȘșȚțâÂ}
+\usepackage{amsmath}
 
-\usepackage{../tslides}
-%\usepackage{comment}
 
-%% General document %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\usepackage{xcolor}
+%\definecolor{IntensColor}{HTML}{2E86C1}
+%\definecolor{StateTransition}{HTML}{D6EAF8}
+%\definecolor{MedianLightOrange}{RGB}{216,178,92}
+%\definecolor{Orchid}{HTML}{8E44AD}
+%\definecolor{True}{HTML}{229954}
+%\definecolor{False}{HTML}{CB4335}
+
+\input{../sty/commands}
+\definecolor{section-color}{HTML}{23373b} %mDarkTeal
+%\AtBeginSection[]{
+%  \begin{frame}
+%  \vfill
+%  \centering
+%  \begin{beamercolorbox}[sep=8pt,center,shadow=true,rounded=true]{title}
+%    \usebeamerfont{title}\insertsectionhead\par%
+%  \end{beamercolorbox}
+%  \vfill
+%  \end{frame}
+%}
 
 
-%\newcommand{\plus}[1] {{\color{Green4} #1}}
-%\newcommand{\intens}[1] {{\color{DeepSkyBlue3} #1}}
-%\newcommand{\egf}[1]{\stackrel{\cdot}{=}_{#1}}
-%\newcommand{\regR}{\mbox{R}}
-%\newcommand{\regS}{\mbox{S}}
-%\newcommand{\regT}{\mbox{T}}
-%\newcommand{\regCS}{\mbox{C}\Sigma}
-%\newcommand{\regSub}{\mbox{Sub}_\Gamma}
-%\newcommand{\te}[1]{\mbox{\texttt{#1}}}
-\newcommand{\Conf}[2]{\ensuremath{\langle #1\ ,\ #2\rangle}}
-%\newcommand{\cc}[1]{\ensuremath{\langle #1 \rangle}}
-%
-%
-%
-%\newcommand{\parrow}{\rightharpoonup}
-%\makeatletter
-%\newcommand{\vo}{\vec{o}\@ifnextchar{^}{\,}{}}
-%\makeatother
-\renewcommand{\to}{}
-%=========================================
+
+\title[FLP]{Fundamentele limbajelor de programare}
+\subtitle{C10}
+\date{}
+
 
 \begin{document}
-\title{\\Curs 10}
-\author{Fundamentele limbajelor de programare} 
-\date{2020-2021} 
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\setlength{\leftmargini}{12pt}
 
 
-\frame{\titlepage} 
 
 
-\frame{\frametitle{Cuprins}\tableofcontents
+%=========================================
+\section{\color{section-color}Programare Logică \\ Logica Clauzelor Horn}  
+%=========================================
 
-} 
+\begin{frame}[fragile]{Program  în Prolog = mulțime de predicate}
 
-\begin{section}{Semantica Small-Step pentru Lambda Calcul}
+Un exemplu de \alert{program în Prolog} din cursul trecut:
+ 
+\begin{columns}
+\begin{column}{.5\textwidth}
+\vspace{-.2cm}
+\begin{verbatim}
+father(peter,meg). 
+father(peter,stewie).
 
-  \begin{frame}[fragile]{Sintaxa limbajului LAMBDA}
-    \begin{block}{BNF}
-    \[
-    \begin{array}{rcl}
-      e & ::= & {\Id} \Smid {\Int} \Smid {\Strue} \Smid {\Sfalse} \\
-        & \Smid & {e + e} \Smid {e < e} \Smid { \terminal{not}(e) } \\
-        & \Smid & \Sif e \Sthen e \Selse e \\
-        & \Smid & {\lambda \Id . e} \Smid {e \; e} \\
-        & \Smid & \terminal{let} \Id \terminal{=} e \terminal{in} e
-    \end{array}
-    \]
-    \end{block}
+mother(lois,meg). 
+mother(lois,stewie).
 
-    \begin{block}{Verificarea sintaxei în Prolog}
-      \begin{asciipl}
-exp(Id) :- atom(Id).                      % identifier
-exp(Lit) :- Lit = true ; Lit = false ; integer(Lit).
-exp(E1 + E2) :- exp(E1), exp(E2).         % same for any op
-exp(if(E1, E2, E3)) :- exp(E1), exp(E2), exp(E3).
-exp(Id -> Exp) :- atom(Id), exp(Exp).     % lambda
-exp(Exp1 $ Exp2) :- exp(Exp1), exp(Exp2). % application
-exp(let(Id, Exp1, Exp2)) :- atom(Id), exp(Exp1), exp(Exp2).
-      \end{asciipl}
-    \end{block}
- \end{frame}
+griffin(peter).
+griffin(lois).
 
-\begin{frame}[fragile]{Semantica small-step pentru Lambda}
-\vspace*{0.5cm}
+griffin(X) :- father(Y,X),  griffin(Y).
+\end{verbatim}
+\end{column}
+\begin{column}{.3\textwidth}
+\intens{\textbf{Predicate:}}\\
+\intens{father/2}\\
+\intens{mother/2}\\
+\intens{griffin/1}
+\end{column}
+\end{columns}
+
+\end{frame}
+
+%---------------------------------------------------------------------
+
+%---------------------------------------------------------------------
+\begin{frame}{Spre logica din spatele Prologului}
+
+Pentru a putea modela universul programului, fixăm un \intens{alfabet/signatură/vocabular}:
 \begin{itemize}
-  \item Definește cel mai mic pas de execuție ca o relație de tranziție  \^{\i}ntre expresii
-    dată fiind o stare cu valori pentru variabilele libere
-  \begin{center}
-	$\rho \vdash \Ss{cod}{cod\,'}$ \hfill\intens{\texttt{step(Env, Cod1,Cod2)}}
-  \end{center}
-%  \item Fiecare pas de execuÈie este concluzia unei demonstraÈii
+	\item o mulțime $\mathbf{R}$ de \intens{simboluri de relații/predicate}
+	\item o mulțime $\mathbf{F}$ de \intens{simboluri de operații/funcții}
+	\item o funcție \intens{aritate} $ar: \mathbf{F} \cup \mathbf{R} \to \mathbb{N}$
+	\item Fie $\mathbf{C}\subseteq \mathbf{F}$ mulțimea simbolurilor de operații
+	de aritate $0$, numite și \intens{simboluri de constante}.
+\end{itemize}
 
-  \item Execuția se obține ca o succesiune de astfel de tranziții.
+Notăm cu $\mathbf{R}_n$/$\mathbf{F}_n$ mulțimea simbolurilor de relații/operații
+de aritate $n$. Observație: $\mathbf{F}_0 = C$
+
+\textbf{\color{True} Exemplu.}
+\begin{itemize}
+	\item $\mathbf{R} = \mathbf{R}_1 \uplus \mathbf{R}_2$, unde $\mathbf{R}_1 = \{P\}$ și $\mathbf{R}_2 = \{R\}$
+	\item $\mathbf{F} = \mathbf{F}_0 \uplus \mathbf{F}_2$, unde $\mathbf{F}_0 = C = \{c\}$ și $\mathbf{F}_2 = \{f\}$
+\end{itemize}
+
+
+\end{frame}
+%---------------------------------------------------------------------
+
+%---------------------------------------------------------------------
+\begin{frame}{Sintaxa Prolog}
+
+\begin{itemize}
+	\item {Sintaxa Prolog nu face diferență între \intens{simboluri de operații} și \intens{simboluri de predicate}!}
+	\vfill
+	\item Dar este important când ne uităm la teoria corespunzătoare programului în logică să facem această distincție.
+	\vfill
+    \item \^{I}n sintaxa Prolog
+    \begin{itemize}
+    \item termenii compuși sunt predicate: \texttt{father(peter, meg)}
+    \item operatorii sunt funcții: \texttt{+, *, mod}
+    \end{itemize}
+\end{itemize}
+\end{frame}
+%---------------------------------------------------------------------
+
+%---------------------------------------------------------------------
+\begin{frame}{Termeni}
+
+Fixăm o mulțime numărabilă de \intens{variabile} $V$.
+
+Definim \intens{termenii} inductiv astfel:
+\begin{itemize}
+	\item orice variabilă este un termen
+	\item orice simbol de constantă este un termen
+	\item dacă $f\in \mathbf{F}_n$, $n > 0$ și $t_1,\ldots,t_n$ sunt termeni, atunci $f(t_1,\ldots,t_n)$ este termen.
+\end{itemize}
+
+%\medskip
+%Notăm cu \intens{$Trm_{\mathcal{L}}$} mulțimea termenilor lui $\mathcal{L}$.
+
+\medskip
+\textbf{\color{True}Exemple:} $c,\ x_1,\ f(x_1,c),\ f(f(x_2,x_2),c)$ \\
+unde $c \in \mathbf{C}$ reprezintă o constantă, $x_1,x_2 \in V$ sunt variabile, iar $f \in \mathbf{F}_2$ reprezintă un simbol de funcție de 
+aritate 2. 
+
+\end{frame}
+%---------------------------------------------------------------------
+
+%---------------------------------------------------------------------
+\begin{frame}{Formule atomice}
+
+\intens{Formulele atomice} sunt definite astfel:
+\vspace{-1cm}
+\begin{center}
+	\item dacă $R\in \mathbf{R}_0$, atunci $R$ este formulă atomică
+	\item dacă $R\in \mathbf{R}_n$, $n > 0$ și $t_1,\ldots,t_n$ sunt termeni, \\ atunci \intens{$R(t_1,\ldots,t_n)$} este formulă atomică.
+\end{center}
+
+\medskip 
+\textbf{\color{True}Exemple:} $P(f(x_1,c)),\ R(c,x_2)$ \\
+unde $c \in \mathbf C$, $x_1,x_2 \in V$, $f \in \mathbf{F}_2$, $P \in \mathbf{R}_1$, iar $R \in \mathbf{R}_2$.
+\end{frame}
+%---------------------------------------------------------------------
+
+%---------------------------------------------------------------------
+\begin{frame}{Formulele logicii de ordinul I}
+
+Definim \intens{formulele} astfel:
+\begin{itemize}
+	\item orice \intens{formulă atomică} este o formulă
+	\item dacă $\varphi$ este o formulă, atunci \intens{$\neg \varphi$} este o formulă
+	\item dacă $\varphi$ și $\psi$ sunt formule, atunci \intens{$\varphi \vee \psi$}, \intens{$\varphi \wedge \psi$}, \intens{$\varphi \to \psi$} sunt formule
+	\item dacă $\varphi$ este o formulă și $x$ este o variabilă, atunci \intens{$\forall x\, \varphi$}, \intens{$\exists x\,\varphi$} sunt formule
+\end{itemize}
+
+\medskip \pause
+\textbf{\color{True}Exemplu:}
+\[P(f(x_1,c)),\quad P(x_1) \vee P(c), \quad \forall x_1\, P(x_1),  \quad \forall x_2\, R(x_2,x_1)\]
+unde $c \in \mathbf{C}$, $x_1,x_2 \in V$, $f \in \mathbf{F}_2$, $P \in \mathbf{R}_1$, iar $R \in \mathbf{R}_2$.
+\end{frame}
+%---------------------------------------------------------------------
+
+\frame{
+\frametitle{Exercițiu}
+
+
+Fie alfabetul definit prin ${\mathbf R}=\{<\}$, ${\mathbf F}=\{s, +\}$, ${\mathbf C}=\{0\}$ și\\
+$ari(s)=1$, $ari(+)=ari(<)=2$.
+
+Dați exemple de $3$ termeni, $3$ formule atomice și $3$ formule.
+
+\pause \medskip 
+
+Exemple de  \intens{termeni}:  
+
+\hspace{.5cm} $0$, $x$, $s(0)$, $s(s(0))$, $s(x)$, $s(s(x))$, $\ldots$,
+
+\hspace{.5cm} $+(0,0)$, $+(s(s(0)),+(0,s(0)))$,   
+  $+(x,s(0))$, $+(x,s(x))$, $\ldots$, 
+
+\medskip 
+
+Exemple de \intens{formule atomice}: 
+
+  
+\hspace{.5cm}   $<(0,0)$, $<(x,0)$, 
+$<(s(s(x)),s(0))$, $\ldots$
+
+\medskip 
+
+Exemple de \intens{formule}:
+
+\hspace{.5cm} $\forall x\,\forall y \, <(x, +(x,y))$, $\forall x \, <(x,s(x))$
+
+}
+
+%---------------------------------------------------------------------
+\begin{frame}{Literali }
+
+
+Un \intens{literal} este o \intens{formulă atomică} sau \intens{negația unei formule atomice}.
+
+\vfill
+
+O formulă este în \intens{formă normală conjunctivă (FNC)} dacă este o \intens{conjuncție} de \intens{disjuncții de literali}. 
+
+\textbf{\color{True} Exemplu:} $(P(f(x_1,c)) \vee R(c,x_2)) \ \wedge \ \neg R(x_1,x_2)\ \wedge\ (R(x_1,x_1) \vee \neg P(c))$ \\
+unde $c \in \mathbf{C}$, $x_1,x_2 \in V$, $f \in \mathbf{F}_2$, $P \in \mathbf{R}_1$, iar $R\in\mathbf{R}_2$. 
+\end{frame}
+
+%---------------------------------------------------------------------
+\begin{frame}{Clauze}
+
+\begin{itemize}
+\item  O \intens{clauză} este o \intens{ disjuncție de literali}.
+
+\medskip 
+
+\item Dacă $L_1,\ldots, L_n$ sunt literali atunci vom reprezenta clauza
+$L_1\vee\ldots\vee L_n$ ca mulțimea
+$\{L_1,\ldots, L_n\}$
+
+\begin{center}
+\intens{clauză = mulțime de literali} 
+\end{center}
+
+
+%\medskip 
+%\item Clauza $C=\{L_1,\ldots, L_n\}$ este \intens{satisfiabilă}
+%dacă  $L_1\vee\ldots\vee L_n$ este satisfiabilă.
+
+\medskip 
+\item O clauză $C$ este \intens{trivială} dacă conține un literal și complementul lui. 
+
+\medskip 
+\item Când $n=0$ obținem \intens{clauza vidă}, care se notează \intens{$\Box$}. 
+
+
+%\medskip 
+%
+%\item Prin definiție, \intens{clauza $\Box$ nu este satisfiabilă.}
+
+
+\end{itemize}
+ 
+%\begin{center}
+%\intens{Rezoluția este o metodă de verificare a satisfiabilității\\ unei mulțimi de clauze.}
+%\end{center}
+\end{frame}
+
+
+
+
+\begin{frame}{Clauze}
+Putem reprezenta o clauză prin mulțimea
+\intens{\[\{\neg Q_1,\ldots, \neg Q_n, P_1,\ldots,  P_k\}\]}
+unde $n,k\geq 0$ și $Q_1,\ldots, Q_n,P_1,\ldots, P_k$ sunt formule atomice.
+
+\bigskip
+Formula corespunzătoare este 
+\[\forall x_1\ldots \forall x_m (\neg Q_1\vee\ldots \vee \neg Q_n\vee  P_1\vee \ldots\vee P_k)\]
+unde $x_1,\ldots, x_m$ sunt toate variabilele care apar în clauză 
+
+\bigskip
+Echivalent, putem scrie 
+\intens{\[\forall x_1\ldots \forall x_m(Q_1\wedge \ldots \wedge Q_n \to P_1\vee \ldots\vee  P_k)\]}
+
+\vspace{-.4cm}
+Presupunem cuantificarea universală a clauzelor implicită:
+\intens{\[Q_1\wedge \ldots \wedge Q_n \to P_1\vee \ldots\vee  P_k \]}
+
+
+\end{frame}
+
+%---------------------------------------------------------------------
+
+\begin{frame}{Clauze program definite}
+
+\begin{itemize}
+\item Clauză  \intens{$Q_1\wedge \ldots \wedge Q_n \to P_1\vee \ldots\vee  P_k$}\\
+unde $n,k\geq 0$ și  $Q_1,\ldots, Q_n,P_1,\ldots, P_k$ sunt formule atomice.
+
+\bigskip   
+
+\item Dacă $k=1$, atunci avem o \intens{clauză program definită}:
+
+\begin{itemize}
+\item cazul $n>0:$ \hspace*{0.3cm}  \intens{$ Q_1\wedge \ldots\wedge  Q_n\to P$}
+\smallskip 
+\item cazul $n=0:$ \hspace*{0.3cm}   \intens{$\top\to P$} (clauză unitate, fapt)  \\
+$\top$ este simbol pentru o formula mereu adevărată
+\smallskip 
+\end{itemize}
+
+\bigskip
+\item \intens{Program logic definit = mulțime finită de clauze definite}
+
+\end{itemize}
+
+\end{frame}
+
+%---------------------------------------------------------------------
+
+\begin{frame}{Clauze Horn}
+
+
+\begin{itemize}
+
+\item Clauză  \intens{$Q_1\wedge \ldots \wedge Q_n \to P_1\vee \ldots\vee  P_k$}\\
+unde $n,k\geq 0$ și  $Q_1,\ldots, Q_n,P_1,\ldots, P_k$ sunt formule atomice.
+
+\bigskip
+\item Dacă $k=0$, atunci avem o \intens{clauză scop definită} (țintă, întrebare):
+\begin{center}
+	\intens{$Q_1\wedge\ldots\wedge Q_n\to \bot$} \\
+	$\bot$ este simbol pentru o formula mereu falsă
+\end{center}
+Vom scrie o clauza scop definită ca \intens{$Q_1, \ldots, Q_n$}. 
+\bigskip
+\item În plus, dacă $n=k=0$, atunci avem \intens{clauza vidă} \intens{$\Box$}
+
+
+\end{itemize}
+
+\begin{center}
+\intens{Clauză Horn = clauză program definită sau clauză scop ($k\leq 1$)}
+\end{center}
+
+
+\begin{center}
+
+Limbajul \intens{PROLOG} are la bază \intens{logica clauzelor Horn}.
+
+\end{center}
+\end{frame}
+
+%---------------------------------------------------------------------
+
+\begin{frame}{Clauze Horn}
+
+
+\begin{center}
+\intens{Clauza Horn = clauză program definită sau clauză scop ($k\leq 1$)}
+\end{center}
+
+
+\begin{itemize}
+
+\item Clauză  \intens{$Q_1\wedge \ldots \wedge Q_n \to P_1\vee \ldots\vee  P_k$}\\
+unde $n,k\geq 0$ și  $Q_1,\ldots, Q_n,P_1,\ldots, P_k$ sunt formule atomice.
+
+
+\bigskip
+\item Fie $x_1, \ldots, x_m$ toate variabilele care apar într-o clauza scop 
+$Q_1,\ldots, Q_n$. Atunci avem echivalența
+
+\vspace{-.6cm}
+$$
+\forall x_1\ldots \forall x_m (\neg Q_1\vee\ldots \vee \neg Q_n) 
+\equiv \neg \exists x_1\ldots \exists x_m (Q_1\wedge \ldots \wedge  Q_n)
+$$
+
+\end{itemize}
+
+\begin{center}
+\intens{Negația unei "întrebări" în PROLOG este clauză scop.} 
+
+
+%Limbajul \intens{PROLOG} are la bază \intens{logica clauzelor Horn}.
+
+\end{center}
+\end{frame}
+
+%---------------------------------------------------------------------
+\begin{frame}{Programare logica}
+
+\begin{itemize}
+\item \intens{Logica clauzelor Horn:} un fragment al logicii de ordinul I în care singurele formule admise sunt \intens{clauze Horn}
+	\begin{itemize}
+		\item \intens{formule atomice}: $P(t_1,\ldots,t_n)$
+		\item \intens{$Q_1\wedge \ldots \wedge Q_n \to P$} 
+		
+		unde toate $Q_i,P$ sunt formule atomice, $\top$ sau $\bot$
+	
+	\end{itemize}
+	\medskip
+	
+
+	 
+	\item \intens{Problema programării logice:}   reprezentăm cunoștințele ca o mulțime de clauze definite $KB$ și suntem interesați să aflăm răspunsul la o întrebare de forma $Q_1\wedge\ldots \wedge Q_n$, unde toate $Q_i$ sunt formule atomice
+
+	\begin{center}
+\intens{	$KB \models Q_1\wedge\ldots\wedge Q_n$}
+	\end{center}
+	
+\begin{itemize}	
+	\item Variabilele din $KB$  sunt  \intens{cuantificate universal}.
+
+	\medskip
+	\item Variabilele din $Q_1, \ldots,  Q_n$ sunt \intens{cuantificate existențial}.
+	\end{itemize}
+\end{itemize}
+
+\end{frame}
+
+%---------------------------------------------------------------------
+\begin{frame}{Un exemplu}
+
+Fie următoarele clauze definite:
+
+\hspace{.4cm} $father(jon,ken)$.
+
+\hspace{.4cm} $father(ken,liz)$.
+
+\hspace{.4cm} $father(X,Y) \to ancestor(X,Y)$
+
+\hspace{.4cm} $daugther(X,Y) \to ancestor(Y,X)$ 
+
+\hspace{.4cm} $ancestor(X,Y) \wedge ancestor(Y,Z) \to ancestor(X,Z)$
+
+\medskip
+Putem pune întrebările:
+\begin{itemize}
+	\item \intens{$ancestor(jon,liz)$}?
+	\item \intens{$ancestor(ken,Z)$}? \\(există $Z$ astfel încât $ancestor(ken,Z)$) 
+\end{itemize}
+
+\end{frame}
+%-------------------------------------------------------------------
+
+%---------------------------------------------------------------------
+\begin{frame}{Sistem de deducție pentru logica clauzelor Horn}
+
+
+Pentru un program logic definit $KB$  avem
+\begin{itemize}
+	 
+	\item \intens{Axiome:} orice clauză din $KB$ 
+	 
+	\item \intens{Regula de deducție \textit{backchain}:}
+	\[
+	\infer{\theta(Q)}{\theta(Q_1)\quad \theta(Q_2) \quad \ldots \quad \theta(Q_n) \quad (Q_1 \wedge Q_2 \wedge \ldots \wedge Q_n \to P)}
+	\]
+	unde $Q_1 \wedge Q_2 \wedge \ldots \wedge Q_n \to P \in KB$, iar $\theta$ cmgu pentru $Q$ și $P$.
+\end{itemize}
+
+\vspace{.4cm}
+Regula \textit{backchain} conduce la un \intens{sistem de deducție complet}:
+\begin{center}
+	
+	Pentru o mulțime de clauze $KB$ și o țintă $Q$, \\
+	dacă $KB \models Q$, \\
+	atunci există o derivare a lui $Q$ folosind regula \textit{backchain}.
+\end{center} 
+\end{frame}
+
+%---------------------------------------------------------------------
+\begin{frame}{Cum răspundem la întrebări}
+
+Pentru o țintă $Q$, trebuie să găsim o clauză din $KB$ 
+\vspace{-.2cm}
+\begin{center}
+$Q_1 \wedge \ldots \wedge Q_n \to P$,
+\end{center}
+\vspace{-.2cm}
+
+și un unificator $\theta$ pentru $Q$ și $P$. 
+
+ În continuare vom verifica $\theta(Q_1),\ldots,\theta(Q_n)$.
+
+\medskip  
+\textbf{\color{True} Exemplu.} Pentru ținta
+\[\intens{ancestor(ken,Z)},\] 
+\vspace{-.2cm}
+putem folosi clauză
+\[\intens{father(X,Y) \to ancestor(X,Y)}\]
+\vspace{-.2cm}
+cu unificatorul
+\vspace{-.1cm}
+\[ \intens{\{ X \mapsto ken, Y \mapsto Z\} }\]
+\vspace{-.2cm}
+pentru a obține o nouă țintă
+\[ \intens{father(ken,Z) }.\]
+\vspace{-.6cm}
+
+\end{frame}
+
+%---------------------------------------------------------------------
+\begin{frame}{Sistem de deducție}
+
+\intens{Rergula backchain}
+{\small
+	\[
+	\infer{\theta(Q)}{\theta(Q_1)\quad \theta(Q_2) \quad \ldots \quad \theta(Q_n) \quad (Q_1 \wedge Q_2 \wedge \ldots \wedge Q_n \to P)}
+	\]
+	unde $Q_1 \wedge Q_2 \wedge \ldots \wedge Q_n \to P \in KB$, iar $\theta$ este cgu pentru $Q$ și $P$.}
+
+\medskip 
+
+
+\textbf{\color{True} Exemplu.} Presupunem că în KB avem:
+
+\hspace{.4cm} $father(ken,liz)$.
+
+\hspace{.4cm} $father(X,Y) \to ancestor(X,Y)$
+
+	\[
+	\infer{\intens{ancestor(ken,Z)}}{\infer{\intens{father(ken,Z)}}{{father(ken,liz)}} \quad father(X,Y) \to ancestor(X,Y)}
+	\]
+
+
+
+\end{frame}
+
+
+%---------------------------------------------------------------------
+\begin{frame}{Puncte de decizie în programarea logica}
+Având doar această regulă, care sunt punctele de decizie în căutare?
+\begin{itemize}
+	 
+	\item \intens{Ce clauză să alegem.}
+	\begin{itemize}
+		\item Pot fi mai multe clauze a căror parte dreaptă se potrivește cu o țintă.
+		\item Aceasta este o alegere de tip \textbf{SAU}: este suficient ca oricare din variante să reușească.
+	\end{itemize}
+	
+	\medskip  
+	\item \intens{Ordinea în care rezolvăm noile ținte.}
+	\begin{itemize}
+		\item Aceasta este o alegere de tip \textbf{ȘI:} trebuie arătate toate țintele noi.
+		\item Ordinea în care le rezolvăm poate afecta găsirea unei derivări, depinzând de strategia de căutare folosită.
+	\end{itemize}
+\end{itemize}
+\end{frame}
+%---------------------------------------------------------------------
+
+%---------------------------------------------------------------------
+\begin{frame}{Strategia de căutare din Prolog}
+
+Strategia de căutare din Prolog este de tip \intens{\textit{depth-first}}
+\medskip
+\begin{itemize}
+	\item \intens{de sus în jos}
+	\begin{itemize}
+		\item pentru alegerile de tip \textbf{SAU}
+		\item alege clauzele în ordinea în care apar în program
+	\end{itemize}
+	\medskip
+	\item \intens{de la stânga la dreapta}
+	\begin{itemize}
+		\item pentru alegerile de tip \textbf{ȘI}
+		\item alege noile ținte în ordinea în care apar în clauza aleasă
+	\end{itemize}
+\end{itemize}
+
+\end{frame}
+%---------------------------------------------------------------------
+
+
+%
+%%---------------------------------------------------------------------
+%\begin{frame}{Sistemul de inferență backchain}
+%
+%Notăm cu \intens{$KB \vdash_b Q$} dacă există o derivare a lui $Q$ din $KB$ folosind sistemul de inferență {\em backchain}.
+%
+%\medskip
+%\begin{theorem}
+%Sistemul de inferență {\em backchain} este \intens{corect} și \intens{complet} pentru formule atomice fără variabile $Q$.
+%\begin{center}
+%\intens{$KB \models Q$} \quad \intens{dacă și numai dacă} \quad \intens{$KB \vdash_b Q$}
+%\end{center}
+%\end{theorem}
+%
+%\medskip  
+%Sistemul de inferență {\em backchain} este \intens{corect} și \intens{complet} și pentru formule atomice \intens{cu variabile} $Q$: 
+%\begin{center}
+%\intens{$KB \models \exists x Q(x)$}  {dacă și numai dacă} \intens{$KB \vdash_b \theta(Q)$ } \\
+%\hspace*{6.5cm}\intens{pentru o substituție $\theta$.}
+%\end{center}
+%
+%\end{frame}
+%%---------------------------------------------------------------------
+%
+
+
+%---------------------------------------------------------------------
+\begin{frame}{Regula {backchain} și rezoluția SLD}
+\begin{itemize}
+	\item Regula \textit{backchain} este implementată în programarea logică prin \intens{rezoluția SLD} (Selected, Linear, Definite).
+	
+	\medskip
+	\item Prolog are la bază rezoluția SLD.
+\end{itemize}
+\end{frame}
+%---------------------------------------------------------------------
+
+
+%------------------------------------------------------------------------
+\begin{frame}{Rezoluția SLD}
+ 
+\vspace{.2cm}
+Fie $KB$ o mulțime de clauze definite.
+
+\medskip
+\begin{center}
+\intens{SLD}
+\fbox{
+$\displaystyle\frac{\neg Q_1\vee\cdots\vee \intens{\neg Q_i}\vee\cdots\vee\neg Q_n }
+{\intens{ \theta}(\neg Q_1\vee\cdots\vee \intens{\neg P_1\vee\cdots\vee\neg P_m}\vee\cdots\vee\neg Q_n)}$}
+
+\end{center}
+\vspace{-.2cm}
+unde 
+\begin{itemize}
+	\item \intens{ $Q\vee\neg P_1\vee\cdots\vee \neg P_m$} este o clauză definită din $KB$
+	
+	\item în care toate variabilele au fost redenumite cu variabile noi
+
+	\item \intens{ $\theta$} este cmgu pentru \intens{ $Q_i$} și \intens{ $Q$}
+
 \end{itemize}
 \end{frame}
 
-\begin{frame}[fragile]{Semantica variabilelor}
-	\[\reg{\rho \vdash \Ss{x}{v}}{}{\rho(x) = v}\]
-  \begin{block}{Prolog}
-    \begin{asciipl}
-      step(Env, X, V) :- atom(X), get(Env, X, V).
-    \end{asciipl}
-  \end{block}
-
-\end{frame}
-
-  
-\begin{frame}[fragile]{Semantica expresiilor aritmetice}
-    \begin{itemize}
-    \item \intens{Semantica adunării a două expresii aritmetice}	
-     \item[] $\reg{\Ss{\Conf{i_1 + i_2}{\sigma}}{\Conf{i}{\sigma}}}{}{i = i_1 + i_2}$
-    
-    \item[] $\reg{\Ss{\Conf{a_1 + a_2}{\sigma}}{\Conf{a_1' + a_2}{\sigma'}}}{\Ss{\Conf{a_1}{\sigma}}{\Conf{a_1'}{\sigma'}}}{}$\hfill$\reg{\Ss{\Conf{a_1 + a_2}{\sigma}}\to{\Conf{a_1 + a_2'}{\sigma'}}}{\Ss{\Conf{a_2}{\sigma}}\to {\Conf{a_2'}{\sigma'}}}{}$
- 
-
-    \item Pentru alți operatori (artimetici, de comparație, booleeni, condițional)
-    \begin{itemize}
-        \item  Similar cu regulile din IMP
-    \end{itemize}
-    \end{itemize}
-    
-   \begin{block}{Prolog} 
-  \begin{verbatim}
-  step(_, I1 + I2,I):- integer(I1),integer(I2), 
-                       I is I1 + I2.
-                              
-  step(Env, AE + AE1,AE + AE2):- step(Env, AE1,AE2).
-  
-  step(Env, AE1 + AE,AE2 + AE):- step(Env, AE1,AE2).
-  \end{verbatim}
-  \end{block}
-  \end{frame}
-  
-
-
-\begin{frame}[fragile]{Semantica $\lambda$-abstracției}
-	\[\reg{\rho \vdash \Ss{\lambda x. e}{{\it closure}(x, e, \rho)}}{}{}\]
-
-  $\lambda$-abstracția se evaluează la o valoare specială numită closure
-  care capturează valorile curente ale variabilelor pentru a se putea
-  executa în acest mediu atunci când va fi aplicată.
-
-  \begin{block}{Prolog}
-    \begin{asciipl}
-      step(Env, X -> E, closure(X, E, Env)).
-    \end{asciipl}
-  \end{block}
-
-\end{frame}
-
-\begin{frame}[fragile]{Semantica construcției $\terminal{let}$}
-	\[\reg{\rho \vdash \Ss{\terminal{let} x \terminal{=} e_1 \terminal{in} e_2}{(\lambda x . e2)\; e_1}}{}{}\]
-
-  A îi da lui $x$ valoarea lui $e_1$ în $e_2$ este același lucru cu a
-  aplica funcția de $x$ cu corpul $e_2$ expresiei $e_1$.
-
-  \begin{block}{Prolog}
-    \begin{asciipl}
-      step(_, let(X, E1, E2), (X -> E2) $ E1).
-    \end{asciipl}
-  \end{block}
-
-\end{frame}
-
-
-\begin{frame}[fragile]{Semantica operatorului de aplicare}
-	\[\reg{\rho \vdash \Ss{{\it closure}(x, e, \rho_e) \; v}{{\it closure}(x, e', \rho_e) \; v}}{\rho_e[v/x]\vdash \Ss{e}{e'}}{v \mbox{ valoare}}\]
-
-	\[\reg{\rho \vdash \Ss{{\it closure}(x, v, \rho_e) \; e}{v}}{}{v \mbox{ valoare}}\]
-
-  \[\reg{\rho \vdash \Ss{e_1 \; e_2}{e'_1 \; e_2}}{\rho \vdash \Ss{e_1}{e'_1}}{}
-    \hfill
-    \reg{\rho \vdash \Ss{e_1 \; e_2}{e_1 \; e'_2}}{\rho \vdash \Ss{e_2}{e'_2}}{}
-    \]
-
-  \begin{block}{Prolog}
-    \begin{asciipl}
-      step(Env, E $ E1, E $ E2) :- step(Env, E1, E2).
-      step(Env, E1 $ E, E2 $ E) :- step(Env, E1, E2).
-      step(Env, closure(X, E, EnvE) $ V, Result) :-
-          \+ step(Env, V, _),
-          set(EnvE, X, V, EnvEX),
-          step(EnvEX, E, E1)
-          ->  Result = closure(X, E1, EnvE) $ V
-          ;   Result = E.
-    \end{asciipl}
-  \end{block}
-
-\end{frame}
-
-\end{section}
-\begin{section}{Determinarea tipurilor}
-
-\begin{frame}{Problemă: Sintaxa este prea permisivă}
-    \begin{block}{\alert{Problemă:} Mulți termeni acceptați de sintaxă nu pot fi evaluați}
-        \begin{itemize}
-        \item $2\;(\fun{x}{x})$\only<2>{--- expresia din stânga aplicației trebuie să reprezinte o funcție}
-         \item $(\fun{x}{x}) + 1$\only<2>{  --- adunăm funcții cu numere}
-        \item $(\fun{x}{x + 1})\; (\fun{x}{x})$\only<2>{ --- pot face o reducție, dar tot nu pot evalua}
-        \end{itemize}
-     \end{block}
-     \onslide<2>
-     \vfill\begin{block}{Soluție:  Identificarea (precisă) a programelor corecte}
-     \begin{itemize}
-     \item Definim tipuri pentru fragmente de program corecte (e.g., int, bool)
-     \item Definim (recursiv) o relație care să lege fragmente de program de tipurile asociate
-     \[((\fun{x}{x + 1})\; ((\fun{x}{x})\; 3)) : \mbox{int}\]
-     \end{itemize}
-     \end{block}
-\end{frame}
-
-
-    \begin{subsection}{Asociere de tipuri}
-    \begin{frame}{Relația de asociere de tipuri}
-    Definim (recursiv) o relație de forma $\T{\Gamma}{e}{\tau}$, unde
-    \begin{itemize}
-    \item $\tau$ este un tip
-    
-    \vspace{-2ex}
-    \begin{syntaxBlock}{\structure{\tau}}
-    \color<beamer|handout>{black!25!white}{
-    \renewcommand{\syntaxKeyword}{}
-    \syntax{int}{întregi}
-    \syntaxCont{bool}{valori de adevăr}
-    \syntaxCont{\structure{\tau} \rightarrow \structure{\tau}}{funcții}
-    \syntaxCont{\structure{a}}{variabile de tip}
-    }
-    \vspace{-4ex}
-    \end{syntaxBlock}
-    \item $e$ este un termen (potențial cu variabile libere)
-    \item $\Gamma$ este \structure{mediul de tipuri}, o funcție parțială finită care asociază tipuri variabilelor (libere ale lui $e$)
-    \item Variabilele de tip sunt folosite pentru a indica polimorfismul
-    \end{itemize}
-    
-    \begin{block}{Cum citim $\T{\Gamma}{e}{\tau}$?}
-    Dacă variabila $x$ are tipul $\Gamma(x)$ pentru orice $x\in dom(\Gamma)$,\\ atunci termenul $e$ are tipul $\tau$.
-    \end{block}
-    \end{frame}
-    
-    \begin{frame}{Axiome}
-    \begin{itemize}
-    \item[] $\reg[:var]{\T{\Gamma}{x}{\tau}}{}{\Gamma(x) = \tau}$
-    \vitem[] $\reg[:int]{\T{\Gamma}{n}{int}}{}{\mbox{$n$ întreg}}$
-    \vitem[] $\reg[:bool]{\T{\Gamma}{b}{bool}}{}{b = \Strue \mathrel{or} b = \Sfalse}$
-    \end{itemize}
-    \end{frame}
-    
-    
-    \begin{frame}
-    {Expresii}
-    \begin{itemize}
-    \item[]
-    $\reg[:iop]{\T{\Gamma}{e_1\mathrel{o} e_2}{int}}{\T{\Gamma}{e_1}{int} \si \T{\Gamma}{e_2}{int}}{o\in \{+,-,*,/\}}$
-    
-    \vitem[]
-    $\reg[:cop]{\T{\Gamma}{e_1\mathrel{o} e_2}{bool}}{\T{\Gamma}{e_1}{int} \si \T{\Gamma}{e_2}{int}}{o\in \{\leq, \geq, <, >, =\}}$
-    
-    \vitem[]
-    $\reg[:bop]{\T{\Gamma}{e_1\mathrel{o} e_2}{bool}}{\T{\Gamma}{e_1}{bool} \si \T{\Gamma}{e_2}{bool}}{o\in \{\Sand, \Sor\}}$
-    
-    \vitem[]
-    $\reg[:if]{\T{\Gamma}{\Sif e_b \Sthen e_1 \Selse e_2}{\tau}}{\T{\Gamma}{e_b}{bool} \si \T{\Gamma}{e_1}{\tau} \si \T{\Gamma}{e_2}{\tau}}{}$
-    \end{itemize}
-    \end{frame}
-    
-    
-    \begin{frame}{Fragmentul funcțional}
-    \begin{itemize}
-    \item[] 
-    $\displaystyle\reg[:fn]{\T{\Gamma}{\fun{x}{e}}{\tau \rightarrow \tau'}}{\T{\Gamma'}{e}{\tau'}}{\Gamma' = \Gamma[x\mapsto \tau]}$
-    
-    \vitem[]
-    $\displaystyle\reg[:app]{\T{\Gamma}{e_1\; e_2}{\tau}}{\T{\Gamma}{e_1}{\tau' \rightarrow \tau} \si \T{\Gamma}{e_2}{\tau'}}{}$
-    \end{itemize}
-    \end{frame}
-    
-    \end{subsection}
-    
-    \begin{subsection}{Proprietăți}
-    
-    \begin{frame}{Programe în execuție}
-     \begin{alertblock}{Problemă:}
-     \begin{itemize}
-       \item În timpul execuției programul conține valori de tip closure
-       \item Care este tipul lor?
-     \end{itemize}
-     \end{alertblock} 
-    
-     \begin{block}{Soluție}
-     \begin{itemize}
-     \item Adăugam regula $\reg[:cl]{\T{\Gamma}{{\it closure}(x, e, \rho)}{\tau}}{\T{\Gamma_\rho}{\lambda x. e}{\tau}}{} {\it unde}$ 
-     \item Mediul de tipuri $\Gamma_\rho$ asociat unui mediu de execuție $\rho$ satisface:
-     \begin{itemize}
-     \item $\Dom(\Gamma_\rho) = \Dom(\rho)$
-     \item Pentru orice variabilă $x\in \Dom(\rho)$, există $\tau$ tip și $v$ valoare astfel încât $\Gamma_\rho(x) = \tau$, $\rho(x) = v$ și $\T{}{v}{\tau}$
-     \end{itemize}
-     \end{itemize}
-     \end{block}
-    \end{frame}
-    
-    \begin{frame}{Proprietăți}{ale sistemului de tipuri pentru limbajul $\Sfun$-IMP}
-    \begin{theorem}[Proprietatea de a progresa] Dacă $\T{\Gamma_\rho}{e}{\tau}$ atunci $e$ este valoare sau $e$ poate progresa în $\rho$: există $e'$ astfel încât $\rho \vdash \Ss{e}{e'}$.
-    \end{theorem}
-    \vfill
-    
-    \begin{theorem}[Proprietatea de conservare a tipului]
-    Dacă $\T{\Gamma_\rho}{e}{\tau}$ și $\rho\vdash \Ss{e}{e'}$, atunci 
-    $\T{\Gamma_\rho'}{e'}{\tau}$.
-    \end{theorem}
-    
-    \vfill
-    \begin{theorem}[Siguranță---programele bine formate nu se împotmolesc]
-    Dacă $\T{\Gamma_\rho}{e}{\tau}$ și $\rho\vdash {e}\longrightarrow^\ast{e'}$, atunci $e'$ este valoare sau există $e''$, astfel încât $\rho \vdash \Ss{e'}{e''}$.
-    \end{theorem}
-    
-    \end{frame}
-    
-    \begin{frame}{Probleme computaționale}
-    \begin{block}{Verificarea tipului}
-    Date fiind $\Gamma$, $e$ și $\tau$, verificați dacă $\tjud{e}{\tau}$.
-    \end{block}
-    
-    \begin{block}{Determinarea (inferarea) tipului}
-    Date fiind $\Gamma$ și $e$, găsiți (sau arătați ce nu există) un $\tau$ astfel încât $\tjud{e}{\tau}$.
-    \end{block}
-    
-    \begin{itemize}
-    \item A doua problemă e mai grea în general decât prima
-    \item Algoritmi de inferare a tipurilor
-    \begin{itemize}
-    \item Colectează constrângeri asupra tipului
-    \item Folosesc metode de rezolvare a constrângerilor (programare logică)
-    \end{itemize}
-    \end{itemize}
-    \end{frame}
-    
-    \begin{frame}{Probleme computaționale}{Proprietăți}
-    \begin{theorem}[Determinarea tipului este decidabilă]
-    Date fiind $\Gamma$ și $e$, poate fi găsit (sau demonstrat că nu există) un $\tau$ astfel încât 
-    $\tjud{e}{\tau}$.
-    \end{theorem}
-    \vfill
-    
-    \begin{theorem}[Verificarea tipului este decidabilă]
-    Date fiind $\Gamma$, $e$ și $\tau$, problema $\tjud{e}{\tau}$ este decidabilă.
-    \end{theorem}
-    
-    \vfill
-    \begin{theorem}[Unicitatea tipului]
-    Dacă $\tjud{e}{\tau}$ și $\tjud{e}{\tau'}$, atunci $\tau=\tau'$.
-    \end{theorem}
-    \end{frame}
-    
-    \end{subsection}
-
-    \begin{subsection}{Exemplu}
-      \begin{frame}{Exemplu}
-        \begin{block}{Care este tipul expresiei următoare (dacă are)}
-          \[ \lambda x.\lambda y. \lambda z. \Sif {y = 0} \Sthen z \Selse {x / y}\]
-        \end{block}
-
-        \begin{block}{Aplicăm regula 
-    $\displaystyle\reg[:fn]{\T{\Gamma}{\fun{x}{e}}{\tau \rightarrow \tau'}}{\T{\Gamma'}{e}{\tau'}}{\Gamma' = \Gamma[x\mapsto \tau]}$
-    }
-          $\vdash  \lambda x.\lambda y. \lambda z. \Sif {y = 0} \Sthen z \Selse {x / y} : t_x \rightarrow t$ dacă
-          $x \mapsto t_x \vdash \lambda y. \lambda z. \Sif {y = 0} \Sthen z \Selse {x / y} : t$
-
-          \pause Mai departe:
-          $x \mapsto t_x \vdash \lambda y. \lambda z. \Sif {y = 0} \Sthen z \Selse {x / y} : t_y \rightarrow t_0$ dacă
-          $x \mapsto t_x, y\mapsto t_y \vdash \lambda z. \Sif {y = 0} \Sthen z \Selse {x / y} : t_0$ și, de mai sus,
-          $t = t_y \rightarrow t_0$
-
-          \pause Mai departe: 
-          $x \mapsto t_x, y\mapsto t_y \vdash \lambda z. \Sif {y = 0} \Sthen z \Selse {x / y} : t_z\rightarrow t_1$ dacă
-          $x \mapsto t_x, y\mapsto t_y, z \mapsto t_z \vdash \Sif {y = 0} \Sthen z \Selse {x / y} : t_1$ și, de mai sus,
-          $t_0 = t_z \rightarrow t_1$
-        \end{block}
-     
-      \end{frame}
-
-      \begin{frame}{Exemplu}
-      \begin{block}{Unde suntem}
-        $\vdash  \lambda x.\lambda y. \lambda z. \Sif {y = 0} \Sthen z \Selse {x / y} : t_x \rightarrow t$ dacă
-        $x \mapsto t_x, y\mapsto t_y, z \mapsto t_z \vdash \Sif {y = 0} \Sthen z \Selse {x / y} : t_1$ și
-        $t_0 = t_z \rightarrow t_1$, $t = t_y \rightarrow t_0$.
-      \end{block}
-        \begin{block}{Aplicăm regula 
-    $\reg[:if]{\T{\Gamma}{\Sif e_b \Sthen e_1 \Selse e_2}{\tau}}{\T{\Gamma}{e_b}{bool} \si \T{\Gamma}{e_1}{\tau} \si \T{\Gamma}{e_2}{\tau}}{}$
-    }
-        $x \mapsto t_x, y\mapsto t_y, z \mapsto t_z \vdash \Sif {y = 0} \Sthen z \Selse {x / y} : t_1$ dacă
-
-        $x \mapsto t_x, y\mapsto t_y, z \mapsto t_z \vdash {y = 0} : \Sbool$ și
-        $x \mapsto t_x, y\mapsto t_y, z \mapsto t_z \vdash {z} : t_1$ și
-        $x \mapsto t_x, y\mapsto t_y, z \mapsto t_z \vdash {x / y} : t_1$
-
-
-        \end{block}
-      \end{frame}
-      \begin{frame}{Exemplu}
-        \begin{block}{Aplicăm regula 
-    $\reg[:cop]{\T{\Gamma}{e_1\mathrel{o} e_2}{bool}}{\T{\Gamma}{e_1}{int} \si \T{\Gamma}{e_2}{int}}{o\in \{\leq, \geq, <, >, =\}}$
-        }
-        $x \mapsto t_x, y\mapsto t_y, z \mapsto t_z \vdash {y = 0} : \Sbool$ dacă
-
-        $x \mapsto t_x, y\mapsto t_y, z \mapsto t_z \vdash y : \Sint$ \hfill și \hfill
-        $x \mapsto t_x, y\mapsto t_y, z \mapsto t_z \vdash 0 : \Sint$
-        \end{block}
-
-        \begin{block}{Aplicăm regula 
-     $\reg[:int]{\T{\Gamma}{n}{int}}{}{\mbox{$n$ întreg}}$
-        }
-
-        $x \mapsto t_x, y\mapsto t_y, z \mapsto t_z \vdash 0 : \Sint$ este adevărat
-        \end{block}
-
-        \begin{block}{Aplicăm regula 
-    $\reg[:iop]{\T{\Gamma}{e_1\mathrel{o} e_2}{int}}{\T{\Gamma}{e_1}{int} \si \T{\Gamma}{e_2}{int}}{o\in \{+,-,*,/\}}$
-        }
-
-        $x \mapsto t_x, y\mapsto t_y, z \mapsto t_z \vdash {x / y} : \Sint$ dacă
-
-        $x \mapsto t_x, y\mapsto t_y, z \mapsto t_z \vdash x : \Sint$ \hfill și \hfill
-        $x \mapsto t_x, y\mapsto t_y, z \mapsto t_z \vdash y : \Sint$
-
-        și, de mai sus, $t_1 = \Sint$
-        \end{block}
-        
-      \end{frame}
-
-      \begin{frame}{Exemplu}
-      \begin{block}{Recapitulăm}
-        $\vdash  \lambda x.\lambda y. \lambda z. \Sif {y = 0} \Sthen z \Selse {x / y} : t_x \rightarrow t$ dacă
-
-        $x \mapsto t_x, y\mapsto t_y, z \mapsto t_z \vdash y : \Sint$ \hfill și \hfill
-        $x \mapsto t_x, y\mapsto t_y, z \mapsto t_z \vdash {z} : t_1$
-
-        $x \mapsto t_x, y\mapsto t_y, z \mapsto t_z \vdash x : \Sint$ \hfill și \hfill
-        $x \mapsto t_x, y\mapsto t_y, z \mapsto t_z \vdash y : \Sint$
-
-        și
-        $t_0 = t_z \rightarrow t_1$, $t = t_y \rightarrow t_0$, $t_1 = \Sint$.
-      \end{block}
-        \begin{block}{Aplicăm regula 
-     $\reg[:var]{\T{\Gamma}{x}{\tau}}{}{\Gamma(x) = \tau}$
-    }
-
-    $x \mapsto t_x, y\mapsto t_y, z \mapsto t_z \vdash y : t_y$ adevărat și, de mai sus $t_y = \Sint$
-
-    $x \mapsto t_x, y\mapsto t_y, z \mapsto t_z \vdash {z} : t_z$ adevărat și, de mai sus, $t_1 = t_z$
-
-    $x \mapsto t_x, y\mapsto t_y, z \mapsto t_z \vdash x : t_x$ adevărat și, de mai sus, $t_x = \Sint$
-
-        \end{block}
-      \end{frame}
-
-      \begin{frame}{Exemplu}
-      \begin{block}{Finalizăm}
-        $\vdash  \lambda x.\lambda y. \lambda z. \Sif {y = 0} \Sthen z \Selse {x / y} : t_x \rightarrow t$ dacă
-
-        $t_0 = t_z \rightarrow t_1$, $t = t_y \rightarrow t_0$, $t_1 = \Sint$, $t_y = \Sint$,
-        $t_1 = t_z$ și $t_x = \Sint$.
-
-      \end{block}
-       \begin{block}{Rezolvăm constrângerile și obținem}
-
-        $\vdash  \lambda x.\lambda y. \lambda z. \Sif {y = 0} \Sthen z \Selse {x / y} : {\Sint} \rightarrow {\Sint} \rightarrow {\Sint} \rightarrow {\Sint}$
-
-        \end{block}
-      \end{frame}
-
-      
-    \end{subsection}
-
-    \begin{subsection}{Implementare în Prolog}
-
-
-
-    \begin{frame}{Relația de asociere de tipuri în Prolog}
-    Definim (recursiv) o relație de forma {\tt type(Gamma, E, T)}, unde
-    \begin{itemize}
-      \item {\tt Gamma} este o listă de perechi de forma {\tt (X, T)} unde
-       {\tt X} este un identificator și {\tt T} este o expresie de tip cu variabile
-      \item {\tt E} este o $\lambda$-expresie scrisă cu sintaxa descrisă mai sus
-      \item {\tt T} este o expresie de tip cu variabile
-    \end{itemize}
-    \end{frame}
-
-  \begin{frame}[fragile]{Sintaxa limbajului LAMBDA}
-    \begin{block}{BNF}
-    \[
-    \begin{array}{rcl}
-      e & ::= & {\Id} \Smid {\Int} \Smid {\Strue} \Smid {\Sfalse} \\
-        & \Smid & {e + e} \Smid {e < e} \Smid { \terminal{not}(e) } \\
-        & \Smid & \Sif e \Sthen e \Selse e \\
-        & \Smid & {\lambda \Id . e} \Smid {e \; e} \\
-        & \Smid & \terminal{let} \Id \terminal{=} e \terminal{in} e
-    \end{array}
-    \]
-    \end{block}
-
-    \begin{block}{Verificarea sintaxei în Prolog}
-      \begin{asciipl}
-exp(Id) :- atom(Id).                      % identifier
-exp(Lit) :- Lit = true ; Lit = false ; integer(Lit).
-exp(E1 + E2) :- exp(E1), exp(E2).         % same for any op
-exp(if(E1, E2, E3)) :- exp(E1), exp(E2), exp(E3).
-exp(Id -> Exp) :- atom(Id), exp(Exp).     % lambda
-exp(Exp1 $ Exp2) :- exp(Exp1), exp(Exp2). % application
-exp(let(Id, Exp1, Exp2)) :- atom(Id), exp(Exp1), exp(Exp2).
-      \end{asciipl}
-    \end{block}
- \end{frame}
-
-  \begin{frame}[fragile]{Sintaxa tipurilor }
-    \begin{block}{BNF}
- \begin{syntaxBlock}{\structure{\tau}}
- \color<beamer|handout>{black!25!white}{
- \renewcommand{\syntaxKeyword}{}
- \syntax{int}{întregi}
- \syntaxCont{bool}{valori de adevăr}
- \syntaxCont{\structure{\tau} \rightarrow \structure{\tau}}{funcții}
- \syntaxCont{\structure{a}}{variabile de tip}
- }
- \vspace{-4ex}
- \end{syntaxBlock}
-\end{block}
-
-    \begin{block}{Verificarea sintaxei tipurilor în Prolog}
-      \begin{asciipl}
-is_type(X) :- variable(X).     % variabile
-is_type(int).                  % intregi
-is_type(bool).                 % valori de adevar
-is_type(T1 -> T2) :-           % functii
-   is_type(T1), is_type(T2).
-      \end{asciipl}
-    \end{block}
-\end{frame}
-
-    \begin{frame}[fragile]{Axiome}
-    \begin{itemize}
-    \item[] $\reg[:var]{\T{\Gamma}{x}{\tau}}{}{\Gamma(x) = \tau}$
-
-    \begin{asciipl}
-      type(Gamma, X, T) :- atom(X), get(Gamma, X, T).
-    \end{asciipl}
-
-    \vitem[] $\reg[:int]{\T{\Gamma}{n}{int}}{}{\mbox{$n$ întreg}}$
-
-    \begin{asciipl}
-      type(_, I, int) :- integer(I).
-    \end{asciipl}
-
-    \vitem[] $\reg[:bool]{\T{\Gamma}{b}{bool}}{}{b = \Strue \mathrel{or} b = \Sfalse}$
-
-    \begin{asciipl}
-      type(_, true, bool).
-      type(_, false, bool).
-    \end{asciipl}
-    \end{itemize}
-    \end{frame}
-    
-    
-    \begin{frame}[fragile]{Expresii}
-    \begin{itemize}
-    \item[]
-    $\reg[:iop]{\T{\Gamma}{e_1\mathrel{o} e_2}{int}}{\T{\Gamma}{e_1}{int} \si \T{\Gamma}{e_2}{int}}{o\in \{+,-,*,/\}}$
-
-    \begin{asciipl}
-type(Gamma, E1 + E2, int) :-
-    type(Gamma, E1, int), type(Gamma, E2, int).
-    \end{asciipl}
-    
-    \vitem[]
-    $\reg[:cop]{\T{\Gamma}{e_1\mathrel{o} e_2}{bool}}{\T{\Gamma}{e_1}{int} \si \T{\Gamma}{e_2}{int}}{o\in \{\leq, \geq, <, >, =\}}$
-
-    \begin{asciipl}
-type(Gamma, E1 < E2, bool) :-
-    type(Gamma, E1, int), type(Gamma, E2, int).
-    \end{asciipl}
-    
-    \vitem[]
-    $\reg[:bop]{\T{\Gamma}{e_1\mathrel{o} e_2}{bool}}{\T{\Gamma}{e_1}{bool} \si \T{\Gamma}{e_2}{bool}}{o\in \{\Sand, \Sor\}}$
-
-    \begin{asciipl}
-type(Gamma, and(E1, E2), bool) :-
-    type(Gamma, E1, bool), type(Gamma, E2, bool).
-    \end{asciipl}
-    \end{itemize}
-    \end{frame}
-
-    \begin{frame}[fragile]{Expresia condițională}
-    \begin{itemize}
-    
-    \vitem[]
-    $\reg[:if]{\T{\Gamma}{\Sif e_b \Sthen e_1 \Selse e_2}{\tau}}{\T{\Gamma}{e_b}{bool} \si \T{\Gamma}{e_1}{\tau} \si \T{\Gamma}{e_2}{\tau}}{}$
-
-    \vitem[]
-    \begin{asciipl}
-type(Gamma, if(E, E1, E2), T) :-
-    type(Gamma, E, bool),
-    type(Gamma, E1, T),
-    type(Gamma, E2, T).
-    \end{asciipl}
-    
-    \end{itemize}
-    \end{frame}
-    
-    \begin{frame}[fragile]{Fragmentul funcțional}
-    \begin{itemize}
-    \item[] 
-    $\displaystyle\reg[:fn]{\T{\Gamma}{\fun{x}{e}}{\tau \rightarrow \tau'}}{\T{\Gamma'}{e}{\tau'}}{\Gamma' = \Gamma[x\mapsto \tau]}$
-    
-    \begin{asciipl}
-type(Gamma, X -> E, TX -> TE) :-
-    atom(X), set(Gamma, X, TX, GammaX), type(GammaX, E, TE).
-    \end{asciipl}
- 
-
-    \vitem[]
-    $\displaystyle\reg[:app]{\T{\Gamma}{e_1\; e_2}{\tau}}{\T{\Gamma}{e_1}{\tau' \rightarrow \tau} \si \T{\Gamma}{e_2}{\tau'}}{}$
-    
-    \begin{asciipl}
-type(Gamma, E1 $ E2, T) :-
-    type(Gamma, E, TE2 -> T), type(Gamma, E2, TE2).
-    \end{asciipl}
-     \end{itemize}
-    \end{frame}
-
-      
-    \end{subsection}
-  \end{section}
-
-  \begin{section}{Funcții polimorfice}
-    \begin{frame}{Tipurile variabile nu sunt suficiente}
-      \begin{block}{Tipurile variabile sunt destul de flexibile}
-      \begin{itemize}
-        \item $\vdash {\lambda x . x} : t \rightarrow t$ pentru orice $t$
-        \item $\vdash {\Sif (\lambda x.x)\; {\Strue} \Sthen (\lambda x. x)\; 3} \Selse 4 : \Sint$
-      \end{itemize}
-      \end{block}
-      \pause 
-      \begin{alertblock}{ Dar tipul unei expresii este fixat:}
-       \[\not\vdash (\lambda {id}. {\Sif {id}\; {\Strue} \Sthen {id}\; 3} \Selse 4) (\lambda x. x) : \Sint\]
-      \end{alertblock}
-      \pause
-      \begin{block}{Soluție}
-        Pentru funcțiile cu nume, am vrea să fie ca și cum am calcula mereu tipul
-       \[\vdash \Slet {id} = (\lambda x. x) \Sin {\Sif {id}\; {\Strue} \Sthen {id}\; 3} \Selse 4)  : \Sint\]
-
-       \structure{Operațional:} redenumim variabilele de tip când instanțiem numele funcției
-
-      \end{block}
-      
-    \end{frame}
-
-    \begin{frame}{Scheme de tipuri}
-      \begin{itemize}
-        \item Numim schemă de tipuri o expresie de forma $\c{\tau}$,
-         
-        unde $\tau$ este e un expresie tip  cu variabile
-
-        \item variabilele dintr-o schemă nu pot fi constrânse 
-        
-        e ca și cum ar fi cuantificate universal
-
-        \item O schemă poate fi concretizată la un tip obișnuit
-        substituindu-i fiecare variabilă cu orice tip (poate fi și variabilă)
-
-        \begin{itemize}
-          \item Pentru orice substituție $\theta$ de la variabile de tip la tipuri cu variabile
-        \end{itemize}
-      \end{itemize}
-    \end{frame}
-
-
-    \begin{frame}[fragile]{Reguli pentru scheme}
-      
-      \begin{block}{$\displaystyle \reg[:let]{\T{\Gamma}{\Slet {x = e_1} \Sin e2}{\tau}}{\T{\Gamma}{e_1}{\tau_1} \si \T{\Gamma_1}{e_2}{\tau}}{\Gamma_1 = \Gamma[\c{\tau_1} / x]}$}
-\pause
-        \begin{asciipl}
-type(Gamma, let(X, E1, E2), T) :-
-    type(Gamma, E1, T1),
-    copy_term(T1, FreshT1),   % redenumeste variabilele
-                              % ca sa nu poata fi constranse
-    set(Gamma, X, scheme(FreshT1), GammaX),
-    type(GammaX, E2, T).
-        \end{asciipl}
-      \end{block}
-
-\pause
-      \begin{block}{$\displaystyle \reg[:sch]{\T{\Gamma}{x}{\tau'}}{}{\Gamma(x) = \c{\tau} \mbox{ și } \tau' = \theta(\tau)}$}
-        \begin{asciipl}
-type(Gamma, X, T) :-
-    atom(X), get(Gamma, X, T), is_type(T), !.         
-type(Gamma, X, T) :-
-    atom(X), get(Gamma, X, scheme(TX)),
-    copy_term(TX, T).         % redenumeste variabilele
-                              % ca sa poata fi constranse
-        \end{asciipl}
-      \end{block}
-    \end{frame}
-
-
-
-  \end{section}
-
-    
-%---------------------------------------------------------------------
- 
-\begin{frame}
+%------------------------------------------------------------------
+\begin{frame}{Rezoluția SLD - exemplu}
+
+{
+\footnotesize
+\vspace{.2cm}
+\begin{minipage}{7cm}
+\begin{alltt}
+father(eddard,sansa). \\
+father(eddard,jonSnow). \\
+
+stark(eddard). \\
+stark(catelyn). \\
+
+stark(X) :- father(Y,X),    
+    stark(Y).
+\end{alltt}
+\end{minipage}
+\begin{minipage}{3.5cm}
+\texttt{?- stark(jonSnow)}
+\end{minipage}
+
+\vspace{.2cm}
 \begin{center}
-\intens{Pe săptămâna viitoare!}
+\intens{SLD}
+\fbox{
+$\displaystyle\frac{\neg Q_1\vee\cdots\vee \intens{\neg Q_i}\vee\cdots\vee\neg Q_n }
+{\intens{ \theta}(\neg Q_1\vee\cdots\vee \intens{\neg P_1\vee\cdots\vee\neg P_m}\vee\cdots\vee\neg Q_n)}$}
+\end{center}
+\vspace{-.3cm}
+\begin{itemize}
+	\item \intens{ $Q\vee\neg P_1\vee\cdots\vee \neg P_m$} este o clauză definită din $KB$
+	\item variabilele din \intens{$Q\vee\neg P_1\vee\cdots\vee \neg P_m$} și \intens{$Q_i$} se redenumesc
+	\item \intens{ $\theta$} este cmgu pentru \intens{ $Q_i$} și \intens{ $Q$}.
+\end{itemize}
+}
+\end{frame}
+
+
+
+%------------------------------------------------------------------
+\begin{frame}{Rezoluția SLD - exemplu}
+
+{
+\footnotesize
+\vspace{.2cm}
+\begin{minipage}{6.5cm}
+$father(eddard,sansa)$ \\
+$father(eddard,jonSnow)$ \\
+
+$stark(eddard)$ \\
+$stark(catelyn)$ \\
+
+
+\intens{$stark(X)\vee\neg father(Y,X)\vee\neg stark(Y)$}
+\end{minipage}
+\begin{minipage}{3.5cm}
+$$\displaystyle\frac{\onslide<1->{\intens{\neg stark(jonSnow)}}}
+{\onslide<2->{\intens{\neg father(Y,jonSnow)\vee \neg stark(Y)}}}$$
+
+\onslide<1->{$$\theta(X) = jonSnow$$}
+\end{minipage}
+
+
+\vspace{.2cm}
+\begin{center}
+\intens{SLD}
+\fbox{
+$\displaystyle\frac{\neg Q_1\vee\cdots\vee \intens{\neg Q_i}\vee\cdots\vee\neg Q_n }
+{\intens{ \theta}(\neg Q_1\vee\cdots\vee \intens{\neg P_1\vee\cdots\vee\neg P_m}\vee\cdots\vee\neg Q_n)}$}
+\end{center}
+\vspace{-.3cm}
+\begin{itemize}
+	\item \intens{ $Q\vee\neg P_1\vee\cdots\vee \neg P_m$} este o clauză definită din $KB$
+	\item variabilele din \intens{$Q\vee\neg P_1\vee\cdots\vee \neg P_m$} și \intens{$Q_i$} se redenumesc
+	\item \intens{ $\theta$} este cmgu pentru \intens{ $Q_i$} și \intens{ $Q$}.
+\end{itemize}
+}
+\end{frame}
+
+%------------------------------------------------------------------
+\begin{frame}{Rezoluția SLD - exemplu}
+
+{
+\footnotesize
+\vspace{.2cm}
+\begin{minipage}{6.5cm}
+$father(eddard,sansa)$ \\
+$father(eddard,jonSnow)$ \\
+
+$stark(eddard)$ \\
+$stark(catelyn)$ \\
+
+
+\intens{$stark(X)\vee\neg father(Y,X)\vee\neg stark(Y)$}
+\end{minipage}
+\begin{minipage}{3.5cm}
+$$\displaystyle\frac{{\intens{\neg stark(jonSnow)}}}
+{{\intens{\neg father(Y,jonSnow)\vee \neg stark(Y)}}}$$
+ 
+$$\displaystyle\frac
+{{\intens{\neg father(Y,jonSnow)}\vee \neg stark(Y)}} {{ \neg stark(eddard)}}$$
+ 
+
+$$\displaystyle\frac {\intens{ \neg stark(eddard)}}{\Box}$$
+\end{minipage}
+
+
+\vspace{.2cm}
+\begin{center}
+\intens{SLD}
+\fbox{
+$\displaystyle\frac{\neg Q_1\vee\cdots\vee \intens{\neg Q_i}\vee\cdots\vee\neg Q_n }
+{\intens{ \theta}(\neg Q_1\vee\cdots\vee \intens{\neg P_1\vee\cdots\vee\neg P_m}\vee\cdots\vee\neg Q_n)}$}
+\end{center}
+\vspace{-.3cm}
+\begin{itemize}
+	\item \intens{ $Q\vee\neg P_1\vee\cdots\vee \neg P_m$} este o clauză definită din $KB$
+	\item variabilele din \intens{$Q\vee\neg P_1\vee\cdots\vee \neg P_m$} și \intens{$Q_i$} se redenumesc
+	\item \intens{ $\theta$} este cmgu pentru \intens{ $Q_i$} și \intens{ $Q$}.
+\end{itemize}
+}
+\end{frame}
+
+%------------------------------------------------------------------------
+\begin{frame}{Rezoluția SLD }
+ 
+Fie $KB$ o mulțime de clauze definite și $Q_1 \wedge \ldots \wedge Q_m$ o întrebare, unde $Q_i$ sunt formule atomice.
+
+\begin{itemize}
+	\item \intens{O derivare} din $KB$ prin rezoluție SLD este o secvență 
+\begin{center}
+\intens{$G_0:= \neg Q_1 \vee \ldots \vee \neg Q_m$},\quad  $G_1$,\quad $\ldots$,\quad $G_k$, $\ldots$
+\end{center}
+în care $G_{i+1}$ se obține din $G_i$ prin regula \intens{ SLD}.  
+
+	\item Dacă există un $k$ cu 
+\intens{$G_k=\Box$} (clauza vidă), atunci  derivarea se numește \intens{SLD-respingere}.
+\end{itemize}
+
+\pause
+\textbf{Teoremă.} Sunt echivalente:
+\begin{enumerate}
+\item există o \intens{SLD-respingere} a lui $Q_1 \wedge \ldots \wedge Q_m$ din  $KB$,
+\vspace{.2cm}
+\item  \intens{$KB\models Q_1\wedge\cdots\wedge Q_m$}.
+\end{enumerate}
+\end{frame}
+
+
+%------------------------------------------------------------------------
+\begin{frame}{Rezoluția SLD - arbori de căutare}
+ \intens{Arbori SLD}
+ \begin{itemize}
+ 	\item Presupunem că avem o mulțime de clauze definite $KB$ și o țintă $G_0 = \neg Q_1 \vee \ldots \vee \neg Q_m$
+	\medskip
+	\item Construim un arbore de căutare (\intens{arbore SLD}) astfel:
+	\begin{itemize}
+		\vspace{.1cm}
+		\item Fiecare nod al arborelui este o țintă (posibil vidă)
+		\vspace{.1cm}
+		\item Rădăcina este $G_0$
+		\vspace{.1cm}
+		\item Dacă arborele are un nod $G_i$, iar $G_{i+1}$ se obține din $G_i$ folosind regula SLD folosind o clauză $C_i \in KB$, atunci nodul  $G_i$ are copilul $G_{i+1}$. \\
+		Muchia dintre $G_i$ și $G_{i+1}$ este etichetată cu $C_i$.
+	\end{itemize}
+	\medskip
+	\item Dacă un arbore SLD cu rădăcina $G_0$ are o frunză $\Box$ (clauza vidă), atunci există o SLD-respingere a lui $G_0$ din $KB$.
+\end{itemize}
+\end{frame}
+
+%------------------------------------------------------------------------
+\begin{frame}{Rezoluția SLD - arbori de căutare}
+
+\textbf{\color{True} Exemplu.}
+
+Fie $KB$ următoarea mulțime de clauze definite:
+\begin{enumerate}
+	\item \intens{$grandfather(X,Z):-father(X,Y), parent(Y,Z)$}
+	\item \intens{$parent(X,Y):-father(X,Y)$}
+	\item \intens{$parent(X,Y):-mother(X,Y)$}
+	\item \intens{$father(ken,diana)$}
+	\item \intens{$mother(diana,brian)$}
+\end{enumerate}
+
+\vspace{.2cm}
+\intens{Găsiți o respingere din $KB$ pentru}
+\begin{center}
+\intens{$?- grandfather(ken,Y)$}
 \end{center}
 \end{frame}
 
 %------------------------------------------------------------------------
+\begin{frame}{Rezoluția SLD - arbori de căutare}
+
+\textbf{\color{True} Exemplu.}
+
+Fie $KB$ următoarea mulțime de clauze definite:
+\begin{enumerate}
+	\item \intens{$grandfather(X,Z) \vee \neg father(X,Y) \vee \neg parent(Y,Z)$}
+	\item \intens{$parent(X,Y) \vee \neg father(X,Y)$}
+	\item \intens{$parent(X,Y) \vee \neg mother(X,Y)$}
+	\item \intens{$father(ken,diana)$}
+	\item \intens{$mother(diana,brian)$}
+\end{enumerate}
+
+\vspace{.2cm}
+\intens{Găsiți o respingere din $KB$ pentru}
+\begin{center}
+\intens{$\neg grandfather(ken,Y)$}
+\end{center}
+
+\end{frame}
+
+%------------------------------------------------------------------------
+\begin{frame}{Rezoluția SLD - arbori de căutare}
+
+{\footnotesize
+
+\textbf{\color{True} Exemplu.}
+
+\begin{enumerate}
+	\item {$grandfather(X,Z) \vee \neg father(X,Y)\vee \neg parent(Y,Z)$}
+	\item {$parent(X,Y)\vee \neg father(X,Y)$}
+	\item {$parent(X,Y)\vee \neg mother(X,Y)$}
+	\item {$father(ken,diana)$}
+	\item {$mother(diana,brian)$}
+\end{enumerate}
+
+\vspace{-.1cm}
+\begin{figure}[h]
+  \begin{tikzpicture}	
+  	\node(1) at (0,4) {\intens{$\neg grandfather(ken,Y)$}};
+	\node(2) at (0,3) {\intens{$\neg father(ken,V)$} $\vee\ \neg parent(V,Y)$};
+	\node(3) at (0,2) {\intens{$\neg parent(diana,Y)$}};
+	\node(4) at (-2,1) {$\neg father(diana,Y)$};
+	\node(5) at (2,1) {\intens{$\neg mother(diana,Y)$}};
+	\node(6) at (2,0) {$\Box$};
+	  	
+	\draw [->]  (1) -- node[midway,right] {\footnotesize $1$}  (2) ;
+	\draw [->]  (2) -- node[midway,right] {\footnotesize $4$}  (3) ;
+	\draw [->]  (3) -- node[midway,right] {\footnotesize $2$}  (4) ;
+	\draw [->]  (3) -- node[midway,right] {\footnotesize $3$}  (5) ;
+	\draw [->]  (5) -- node[midway,right] {\footnotesize $5$}  (6) ;
+   \end{tikzpicture}
+\end{figure}
+}
+\end{frame}
+
+%%------------------------------------------------------------------------
+%\begin{frame}{Rezoluția SLD }
+%
+%\vspace*{.3cm}
+%
+%\begin{example} 
+%\begin{minipage}{5.5cm}
+%{
+%\begin{enumerate}
+% \setcounter{enumi}{1}
+%
+%	\item {$\intens{parent(X,Y)}\vee \neg father(X,Y)$}
+%	\end{enumerate}
+%}
+%\end{minipage}
+%\begin{minipage}{4.5cm}
+%\begin{figure}[h]
+%  \begin{tikzpicture}	
+%	\node(3) at (0,2) {\intens{$\neg parent(diana,Y)$}};
+%	\node(4) at (-2,1) {$\neg father(diana,Y)$};
+%	\draw [->]  (3) -- node[midway,right] {\footnotesize $2$}  (4) ;
+%
+%   \end{tikzpicture}
+%  \end{figure}
+%  \end{minipage}
+%
+%\medskip
+%Aplicarea \intens{SLD}:
+%\medskip 
+%\begin{itemize}
+%\item redenumesc variabilele: $\intens{parent(X,Y_2)}\vee \neg father(X,Y_2)$
+%\medskip
+%\item determin unificatorul: \intens{$\theta={X/diana, Y_2/Y}$}
+%\medskip
+%\item aplic regula: $\displaystyle\frac {\intens{\neg parent(diana,Y)}}{\intens{\neg father(diana,Y)}}$
+%\end{itemize}
+%\end{example}
+%\end{frame}
+
+%---------------------------------------------------------------------
+\begin{frame}{Limbajul Prolog}
+\begin{itemize}
+	\item Am arătat că \intens{sistemul de inferență din spatele Prolog-ului este complet}. 
+	\begin{itemize}
+		\item Dacă o întrebare este consecință logică a unei mulțimi de clauze, atunci există o derivare a întrebării.
+	\end{itemize}
+	\medskip
+	\item Totuși, \alert{strategia de căutate din Prolog este incompletă!}
+	\begin{itemize}
+		\item Chiar dacă o întrebare este consecință logică a unei mulțimi de clauze, Prolog nu găsește mereu o derivare a întrebării.
+	\end{itemize}
+	
+\end{itemize}
+\end{frame}
+%---------------------------------------------------------------------
+
+
+%---------------------------------------------------------------------
+\begin{frame}{Limbajul Prolog - exemplu}
+
+\begin{alltt}
+warmerClimate :- albedoDecrease. \\
+warmerClimate :- carbonIncrease. \\
+iceMelts :- warmerClimate. \\
+albedoDecrease :- iceMelts. \\
+carbonIncrease. \\
+
+?- iceMelts.\\
+\alert{! Out of local stack}
+\end{alltt}
+
+\end{frame}
+
+
+\begin{frame}{Limbajul Prolog - exemplu}
+
+\begin{alltt}
+\alert{warmerClimate} :- \alert{albedoDecrease.} \\
+warmerClimate :- carbonIncrease. \\
+\alert{iceMelts} :- \alert{warmerClimate}. \\
+\alert{albedoDecrease} :- \alert{iceMelts.} \\
+carbonIncrease. \\
+
+?- iceMelts.\\
+\alert{! Out of local stack}
+\end{alltt}
+
+\end{frame}
+
+%---------------------------------------------------------------------
+\begin{frame}{Limbajul Prolog - exemplu}
+
+Totuși, există o derivare a lui $iceMelts$ în sistemul de deducție din clauzele:
+\begin{center}
+\begin{tabular}{rcl}
+
+$albedoDecrease$ & $\to$ & $warmerClimate  $ \\
+$carbonIncrease$ & $\to$ & $warmerClimate $ \\
+$warmerClimate$ & $\to$ & $iceMelts$  \\
+$iceMelts$ & $\to$ & $albedoDecrease$ \\
+$\top$&$\to$ & $carbonIncrease $ \\
+
+\end{tabular}
+
+\bigskip
+$
+\inferrule
+	{\inferrule
+	{carbonInc. \\ carbonInc. \to warmerClim.}
+	{warmerClim.} \\ warmerClim. \to iceMelts}
+	{iceMelts}
+$
+\end{center}
+
+\end{frame}
+
+%---------------------------------------------------------------------
+
+\begin{frame}{Rezoluția SLD - arbori de căutare}
+
+\textbf{\color{True} Exercițiu}
+Desenați arborele SLD pentru programul Prolog de mai jos și ținta \\\texttt{?- p(X,X).}
+
+\medskip
+
+\begin{tabular}{ll}
+	\texttt{1. p(X,Y) :- q(X,Z), r(Z,Y).} & \hspace{.5cm} \texttt{7. s(X) :- t(X,a).}  \\
+	\texttt{2. p(X,X) :- s(X).}		  & \hspace{.5cm} \texttt{8. s(X) :- t(X,b).}  \\
+	\texttt{3. q(X,b).}  			  & \hspace{.5cm} \texttt{9. s(X) :- t(X,X).}  \\
+	\texttt{4. q(b,a).} 			  & \hspace{.5cm} \texttt{10. t(a,b).}  \\
+	\texttt{5. q(X,a) :- r(a,X).} 		  & \hspace{.5cm} \texttt{11. t(b,a).}  \\
+	\texttt{6. r(b,a).} 			  &
+\end{tabular}
+
+\end{frame}
+
+\begin{frame}{Rezoluția SLD - arbori de căutare}
+
+\tiny{\begin{tabular}{llll}
+	\texttt{1. p(X,Y) :- q(X,Z), r(Z,Y).} & \hspace{.3cm} \texttt{4. q(b,a).}  &\hspace{.3cm} \texttt{7. s(X) :- t(X,a).}  & \hspace{.3cm} \texttt{10. t(a,b).}\\
+\texttt{2. p(X,X) :- s(X).}		  &  \hspace{.3cm} \texttt{5. q(X,a) :- r(a,X).}
+	&\hspace{.3cm} \texttt{8. s(X) :- t(X,b).}  &\hspace{.3cm}\texttt{11. t(b,a).} \\
+	\texttt{3. q(X,b).}  			  & 
+	\hspace*{.3cm} \texttt{6. r(b,a).} &\hspace{.3cm} \texttt{9. s(X) :- t(X,X).} &  \\
+	 & & & \\
+			$p(X,Y) \vee \neg q(X,Z)\vee\neg r(Z,Y)$ & \hspace{.3cm} $ q(b,a)$  &\hspace{.3cm} $s(X) \vee\neg t(X,a)$  & \hspace{.3cm}  $t(a,b)$\\
+		$p(X,X) \vee\neg s(X)$		  &  \hspace{.3cm} $q(X,a) \vee\neg r(a,X)$
+	&\hspace{.3cm} $s(X) \vee\neg t(X,b)$  &\hspace{.3cm}$t(b,a)$ \\
+	
+		$ q(X,b)$  			  & 
+	\hspace*{.3cm} $ r(b,a)$ &\hspace{.3cm} 
+	$s(X) \vee\neg t(X,X)$ &  
+\end{tabular}}
+
+\bigskip
+
+\begin{tikzpicture}[
+  every node/.style = {align=center,font=\small}]
+\node (n1) {$\neg p(X,X)$};
+\node [below left=15pt of n1] (n11){$\neg q(X,Z)\vee\neg r(Z,X)$};
+\node [below =15pt of n11] (n113){$\neg r(a,X)$};
+\node [below =0.5pt of n113] (nf2){(fail)};
+\node [left=2pt and 1pt of n113] (n112){$\neg r(a,b)$};
+\node [below=0.5pt of n112] (nf1){$(fail)$};
+\node [left=2pt of n112] (n111){$\neg r(b,X)$};
+\node [below=15pt of n111] (n1111){$\Box$\\(X=a)};
+\node [right=2pt of n113] (n114){$\neg q(a,b)$};
+\node [below=15pt of n114] (n1141){$\Box$\\(X=a)};
+\node [below right=15pt and 15pt of n1] (n12){$\neg s(X)$};
+\node [below=15pt of n12] (n122){$\neg t(X,b)$};
+\node [left=2pt of n122] (n121){$\neg t(X,a)$};
+\node [right=2pt of n122] (n123){$\neg t(X,X)$};
+\node [below=0.5pt of n123] (nf11){$(fail)$};
+\node [below=15pt of n121] (n1211){$\Box$\\(X=b)};
+\node [below=15pt of n122] (n1221){$\Box$\\(X=a)};
+
+\draw [-]  (n1) -- node[midway,left] {\footnotesize $1$}  (n11) ;
+\draw [-]  (n1) -- node[midway,right] {\footnotesize $2$}  (n12) ;
+\draw [-]  (n11) -- node[midway,left] {\footnotesize $3$}  (n111) ;
+\draw [-]  (n11) -- node[midway,left] {\footnotesize $4$}  (n112) ;
+\draw [-]  (n11) -- node[midway,left] {\footnotesize $5$}  (n113) ;
+\draw [-]  (n11) -- node[midway,right] {\footnotesize $6$}  (n114) ;
+\draw [-]  (n12) -- node[midway,left] {\footnotesize $7$}  (n121) ;
+\draw [-]  (n12) -- node[midway,left] {\footnotesize $8$}  (n122) ;
+\draw [-]  (n12) -- node[midway,right] {\footnotesize $9$}  (n123) ;
+\draw [-]  (n121) -- node[midway,right] {\footnotesize $11$}  (n1211) ;
+\draw [-]  (n122) -- node[midway,right] {\footnotesize $10$}  (n1221) ;
+\draw [-]  (n111) -- node[midway,right] {\footnotesize $6$}  (n1111) ;
+\draw [-]  (n114) -- node[midway,right] {\footnotesize $3$}  (n1141) ;
+
+\end{tikzpicture}
+
+\end{frame}
+
+
+%---------------------------------------------
+\begin{frame}
+  \vfill
+  \centering
+
+\textbf{Pe data viitoare!}
+
+  \vfill
+\end{frame}
 
 \end{document}
+
+
+
 
 
 
