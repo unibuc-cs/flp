@@ -1,0 +1,96 @@
+
+\usepackage{stmaryrd}
+
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{headline}{}{}
+\addtobeamertemplate{headline}{}{\textcolor{white}{\rule{\paperwidth}{5pt}}}
+\setbeamertemplate{footline}[frame number]{}
+\usepackage[romanian,english]{babel}
+\selectlanguage{romanian}
+
+\setbeamertemplate{section page}
+{
+    \begingroup
+    \centering
+    {\usebeamerfont{section name}\usebeamercolor[fg]{section name}Secțiunea~\insertsectionnumber}
+    \vskip1em\par
+    \begin{beamercolorbox}[sep=12pt,center]{section title}
+      \usebeamerfont{section title}\insertsection\par
+    \end{beamercolorbox}
+  \endgroup
+}
+\usepackage{mathabx}
+
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\vp}{\varphi}
+\newcommand{\uu}[1]{\underline{#1}}
+\newcommand{\id}{\mathrm{id}}
+\newcommand{\Imm}{\mathrm{Im}}
+\newcommand{\Seq}{\mathrm{Seq}}
+\newcommand{\wt}[1]{\widetilde{#1}}
+\newcommand{\ghil}[1]{\quotedblbase{}#1\textquotedblright{}}
+\newcommand{\dd}{\Leftrightarrow}
+\newcommand{\Pp}{\mathcal{P}}
+\newcommand{\se}{\subseteq}
+\newcommand{\sn}{\subsetneq}
+\newcommand{\cc}{\mathfrak{c}}
+\newcommand{\rg}{\mathrm{rg}}
+\newcommand{\ar}{\mathrm{ar}}
+
+\newcommand{\non}{\neg}
+\newcommand{\si}{\wedge}
+\newcommand{\sau}{\vee}
+\newcommand{\dnd}{\leftrightarrow}
+\newcommand{\snon}{\pmb{\neg}}
+\newcommand{\ssi}{\pmb{\wedge}}
+\newcommand{\simp}{\pmb{\rightarrow}}
+\newcommand{\ssau}{\pmb{\vee}}
+\newcommand{\sdnd}{\pmb{\leftrightarrow}}
+\newcommand{\bbot}{\pmb{\bot}}
+\newcommand{\ttop}{\pmb{\top}}
+
+\newcommand{\terminal}[1]{\textbf{#1}}
+\newcommand{\twhile}{\terminal{while}}
+\newcommand{\tdo}{\terminal{do}}
+\newcommand{\tif}{\terminal{if}}
+\newcommand{\tthen}{\terminal{then}}
+\newcommand{\telse}{\terminal{else}}
+\newcommand{\tskip}{\terminal{skip}}
+
+\newcommand{\swhile}{\mathop{\twhile}}
+\newcommand{\sdo}{\mathbin{\tdo}}
+\newcommand{\sif}{\mathop{\tif}}
+\newcommand{\sthen}{\mathbin{\tthen}}
+\newcommand{\selse}{\mathbin{\telse}}
+\newcommand{\sskip}{\tskip}
+
+\newcommand{\splus}{\dot{+}}
+\newcommand{\sminus}{\dot{-}}
+\newcommand{\sapart}{\dot{\in}}
+\newcommand{\stimes}{\dot{\times}}
+\newcommand{\sS}{\dot{S}}
+\newcommand{\szero}{\dot{0}}
+\newcommand{\sdoi}{\dot{2}}
+\newcommand{\sless}{\dot{<}}
+\newcommand{\sleq}{\dot{\leq}}
+
+\newcommand{\vDashv}{%
+  \mathrel{%
+    \text{%
+      \ooalign{$\vDash$\cr\reflectbox{$\vDash$}\cr}%
+    }%
+  }%
+}
+
+
+\newtheorem{teo}{Teorem\u a}[section]
+
+% \tikzstyle{block} = [rectangle, draw, fill=blue!20,
+%     text width=5em, text centered, rounded corners, minimum height=1em]
+% \tikzstyle{line} = [draw, -latex']
+% \tikzstyle{cloud} = [draw, ellipse,fill=red!20, node distance=3cm,
+%     minimum height=2em]
