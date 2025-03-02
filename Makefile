@@ -9,4 +9,7 @@ clean:
 %.pdf: %.md header.tex Makefile
 	pandoc $< -o $@ -s -t beamer -H header.tex
 
+%.tex: %.md header.tex Makefile
+	pandoc $< -o $@ -s -t beamer -H header.tex
+
 .PHONY: all clean

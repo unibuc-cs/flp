@@ -1,0 +1,881 @@
+\documentclass[xcolor=pdftex,romanian,colorlinks]{beamer}
+
+\usepackage{../tslides}
+\usepackage{comment}
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{headline}{}{}
+\addtobeamertemplate{headline}{}{\textcolor{white}{\rule{\paperwidth}{5pt}}}
+\setbeamertemplate{footline}[frame number]{}
+% \usepackage[romanian,english]{babel}
+% \selectlanguage{romanian}
+
+\setbeamertemplate{section page}
+{
+    \begingroup
+    \centering
+    {\usebeamerfont{section name}\usebeamercolor[fg]{section name}Secțiunea~\insertsectionnumber}
+    \vskip1em\par
+    \begin{beamercolorbox}[sep=12pt,center]{section title}
+      \usebeamerfont{section title}\insertsection\par
+    \end{beamercolorbox}
+  \endgroup
+}
+\title{Fundamentele limbajelor de programare}
+\subtitle{Semantica execuției programelor imperative}
+\begin{document}
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\begin{frame}{Feluri de a da semantica}
+\begin{itemize}
+  \item Limbaj de programare: sintaxă și semantică
+  \vitem Feluri de semantică
+  \begin{itemize}
+  \item Limbaj natural --- descriere textuală a efectelor
+  \vitem Operațională --- asocierea unei demonstrații a execuției
+  \vitem Axiomatică --- Descrierea folosind logică a efectelor unei instrucțiuni
+  \vitem Denotațională --- prin asocierea unui obiect matematic (denotație)
+
+  \vitem Statică --- Asocierea unui sistem de tipuri care exclude programe eronate
+  \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{subsection}{IMP}
+\begin{frame}[fragile]{Limbajul IMP}
+IMP este un limbaj \structure{IMP}erativ foarte simplu.
+\begin{block}{Ce conține}
+\begin{minipage}{.49\columnwidth}
+\begin{itemize}
+\vitem Expresii
+\begin{itemize}
+  \item Aritmetice%\hfill $x + 3$
+  \item Booleene%\hfill $\Snot(x > 7)$
+\end{itemize}
+\vitem Blocuri de instrucțiuni
+\begin{itemize}
+  \item De atribuire%\hfill $x := 5$
+  \item Condiționale%\hfill $\Sif(x > 7)\; \{x =5 \} \Selse \{x = 0\}$
+  \item De ciclare  %\hfill$\Swhile (x > 7)\; \Sdo \{x = x - 1 \}$
+\end{itemize}
+\end{itemize}
+\end{minipage}
+\begin{minipage}{.49\columnwidth}
+\begin{asciic}
+x := 10;
+sum := 0;
+while (0 <= x) do (
+  sum := sum + x;
+  x := x + -1
+)
+\end{asciic}
+\end{minipage}
+\end{block}
+\begin{block}{Ce nu conține}
+\begin{itemize}
+\item Expresii cu efecte laterale
+\item Proceduri și funcții
+\item Schimbări abrupte de control
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{comment}
+ \begin{frame}{Sintaxă formală}{Backus Naur Form}
+  \begin{itemize}
+   \item Pentru gramatici (generative) independente de context
+   \item Producții
+       --- generează termeni prin expandare (rescriere)
+
+\alert{\renewcommand{\syntaxKeyword}{}\syntax[\Stmt]{\color{black}\Sif\;\terminal{(}\BExp\terminal{)}\Block\Selse\Block}{}
+	\syntaxCont[\Stmt]{\color{black}\Id \terminal{:=}\AExp\terminal{;}}{}}
+   \item Categorii sintactice (neterminale, încep cu majusculă)
+   \begin{itemize}
+    \item descriu tipurile de sintaxă
+     \begin{itemize}
+      \item Tipuri lexicale: %$\Int$ (întregi), $\Id$ (identificatori), $\Bool$ (Booleeni)
+	  \item Tipuri construite:
+     %$\AExp$ (expr. aritmetice), $\BExp$ (expr. Booleene), \\$\Stmt$ (instrucțiuni), $\Block$ (bloc de instrucțiuni), $\Pgm$ (program)
+     \end{itemize}
+   \end{itemize}
+   \item Cuvinte cheie (terminale, încep cu literă mică sau simboluri)
+   \begin{itemize}
+    \item descriu elementele lexicale:
+   $\Sif$, $\Selse$, $\Sint$,
+   $\Swhile$,
+   $\leq$,
+   $\wedge$, $\neg$,
+   $\terminal{+}$, $\terminal{:=}$, $\terminal{;}$, $\terminal{(}$, $\terminal{)}$, \ldots
+   \end{itemize}
+  \end{itemize}
+ \end{frame}
+\end{comment}
+\begin{frame}{Sintaxă formală}{Sintaxa BNF a limbajului IMP}
+\vspace{-5ex}\begin{syntaxBlock}{\AExp}
+\alert{
+\begin{itemize}
+\item[]\renewcommand{\syntaxKeyword}{}
+\syntax{\Int\Smid\Id}{}
+\syntaxCont{\AExp\terminal{+}\AExp\Smid\AExp\terminal{*}\AExp\Smid\AExp\terminal{/}\AExp}{}
+\item[]\renewcommand{\defSort}{\BExp}
+\syntax{\Bool}{}
+\syntaxCont{\AExp \leq \AExp \Smid \AExp = \AExp}{}
+\syntaxCont{\Snot\BExp \Smid \BExp \wedge \BExp \Smid \BExp \vee \BExp}{}
+\item[]\renewcommand{\defSort}{\Block}
+\syntax{\terminal{skip}}{}
+\syntaxCont{\Stmt\terminal{;}\Stmt}{}
+\syntaxCont{\Id\terminal{:=}\AExp}{}
+\syntaxCont{\Sif \BExp \Sthen \Stmt\Selse\Stmt}{}
+\syntaxCont{\Swhile \BExp \Sdo \Stmt}{}
+\syntaxCont{\terminal{(}\Stmt\terminal{)}}{}
+\end{itemize}
+}
+\end{syntaxBlock}
+\end{frame}
+\end{subsection}
+
+\begin{comment}
+\begin{frame}{Semantică în limbaj natural}
+
+\begin{block}{Atribuirea: \alert{$x	= {\rm expr}$}}
+  \begin{itemize}
+    \item<2> Expresia este evaluată în starea curentă a programului
+	\item<2> Variabilei i se atribuie valoarea calculată, înlocuind valoarea precedentă a acelei variabile.
+  \end{itemize}
+\end{block}
+
+\begin{block}<2>{Avantaje și dezavantaje}
+\begin{itemize}
+\item[+] Ușor de prezentat
+\item[\alert{-}] Potențial ambiguă
+\item[\alert{-}] Imposibil de procesat automat
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}{Semantica Axiomatică}{Logica Floyd-Hoare}
+  Definește o relație ternară de forma
+  $\{Pre\}S\{Post\}$, unde:
+  \begin{itemize}
+    \item $S$ este o instrucțiune (Stmt)
+    \item $Pre$ (precondiție), respectiv $Post$ (postcondiție) sunt aserțiuni logice asupra stării sistemului înaintea, respectiv după execuția lui $S$
+  \end{itemize}
+
+  Se asociază fiecărei construcții sintactice Stmt o regulă de deducție care
+definește recursiv relația ternară descrisă mai sus.
+
+\begin{block}{Regula Hoare pentru compunerea secvențială}
+\[\reg{\{P\}\;c1\, c2\;\{R\}}{\{P\}\;c1 \;\{Q\}\si\{Q\}\;c2\;\{R\}}{}\]
+\end{block}
+\end{frame}
+
+\begin{frame}{Logica Floyd-Hoare pentru IMP}
+\[\reg[Skip]{\{P\}\; \{\} \;\{P\}}{\cdot}{}\]
+\vfill
+\[\reg[Seq]{\{P\}\;c1 ; c2\;\{R\}}{\{P\}\;c1 \;\{Q\}\si\{Q\}\;c2\;\{R\}}{}\]
+\vfill
+\[\reg[Asign]{\{P[e/x]\}\;x = e\;\{P\}}{}{}\]
+\vfill
+\[\reg[If]{\{P\}\Sif c \Sthen t \Selse e\;\{Q\}}{\{c\wedge P\}\;t \;\{Q\}\si\{\neg c\wedge P\}\;e\;\{Q\}}{}\]
+\vfill
+\[\reg[While]{\{P\}\Swhile(c)\,b\;\{\neg c \wedge P\}}{\{c\wedge P\}\;b \;\{P\}}{}\]
+\end{frame}
+
+\begin{section}{Semantică statică}
+  \begin{frame}{Semantică Statică - Motivație}
+    \begin{itemize}
+      \item Este sintaxa unui limbaj de programare prea expresivă?
+    \vitem Sunt programe care n-aș vrea să le pot scrie, dar le pot?
+    \vitem Putem detecta programe greșite înainte de rulare?
+
+    \onslide<2>De exemplu, în IMP, folosirea variabilelor fără a le declara
+    \vitem<2> Soluție: Sistemele de tipuri
+    \end{itemize}
+    \end{frame}
+
+    \begin{frame}{Sisteme de tipuri}{La ce folosesc?}
+
+    \begin{itemize}
+    \item Descriu programele „bine formate“
+    \item Pot preveni anumite erori
+    \begin{itemize}
+    \item folosirea variabilelor nedeclarate/neințializate
+    \item detectarea unor bucați de cod inaccesibile
+    \item erori de securitate
+    \end{itemize}
+    \item Ajută compilatorul
+    \item Pot influența proiectarea limbajului
+    \end{itemize}
+    \vfill
+    \begin{block}{Scop (ideal)}
+    Progamele „bine formate“, i. e., cărora li se poate asocia un tip nu eșuează
+    \end{block}
+    \end{frame}
+  \begin{frame}{Sisteme de tipuri}{Intuiție}
+    \begin{itemize}
+    \item Vom defini o relație \structure{$\Gamma \vdash e : T$}
+    \item Citim \structure{$e$ are tipul $T$ dacă $\Gamma$}, unde
+    \item $\Gamma$ — tipuri asociate locațiilor din $e$
+    \end{itemize}
+
+    \begin{block}{Exemple}
+    \[\begin{array}{lll@{\;:\;}ll}
+    &\vdash& \Sif {\Strue} \Sthen \{\} \Selse \{\} & \terminal{stmt}
+    \\\\
+    x:\Sint&\vdash& x + 13 & \Sint
+    \\\\
+    x:\Sint&\not\vdash&x = y +1 &T&\mbox{pentru orice } T
+    \end{array}\]
+    \end{block}
+    \end{frame}
+
+    \begin{frame}{Tipuri în limbajul IMP}
+    \begin{block}{Tipurile expresiilor = tipurile gramaticale}
+    \[T ::= {\Sint} \mid {\Sbool} \mid {\terminal{stmt}}\]
+    \end{block}
+    \begin{block}{$\Gamma$ --- Mediul de tipuri}
+    \begin{itemize}
+    \item Asociază tipuri identificatorilor
+    \[\Gamma : \mathbb{X} \xrightarrow{\circ}\mathbb{T}\]
+    \item \structure{Notație:} o listă de perechi locație-tip
+
+    \[x_1:\Sint, \ldots, x_n:\Sint\]
+    \end{itemize}
+  \end{block}
+    \vfill
+    \begin{block}{Observații pentru limbajul IMP}
+    \begin{itemize}
+    \item Toate locațiile din $\Gamma$ au același tip: $\Sint$
+    \item Apariția unei locații în $\Gamma$ înseamnă că locația e de fapt definită
+    \end{itemize}
+    \end{block}
+    \end{frame}
+
+    \begin{frame}{IMP: Reguli pentru tipuri}
+    \begin{itemize}
+    \vitem[] $\reg[loc]{\tjud{x}{int}}{}{\Gamma(x) = \Sint}$
+    \vitem[] $\reg[int]{\tjud{n}{\Sint}}{}{n \in \mathbb{Z}}$
+    \vitem[] $\reg[op+]{\tjud{e_1 + e_2}{\Sint}}{\tjud{e_1}{\Sint} \si \tjud{e_2}{\Sint}}{}$
+    \vitem[] $\reg[bool]{\tjud{b}{\Sbool}}{}{b\in \{\Strue,\Sfalse\}}$
+    \vitem[] $\reg[op$\leq$]{\tjud{e_1 \leq e_2}{\Sbool}}{\tjud{e_1}{\Sint} \si \tjud{e_2}{\Sint}}{}$
+    \item[] $\reg[atrib]{\tjud{x\terminal{:=}e}{\terminal{stmt}}}{\tjud{e}{\Sint}}{\Gamma(x) = \Sint}$
+    \vitem[] $\reg[secv]{\tjud{c_1\terminal{;} c_2}{\terminal{stmt}}}{\tjud{c_1}{\terminal{stmt}}\si \tjud{c_2}{\terminal{stmt}}}{}$
+    \vitem[] $\reg[if]{\tjud{\Sif c \Sthen t \Selse e}{\terminal{stmt}}}{\tjud{c}{\Sbool} \si \tjud{t}{{\terminal{stmt}}} \si \tjud{e}{\terminal{stmt}}}{}$
+    \vitem[] $\reg[while]{\tjud{\Swhile (c)\,b}{\terminal{stmt}}}{\tjud{c}{\Sbool} \si \tjud{b}{{\terminal{stmt}}}}{}$
+    \end{itemize}
+    \end{frame}
+
+\end{section}
+
+\end{comment}
+
+\begin{section}{Semantica operațională}
+\begin{frame}{Semantică operațională}
+{Plan}
+\begin{itemize}
+%  \item Exemplu de lucru: Limbajul IMP
+ \vitem Instrumente de lucru
+ \begin{itemize}
+  \item Sintaxă, memorie, configurații
+  \item Reguli de deducție și arbori de derivare
+ \end{itemize}
+ \vitem Semantica evaluării
+   \begin{itemize}
+     \item semantică naturală, într-un pas mare (Big-Step)
+	\end{itemize}
+ \vitem Semantica tranzițională
+	\begin{itemize}
+		\item Semantica operațională structurală, a pașilor mici (small-step)
+	\end{itemize}
+ \end{itemize}
+\end{frame}
+
+\begin{frame}{Starea execuției}
+\begin{block}{}
+Fie $\Id$ mulțimea locațiilor de memorie.
+Starea execuției unui program IMP la un moment dat este dată de valorile deținute în acel moment de locațiile de memorie.
+\structure{Matematic:} o funcție $\sigma : \Id \rightarrow \SInt$.
+\end{block}
+\begin{block}{Notații}
+\begin{itemize}
+\item Descrierea funcției prin enumerare:
+$\sigma = n \mapsto 10, sum \mapsto 0$
+
+Convenție: toate valorile neenumerate sunt 0.
+\item Funcția nulă $\zero$, va întoarce $0$ pentru orice locație.
+% \item Obținerea valorii unei variabile: $\sigma(x)$
+\item Suprascrierea valorii unei variabile:
+
+$$\sigma_{x \mapsto v} (y) = \left\{\begin{array}{r@{\mbox{, dacă }}l}
+\sigma	(y) & y \neq x \\
+v & y = x
+\end{array}
+\right.$$
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{subsection}{Semantica Evaluării}
+\begin{frame}{Semantica Evaluării}
+\begin{itemize}
+\item Introdusă în 1987 de Gilles Kahn sub numele de „semantică naturală”
+\item Denumiri alternative: „semantică relațională”, „semantica big-step”
+\item Relaționează fragmente de program într-o stare  cu valoarea corespunzătoare evaluării lor în acea stare
+\begin{itemize}
+\item Expresiile aritmetice se evaluează la întregi: $\s{\c{a,\sigma}}{\c{i}}$
+\item Expresiile Booleene se evaluează la $\Strue$/$\Sfalse$: $\s{\c{b,\sigma}}{\c{t}}$
+\item Instrucțiunile se evaluează la stări: $\s{\c{s,\sigma}}{\c{\sigma'}}$
+\item Blocurile se evaluează la stări: $\s{\c{{\it bl},\sigma}}{\c{\sigma'}}$
+\item Programul se evaluează la o stare: $\s{\c{p}}{\c{\sigma}}$ sau $\s{\c{p,\sigma}}{\c{\sigma'}}$
+\end{itemize}
+\item Valoarea este obținută într-un \structure{singur pas (mare)}
+\item Reguli structurale, având ca premize secvenți corespunzători subtermenilor
+\end{itemize}
+
+\begin{block}{Exemple}
+\begin{itemize}
+\item $\s{\c{3 + x, (x\mapsto 5, y\mapsto 7)}}{\c{8}}$
+\item $\s{\c{x = 3 + y, (x\mapsto 5, y\mapsto 7)}}{\c{x\mapsto 10, y\mapsto 7}}$
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}{Semantica Evaluării a lui IMP}
+{Expresii aritmetice}
+\begin{itemize}
+\item[] $\reg[Int]{\S{\c{i,\sigma}}{\c{i}}}{}{}$
+\vitem[] $\reg[Id]{\S{\c{x,\sigma}}{\c{i}}}{}{i = \sigma(x)}$
+\vitem[] $\reg[Add]{\S{\c{a_1 + a_2,\sigma}}{\c{i}}}{\S{\c{a_1,\sigma}}{\c{i_1}}\si\S{\c{a_2,\sigma}}{\c{i_2}}}{i = i_1 +_{\SInt} i_2}$
+\vitem[] $\reg[Mul]{\S{\c{a_1 * a_2,\sigma}}{\c{i}}}{\S{\c{a_1,\sigma}}{\c{i_1}}\si\S{\c{a_2,\sigma}}{\c{i_2}}}{i = i_1 *_{\SInt} i_2}$
+\vitem[] $\reg[Div]{\S{\c{a_1 / a_2,\sigma}}{\c{i}}}{\S{\c{a_1,\sigma}}{\c{i_1}}\si\S{\c{a_2,\sigma}}{\c{i_2}}}{i_2 \neq 0 \wedge i = i_1 /_{\SInt} i_2}$
+\end{itemize}
+\end{frame}
+\begin{frame}{Semantica Evaluării a lui IMP}
+{Operatori de comparare}
+\begin{itemize}
+\vitem[] $\reg[Cmp-True]{\S{\c{a_1 \leq a_2,\sigma}}{\c{\Strue}}}{\S{\c{a_1,\sigma}}{\c{i_1}}\si\S{\c{a_2,\sigma}}{\c{i_2}}}{i_1 \leq_{\SInt} i_2}$
+\vitem[] $\reg[Cmp-False]{\S{\c{a_1 \leq a_2,\sigma}}{\c{\Sfalse}}}{\S{\c{a_1,\sigma}}{\c{i_1}}\si\S{\c{a_2,\sigma}}{\c{i_2}}}{i_1 >_{\SInt} i_2}$
+\vitem[] $\reg[Eq-True]{\S{\c{a_1 = a_2,\sigma}}{\c{\Strue}}}{\S{\c{a_1,\sigma}}{\c{i}}\si\S{\c{a_2,\sigma}}{\c{i}}}{}$
+\vitem[] $\reg[Eq-False]{\S{\c{a_1 = a_2,\sigma}}{\c{\Sfalse}}}{\S{\c{a_1,\sigma}}{\c{i_1}}\si\S{\c{a_2,\sigma}}{\c{i_2}}}{i_1 \neq_{\SInt} i_2}$
+\end{itemize}
+\end{frame}
+\begin{frame}{Semantica Evaluării a lui IMP}
+{Operatori logici}
+\begin{itemize}
+\item[] $\reg[Bool]{\S{\c{t,\sigma}}{\c{t}}}{}{}$
+\vitem[] $\reg[Not-True]{\S{\c{\Snot b,\sigma}}{\c{\Strue}}}{\S{\c{b,\sigma}}{\c{\Sfalse}}}{}$
+\hfill
+$\reg[Not-False]{\S{\c{\Snot b,\sigma}}{\c{\Sfalse}}}{\S{\c{b,\sigma}}{\c{\Strue}}}{}$
+\vitem[] $\reg[And-True]{\S{\c{b_1 \wedge b_2,\sigma}}{\c{t}}}{\S{\c{b_1,\sigma}}{\c{\Strue}}\si\S{\c{b_2,\sigma}}{\c{t}}}{}$
+\vitem[] $\reg[And-False]{\S{\c{b_1 \wedge b_2,\sigma}}{\c{\Sfalse}}}{\S{\c{b_1,\sigma}}{\c{\Sfalse}}}{}$
+\vitem[] $\reg[Or-True]{\S{\c{b_1 \vee b_2,\sigma}}{\c{\Strue}}}{\S{\c{b_1,\sigma}}{\c{\Strue}}}{}$
+\vitem[] $\reg[Or-False]{\S{\c{b_1 \vee b_2,\sigma}}{\c{t}}}{\S{\c{b_1,\sigma}}{\c{\Sfalse}}\si\S{\c{b_2,\sigma}}{\c{t}}}{}$
+\end{itemize}
+\end{frame}
+\begin{frame}{Semantica Evaluării a lui IMP}
+{Instrucțiuni simple}
+\begin{itemize}
+\item[] $\reg[Asgn]{\S{\c{x \terminal{:=} a, \sigma}}{\c{\sigma'}}}{\S{\c{a,\sigma}}{\c{i}}}{\sigma' = \sigma_{x \mapsto i}}$
+\vitem[] $\reg[Secv]{\S{\c{s_1 \terminal{;} s_2,\sigma}}{\c{\sigma''}}}{\S{\c{s_1,\sigma}}{\c{\sigma'}}\si\S{\c{s_2,\sigma'}}{\c{\sigma''}}}{}$
+\vitem[] $\reg[Skip]{\S{\c{\Sskip,\sigma}}{\c{\sigma}}}{}{}$
+\vitem[] $\reg[Block]{\S{\c{\terminal{(}s\terminal{)},\sigma}}{\c{\sigma'}}}{\S{\c{s,\sigma}}{\c{\sigma'}}}{}$
+\end{itemize}
+\end{frame}
+\begin{frame}{Semantica Evaluării a lui IMP}
+{Blocuri și instrucțiuni de ciclare}
+\begin{itemize}
+\item[] $\reg[If-True]{\S{\c{\Sif b \Sthen {\it bl}_1 \Selse {\it bl}_2,\sigma}}{\c{\sigma_1}}}{\S{\c{b,\sigma}}{\c{\Strue}}\si \S{\c{{\it bl}_1,\sigma}}{\c{\sigma_1}}}{}$
+\vitem[] $\reg[If-False]{\S{\c{\Sif b \Sthen {\it bl}_1\Selse {\it bl}_2,\sigma}}{\c{\sigma_2}}}{\S{\c{b,\sigma}}{\c{\Sfalse}}\si \S{\c{{\it bl}_2,\sigma}}{\c{\sigma_2}}}{}$
+\vitem[] $\reg[While-True]{\S{\c{\Swhile b \Sdo {\it bl},\sigma}}{\c{\sigma''}}}{\S{\c{b,\sigma}}{\c{\Strue}}\si \S{\c{{\it bl},\sigma}}{\c{\sigma'}} \si \S{\c{\Swhile b \Sdo {\it bl},\sigma'}}{\c{\sigma''}}}{}$
+\vitem[] $\reg[While-False]{\S{\c{\Swhile b \Sdo {\it bl},\sigma}}{\c{\sigma}}}{\S{\c{b,\sigma}}{\c{\Sfalse}}}{}$
+\end{itemize}
+\end{frame}
+% \begin{frame}{Semantica Evaluării a lui IMP}
+% {Inițializări; Semantica programului}
+% \begin{itemize}
+% \item[] $\reg[Init]{\S{\c{\Sint x \terminal{:=} i \terminal{;} p, \sigma}}{\c{\sigma''}}}{\S{\c{p,\sigma'}}{\c{\sigma''}}}{\sigma' = \sigma[i/x]}$
+% \vitem[] $\reg[Pgm]{\S{\c{p}}{\c{\sigma}}}{\S{\c{p,\zero}}{\c{\sigma}}}{}$
+% \end{itemize}
+% \end{frame}
+\begin{frame}{Semantica Evaluării a lui IMP}
+{Arbori de derivare}
+
+$\displaystyle
+   \reg[Seq]{
+     \S{\c{a \terminal{:=} \terminal{3} \terminal{;} a \terminal{:=} a \terminal{+} 4,\zero}}{\c{\alt<3->{a\mapsto \alt<4->{7}{??}}{?}}}
+   }{
+     \only<2->{\reg[Asgn]{
+	   \S{\c{a \terminal{:=} 3 ,\zero}}{\c{\alt<3->{a\mapsto 3}{?}}}
+	 }{
+	   \only<3->{\reg[Int]{
+	     \S{\c{3,\zero}}{\c{3}}
+	   }{}{}}
+	 }{}}
+     \only<2->{\reg[Asgn]{
+	   \S{\c{a \terminal{:=} a \terminal{+} 4 ,\alt<3->{a\mapsto 3}{?}}}{\c{\alt<3->{a\mapsto \alt<4->{7}{??}}{?}}}
+	 }{\cdots
+	 }{}}}{}
+	 $
+
+\vfill
+   $\displaystyle
+     \only<2->{\reg[Asgn]{
+	   \S{\c{a \terminal{:=} a \terminal{+} 4 ,\alt<3->{a\mapsto 3}{?}}}{\c{\alt<3->{a\mapsto \alt<4->{7}{??}}{?}}}
+	 }{
+	   \only<3->{\reg[Add]{
+	     \S{\c{a + 4,a \mapsto 3}}{\c{\alt<4->{7}{??}}}
+	   }{
+	     \only<4->{\reg[Id]{
+		   \S{\c{a, a\mapsto 3}}{\c{3}}
+		 }{}{}\si \reg[Int]{
+		   \S{\c{4, a\mapsto 3}}{\c{4}}
+		 }{}{}}
+	   }{}}
+	 }{}}
+   $
+\end{frame}
+% \begin{frame}{Semantica Evaluării}
+% {Avantaje și dezavantaje}
+% \begin{block}{Avantaje}
+% \begin{itemize}
+% \item Compozitională: arborii de demonstrații sunt compoziționali
+% \item Ușor și relativ eficient de implementat și executat
+% \item Foarte folosită pentru definirea sistemelor de tipuri
+% \end{itemize}
+% \end{block}
+% \begin{alertblock}{Dezavantaje}
+% \begin{itemize}
+% \item Lipsa granularității --- computația e un monolit
+% \item Greu de capturat nedeterminismul/concurența
+% \item Greu de capturat schimbările de control
+% \item Nemodulară - extensiile solicită modificarea regulilor existente.
+% \end{itemize}
+% \end{alertblock}
+% \end{frame}
+
+\end{subsection}
+
+\end{section}
+
+
+\begin{section}{Semantica tranzițională (Small-Step SOS)}
+  \begin{frame}{Semantica Tranzițională}
+  \begin{itemize}
+  \item Introdusă de Gordon Plotkin (1981) ca \structure{S}emantică \structure{O}perațională \structure{S}tructurală
+  \item Denumiri alternative: „semantică prin tranziții”, „semantică prin reducere"
+  \item Definește cel mai mic pas de execuție ca o relație „de tranziție” între configurații:
+  $$\Ss{\c{{\it Cod}, {\it Stare}}}{\c{{\it Cod'}, {\it Stare'}}}$$
+  \item Fiecare pas de execuție este concluzia unei demonstrații
+  \item Execuția se obține ca o succesiune de astfel de tranziții:
+  $$\begin{array}{l}\Ss{\c{\alert{x \terminal{:=} 0} \terminal{;}  x \terminal{:=} x \terminal{+} 1 ,\bot}}{\Ss{\c{\alert{\Sskip \terminal{;}x \terminal{:=} x \terminal{+} 1} ,x \mapsto 0}}{}}
+\\
+  {\Ss{\c{x \terminal{:=} \alert{x} \terminal{+} 1 ,x \mapsto 0}}{}}
+  {\Ss{\c{x \terminal{:=} \alert{0 \terminal{+} 1} ,x \mapsto 0}}{}}
+  \\
+  {\Ss{\c{\alert{x \terminal{:=} 1 },x \mapsto 0}}{{\c{\Sskip,x \mapsto 1}}}}
+  \end{array}$$
+  \end{itemize}
+  \end{frame}
+
+  \begin{frame}{Redex. Reguli structurale. Axiome}
+  \begin{block}{\alert{Ex}presie \alert{red}uctibilă --- \alert{redex}}
+  Reprezintă fragmentul de sintaxă care va fi modificat la următorul pas.
+
+  \hfill$\Sif 0 \leq 5 \terminal{+} 7 \terminal{*} \alert<2->{x} \Sthen r \terminal{:=}1 \Selse\ r \terminal{:=}0 $\hfill\
+  \end{block}
+
+  \begin{block}{Reguli structurale --- Folosesc la identificarea următorului redex}
+  \begin{itemize}
+  \item Definite recursiv pe structura termenilor
+  \end{itemize}
+  \onslide<3->{
+  $$\reg{
+   \Ss{\c{\Sif \alert{b} \Sthen {\it bl}_1 \Selse {\it bl}_2,\sigma}}{\c{\Sif \structure{b'}\Sthen {\it bl}_1 \Selse {\it bl}_2,\sigma}}
+  }{
+    \Ss{\c{b,\sigma}}{\c{b',\sigma}}
+  }
+  {}$$
+  }
+  \end{block}
+  \begin{block}{Axiome --- Realizează pasul computațional}
+  \onslide<4>{$$\reg{\Ss{\c{\Sif {\terminal{true}}\Sthen {\it bl}_1 \Selse {\it bl}_2,\sigma}}{\c{{\it bl}_1,\sigma}}}{}{}$$}
+  \end{block}
+  \end{frame}
+  \end{section}
+  \begin{section}{Semantica SOS a lui IMP}
+\begin{comment}
+  \begin{subsection}{Sintaxa și starea memoriei}
+  \begin{frame}{Sintaxa BNF a limbajului IMP}
+  \vspace{-5ex}\begin{syntaxBlock}{\AExp}
+  \alert{
+  \begin{itemize}
+  \item[]\renewcommand{\syntaxKeyword}{}
+  \syntax{\Int\Smid\Id}{}
+  \syntaxCont{\AExp\terminal{+}\AExp\Smid\AExp\terminal{*}\AExp\Smid\AExp\terminal{/}\AExp}{}
+  \item[]\renewcommand{\defSort}{\BExp}
+  \syntax{\Bool}{}
+  \syntaxCont{\AExp\leq\AExp}{}
+  \syntaxCont{\Snot\BExp \Smid \BExp \wedge \BExp}{}
+  \item[]\renewcommand{\defSort}{\Block}
+  \syntax{\terminal{(}\Stmt\terminal{)} \Smid \Sskip}{}
+  \item[]\renewcommand{\defSort}{\Stmt}
+  \syntax{\Block\Smid \Stmt\terminal{}\Stmt}{}
+  \syntaxCont{\Id\terminal{:=}\AExp\terminal{;}}{}
+  \syntaxCont{\Sif\;\terminal{(}\BExp\terminal{)}\Block\Selse\Block}{}
+  \syntaxCont{\Swhile\;\terminal{(}\BExp\terminal{)}\Block}{}
+  \item[]\renewcommand{\defSort}{\Pgm}
+  \syntax{\Sint \Id \terminal{:=} \Int \terminal{;} \Pgm\Smid \Stmt}{}
+  \end{itemize}
+  }
+  \end{syntaxBlock}
+  \end{frame}
+
+  \begin{frame}{Starea execuției}
+  \begin{block}{}
+  Starea execuției unui program IMP la un moment dat este data de valorile deținute în acel moment de variabilele declarate de program.
+
+  \structure{Matematic:} o funcție \alert{parțială} $\sigma : \Id \xrightarrow{\circ}\SInt$ de domeniu finit.
+  \end{block}
+  \begin{block}{Notații}
+  \begin{itemize}
+  \item Descrierea funcției prin enumerare:
+  $\sigma = n \mapsto 10, sum \mapsto 0$
+  \item Funcția vidă $\zero$, nedefinită pentru nici o variabilă
+  \item Obținerea valorii unei variabile: $\sigma(x)$
+  \item Suprascrierea valorii unei variabile:
+
+  $$\sigma[v/x] (y) = \left\{\begin{array}{r@{\mbox{, dacă }}l}
+  \sigma	(y) & y \neq x \\
+  v & y = x
+  \end{array}
+  \right.$$
+  \end{itemize}
+  \end{block}
+  \end{frame}
+  \end{subsection}
+\end{comment}
+  \begin{frame}{Semantica SOS a lui IMP}
+  {Expresii aritmetice}
+  \begin{itemize}
+  \item Un întreg este valoare --- nu poate fi redex, deci nu avem regulă
+  %\item[] {\color{black!10}$\reg[Int]{\Ss{\c{i,\sigma}}{\c{i,\sigma}}}{}{}$}
+  \vitem[] $\reg[Id]{\Ss{\c{x,\sigma}}{\c{i, \sigma}}}{}{i = \sigma(x)}$
+  \vitem[] $\reg{\Ss{\c{a_1 + a_2,\sigma}}{\c{a_1' + a_2,\sigma}}}{\Ss{\c{a_1,\sigma}}{\c{a_1',\sigma}}}{}$\hfill$\reg{\Ss{\c{a_1 + a_2,\sigma}}{\c{a_1 + a_2',\sigma}}}{\Ss{\c{a_2,\sigma}}{\c{a_2',\sigma}}}{}$
+  \vitem Ordine nespecificată de evaluare a argumentelor
+  \vitem[] $\reg[Add]{\Ss{\c{i_1 + i_2,\sigma}}{\c{i,\sigma}}}{}{i = i_1 + i_2}$
+  \vitem Regula pentru înmulțire este la fel
+  \end{itemize}
+  \end{frame}
+  \begin{frame}{Semantica SOS a lui IMP}
+  {Ordine de evaluare. Împărțire}
+  \begin{block}{Semantica împărțirii}
+  Evaluăm al doilea argument, și dacă e diferit de 0, atunci evaluăm si primul argument și apoi împărțirea.
+  \end{block}
+  \begin{itemize}
+  \item[] $\reg{\Ss{\c{a_1 / a_2,\sigma}}{\c{a_1 / a_2',\sigma}}}{\Ss{\c{a_2,\sigma}}{\c{a_2',\sigma}}}{}$
+  \vitem[] $\reg{\Ss{\c{a_1 / i_2,\sigma}}{\c{a_1' / i_2,\sigma}}}{\Ss{\c{a_1,\sigma}}{\c{a_1',\sigma}}}{i_2 \neq 0}$
+  % \vitem Evaluarea argumentelor de la dreapta la stânga
+  \vitem[] $\reg[Div]{\Ss{\c{i_1 / i_2,\sigma}}{\c{i,\sigma}}}{}{i_2\neq 0, i = i_1 / i_2}$
+  \end{itemize}
+  \end{frame}
+  \begin{frame}{Semantica SOS a lui IMP}
+  {Expresii Booleene. Constante și operatorul de comparație.}
+  \begin{itemize}
+  \item Constantele Booleene sunt valori --- nu pot fi redex
+  \vitem[] $\reg{\Ss{\c{a_1 \leq a_2,\sigma}}{\c{a_1' \leq a_2,\sigma}}}{\Ss{\c{a_1,\sigma}}{\c{a_1',\sigma}}}{}$\hfill$\reg{\Ss{\c{a_1 \leq a_2,\sigma}}{\c{a_1 \leq a_2',\sigma}}}{\Ss{\c{a_2,\sigma}}{\c{a_2',\sigma}}}{}$
+  \vitem[] $\reg[Leq-false]{\Ss{\c{i_1 \leq i_2,\sigma}}{\c{\terminal{false},\sigma}}}{}{i_1 > i_2}$
+  \vitem[] $\reg[Leq-true]{\Ss{\c{i_1 \leq i_2,\sigma}}{\c{\terminal{true},\sigma}}}{}{i_1 \leq i_2}$
+  \end{itemize}
+  \end{frame}
+  \begin{frame}{Semantica SOS a lui IMP}
+  {Expresii Booleene. Negația logică}
+  \begin{itemize}
+  \item[] $\reg{\Ss{\c{\neg a,\sigma}}{\c{\neg a',\sigma}}}{\Ss{\c{a,\sigma}}{\c{a',\sigma}}}{}$
+  \vitem[] $\reg[Neg-true]{\Ss{\c{\neg \terminal{true},\sigma}}{\c{\terminal{false},\sigma}}}{}{}$
+  \vitem[] $\reg[Neq-false]{\Ss{\c{\neg \terminal{false},\sigma}}{\c{\terminal{true},\sigma}}}{}{}$
+  \end{itemize}
+  \end{frame}
+  \begin{frame}{Semantica SOS a lui IMP}
+  {Expresii Booleene. Și-ul logic}
+  \begin{itemize}
+  \item[] $\reg{\Ss{\c{b_1 \wedge b_2,\sigma}}{\c{b_1' \wedge b_2,\sigma}}}{\Ss{\c{b_1,\sigma}}{\c{b_1',\sigma}}}{}$
+  \vitem[] $\reg[And-false]{\Ss{\c{{\terminal{false}} \wedge b_2,\sigma}}{\c{\terminal{false},\sigma}}}{}{}$
+  \vitem[] $\reg[And-true]{\Ss{\c{{\terminal{true}} \wedge b_2,\sigma}}{\c{b_2,\sigma}}}{}{}$
+  \end{itemize}
+  \end{frame}
+  \begin{frame}{Semantica SOS a lui IMP}
+  {Blocuri}
+  \begin{itemize}
+  \item Instrucțiunea $\Sskip$ este „valoarea” blocurilor și instrucțiunilor
+  \vitem O instrucțiune poate modifica starea curentă
+
+  \[\reg{\Ss{\c{\terminal{(} s \terminal{)},\sigma}}{\c{\terminal{(} s' \terminal{)},\alert{\sigma'}}}}{\Ss{\c{s,\sigma}}{\c{s',\alert{\sigma'}}}}{}\]
+  \vitem[] \[\reg[Block-end]{\Ss{\c{\terminal{(} \Sskip \terminal{)},\sigma}}{\c{\Sskip,\sigma}}}{}{}\]
+  \end{itemize}
+  \end{frame}
+
+  \begin{frame}{Semantica SOS a lui IMP}
+  {Compunerea secvențială}
+  \begin{itemize}
+  \vitem[] $\reg{\Ss{\c{s_1 \terminal{;} s_2},\sigma}{\c{s_1' \terminal{;} s_2,\sigma'}}}{\Ss{\c{s_1,\sigma}}{\c{s_1',\sigma'}}}{}$
+  \vitem[] $\reg[Next-stmt]{\Ss{\c{\Sskip \terminal{;} s_2,\sigma}}{\c{s_2,\sigma}}}{}{}$
+  \end{itemize}
+  \end{frame}
+
+  \begin{frame}{Semantica SOS a lui IMP}
+  {Atribuirea}
+  \begin{itemize}
+  \item[] $\reg{\Ss{\c{x \terminal{:=} a ,\sigma}}{\c{x \terminal{:=} a' ,\sigma}}}{\Ss{\c{a,\sigma}}{\c{a',\sigma}}}{}$
+  \vitem[] $\reg[Asgn]{\Ss{\c{x \terminal{:=} i ,\sigma}}{\c{\Sskip,\sigma'}}}{}{\sigma'=\sigma_{x \mapsto i}}$
+  \end{itemize}
+  \end{frame}
+
+  \begin{frame}{Semantica SOS a lui IMP}
+  {Condițional}
+  \begin{itemize}
+  \item[]
+  $\reg{
+   \Ss{\c{\Sif b \Sthen {\it bl}_1 \Selse {\it bl}_2,\sigma}}{\c{\Sif b' \Sthen {\it bl}_1 \Selse {\it bl}_2,\sigma}}
+  }{
+    \Ss{\c{b,\sigma}}{\c{b',\sigma}}
+  }
+  {}$
+  \vitem[]
+  $\reg[If-true]{\Ss{\c{\Sif {\terminal{true}} \Sthen {\it bl}_1 \Selse {\it bl}_2,\sigma}}{\c{{\it bl}_1,\sigma}}}{}{}$
+  \vitem[]
+  $\reg[If-false]{\Ss{\c{\Sif {\terminal{false}} \Sthen {\it bl}_1 \Selse {\it bl}_2,\sigma}}{\c{{\it bl}_2,\sigma}}}{}{}$
+
+  \end{itemize}
+  \end{frame}
+
+  \begin{frame}{Semantica SOS a lui IMP}
+  {Instrucțiunea de ciclare}
+  \begin{itemize}
+  \item[]
+  $\reg[While]{
+   \Ss{\c{\Swhile b \Sdo {\it bl},\sigma}}{}}{}{}
+  $
+
+  \hfill $\c{\Sif b\Sthen \terminal{(} {\it bl}\terminal{;} {\Swhile b\Sdo {\it bl}} \terminal{)} \Selse {\Sskip},\sigma}$
+  \end{itemize}
+  \end{frame}
+
+  % \begin{frame}{Semantica SOS a lui IMP}
+  % {Inițializări}
+  % \begin{itemize}
+  % \item[] $\reg[Init]{\Ss{\c{\terminal{int} x \terminal{:=} i \terminal{;} p,\sigma}}{\c{p,\sigma'}}}{}{\sigma'=\sigma[i/x]}$
+  % \end{itemize}
+  % \end{frame}
+
+  \begin{frame}{Semantica SOS a lui IMP}
+  {Demonstrarea unui pas. Execuție.}
+
+  \begin{itemize}
+  \item Fiecare pas de deducție este o demonstrație liniară alcătuită din mai multe reguli structurale și având la vârf o axiomă
+
+  \vitem Execuția este o succesiune de astfel de stări
+  \end{itemize}
+  \end{frame}
+
+  \begin{frame}{Semantica SOS a lui IMP}
+  {Execuție pas cu pas}
+
+  $\begin{array}{lr}
+    % \c{\alert{\Sint i \terminal{:=} 3 \terminal{;} \Swhile (0 \leq i)\; \terminal{(} i \terminal{:=} i \terminal{+} -4  \terminal{)}},\bot}&\xrightarrow{\textsc{Init}}\\
+  \onslide<1->
+  \c{\alert{\Swhile 0 \leq i \Sdo i \terminal{:=} i \terminal{+} -4},i \mapsto 3}&\xrightarrow{\textsc{While}}\\
+  \onslide<2->
+  \c{\Sif 0 \leq \alert{i} \Sthen\begin{array}[t]{l} \terminal{(} i \terminal{:=} i \terminal{+} -4  \terminal{;} \\ \ \ \ \Swhile 0 \leq i\Sdo i \terminal{:=} i \terminal{+} -4 \\ \terminal{)}\; \Selse\; \Sskip\end{array},i \mapsto 3}&\xrightarrow{\textsc{Id}}\\
+  \onslide<3->
+  \c{\Sif \alert{0 \leq 3} \Sthen \begin{array}[t]{l} \terminal{(} i \terminal{:=} i \terminal{+} -4  \terminal{;} \\ \ \ \ \Swhile 0 \leq i \Sdo i \terminal{:=} i \terminal{+} -4 \\ \terminal{)}\; \Selse\; \Sskip\end{array},i \mapsto 3}&\xrightarrow{\textsc{Leq-true}}\\
+  \onslide<4->
+  \c{\alert{\Sif (true)\begin{array}[t]{l} \terminal{(} i \terminal{:=} i \terminal{+} -4  \\ \ \ \ \Swhile 0 \leq i \Sdo  i \terminal{:=} i \terminal{+} -4  \\ \terminal{)}\; \Selse\; \Sskip\end{array}},i \mapsto 3}&\xrightarrow{\textsc{If-true}}\\
+  \onslide<5->
+  \c{\terminal{(}i \terminal{:=} \alert{i} \terminal{+} -4  \terminal{;} \Swhile 0 \leq i \Sdo i \terminal{:=} i \terminal{+} -4 \terminal{)},i \mapsto 3}&\xrightarrow{\textsc{Id}}\\
+  \end{array}$
+  \end{frame}
+  \begin{frame}{Semantica SOS a lui IMP}
+  {Execuție pas cu pas}
+
+  $\begin{array}{lr}
+  \c{\terminal{(} i \terminal{:=} \alert{3 \terminal{+} -4}  \terminal{;} \Swhile 0 \leq i\Sdo i \terminal{:=} i \terminal{+} -4 \terminal{)},i \mapsto 3}&\xrightarrow{\textsc{Add}}\\
+  \onslide<2->
+  \c{\terminal{(}\alert{ i \terminal{:=} -1 } \terminal{;} \Swhile 0 \leq i\Sdo i \terminal{:=} i \terminal{+} -4  \terminal{)},i \mapsto 3}&\xrightarrow{\textsc{Asgn}}\\
+  \onslide<3->
+  \c{\terminal{(} \alert{\Sskip \terminal{;} \Swhile 0 \leq i\Sdo i \terminal{:=} i \terminal{+} -4} \terminal{)},i \mapsto -1}&\xrightarrow{\textsc{Next-stmt}}\\
+  \onslide<4->
+  \c{\terminal{(}\alert{\Swhile 0 \leq i\Sdo i \terminal{:=} i \terminal{+} -4} \terminal{)},i \mapsto -1}&\xrightarrow{\textsc{While}}\\
+  \onslide<5->
+  \c{\terminal{(}\;\Sif 0 \leq \alert{i} \Sthen \begin{array}[t]{l} \terminal{(} i \terminal{:=} i \terminal{+} -4 \terminal{;} \\ \ \ \ \Swhile 0 \leq i\Sdo i \terminal{:=} i \terminal{+} -4\\ \terminal{)}\; \Selse\; \Sskip\terminal{)}\end{array},i \mapsto -1}&\xrightarrow{\textsc{Id}}\\
+  \onslide<6->
+  \c{\terminal{(}\;\Sif \alert{0 \leq -1} \Sthen\begin{array}[t]{l} \terminal{(} i \terminal{:=} i \terminal{+} -4  \terminal{;} \\ \ \ \ \Swhile 0 \leq i\Sdo i \terminal{:=} i \terminal{+} -4\\ \terminal{)}\; \Selse\; \Sskip\terminal{)}\end{array},i \mapsto -1}&\xrightarrow{\textsc{Leq-false}}\\
+
+  \end{array}$
+  \end{frame}
+
+  \begin{frame}{Semantica SOS a lui IMP}
+  {Execuție pas cu pas}
+
+  $\begin{array}{lr}
+  \c{\terminal{(}\;\alert{\Sif {\terminal{false}} \Sthen\begin{array}[t]{l} \terminal{(} i \terminal{:=} i \terminal{+} -4  \terminal{;} \\ \ \ \ \Swhile 0 \leq i\Sdo i \terminal{:=} i \terminal{+} -4\\ \terminal{)}\; \Selse\; \Sskip{\color{black}\terminal{)}}\end{array}},i \mapsto -1}&\xrightarrow{\textsc{If-false}}\\
+  \onslide<2->
+  \c{\alert{\terminal{(} \Sskip \terminal{)}},i \mapsto -1}&\xrightarrow{\textsc{Block-end}}\\
+  \onslide<3->
+  \c{\Sskip,i \mapsto -1}
+  \end{array}$
+  \end{frame}
+
+  % \begin{frame}{Semantica SOS}{Avantaje și dezavantaje}
+  % \begin{block}{Avantaje}
+  % \begin{itemize}
+  % \item Definește precis noțiunea de pas computațional
+  % \item Semnalează erorile, oprind execuția
+  % \item Execuția devine ușor de urmărit și depanat
+  % \item Nedeterminismul și concurența pot fi definite și analizate
+  % \end{itemize}
+  % \end{block}
+  % \vfill\begin{alertblock}{Dezavantaje}
+  % \begin{itemize}
+  % \item Regulile structurale sunt evidente și deci plictisitor de scris
+  % \item Schimbarea abruptă a controlului rămâne o o sarcină dificilă
+  % \item Nemodular: adăugarea unei trăsături noi poate solicita schimbarea întregii definiții
+  % \end{itemize}
+  % \end{alertblock}
+  % \end{frame}
+
+  \end{section}
+
+\begin{frame}{Semantica denotațională}
+% \begin{block}{Atribuirea: \alert{$x	= {\rm expr}$}}
+Asociem fiecărui fragment de program un obiect matematic, numit \structure{denotație},
+care să descrie totalitatea efectelor pe care le are execuția acelui fragment de program.
+\begin{itemize}
+\item Asociem expresiilor aritmetice funcții de la starea memoriei la valori întregi
+$$\llbracket e \rrbracket : \Sigma \to \mathbb{Z}$$
+\vitem Asociem expresiilor booleene funcții de la starea memoriei la mulțimea $\{0, 1\}$
+$$\llbracket b \rrbracket : \Sigma \to \{0, 1\}$$
+\vitem Asociem instrucțiunilor funcții de la starea memoriei la starea (următoare) a memoriei.
+$$\llbracket s \rrbracket : \Sigma \to \Sigma$$
+\end{itemize}
+
+% \begin{itemize}
+% \item<2> Funcția constantă $[[1]](s) = 1$
+% \item<2> Funcția care selectează valoarea unui identificator $[[x]](s) = s(x)$
+% \item<2> „Morfismul de adunare” $[[e1 + e2]](s) = [[e1]](s) + [[e2]](s)$.
+% \end{itemize}
+% \vitem Asociem instrucțiunilor funcții de la starea memoriei la starea (următoare) a memoriei.
+% \begin{itemize}
+%   \item<2> $[[x = e]](s)(y) = \left\{\begin{array}{r@{\mbox{, dacă }}l} s(y) & y \neq x
+%   \\{} [[e]](s) & y = x\end{array}\right.$
+% \end{itemize}
+% \end{itemize}
+% \end{block}
+% \begin{block}<2>{Avantaje și dezavantaje}
+% \begin{itemize}
+% \item[+] Formală, matematică, foarte precisă
+% \item[+] Compozițională (morfisme și compuneri de funcții)
+% \item[\alert{-}] Greu de stăpânit (domeniile devin din ce în ce mai complexe)
+% \end{itemize}
+% \end{block}
+
+\end{frame}
+
+\begin{frame}{Semantica denotațională a lui IMP}{Expresii aritmetice}
+
+  Denotația unei expresii aritmetice este o funcție care evaluează expresia la un întreg într-o stare dată a memoriei.
+  $$\llbracket e \rrbracket : \Sigma \to \mathbb{Z}$$
+  \begin{itemize}
+  \item $\llbracket n \rrbracket(\sigma) = n$ pentru orice $n\in \mathbb{Z}$
+  \item $\llbracket x \rrbracket(\sigma) = \sigma(x)$ pentru orice $x\in \Id$
+  \item $\llbracket e_1 + e_2 \rrbracket(\sigma) = \llbracket e_1 \rrbracket(\sigma) + \llbracket e_2 \rrbracket(\sigma)$
+  \item $\llbracket e_1 * e_2 \rrbracket(\sigma) = \llbracket e_1 \rrbracket(\sigma) * \llbracket e_2 \rrbracket(\sigma)$
+  % \item $\llbracket e_1 / e_2 \rrbracket(\sigma) = \llbracket e_1 \rrbracket(\sigma) / \llbracket e_2 \rrbracket(\sigma)$
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Semantica denotațională a lui IMP}{Expresii booleene}
+
+  Denotația unei expresii booleene este o funcție care evaluează expresia într-o valoare de adevăr într-o stare dată a memoriei.
+  $$\llbracket b \rrbracket : \Sigma \to \{0, 1\}$$
+  \begin{itemize}
+  \item $\llbracket \Strue \rrbracket(\sigma) = 1$
+  \item $\llbracket \Sfalse \rrbracket(\sigma) = 0$
+  \item $\llbracket e_1 \leq e_2 \rrbracket(\sigma) = \left\{\begin{array}{r@{\mbox{, dacă }}l} 1 & \llbracket e_1 \rrbracket(\sigma) \leq \llbracket e_2 \rrbracket(\sigma)
+  \\{} 0 & \mbox{nu}\end{array}\right.$
+  \item $\llbracket \Snot b \rrbracket(\sigma) = \left\{\begin{array}{r@{\mbox{, dacă }}l} 1 & \llbracket b \rrbracket(\sigma) = 0
+  \\{} 0 & \mbox{nu}\end{array}\right.$
+  \item $\llbracket b_1 \wedge b_2 \rrbracket(\sigma) = \left\{\begin{array}{r@{\mbox{, dacă }}l} 1 & \llbracket b_1 \rrbracket(\sigma) = 1 \mbox{ și } \llbracket b_2 \rrbracket(\sigma) = 1
+  \\{} 0 & \mbox{nu}\end{array}\right.$
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Semantica denotațională a lui IMP}{Instrucțiuni}
+
+  Denotația unei instrucțiuni este o funcție (parțială) care descrie efectele instrucțiunii asupra stărilor memoriei.
+  $$\llbracket s \rrbracket : \Sigma \nrightarrow \Sigma$$
+  \begin{itemize}
+  \item $\llbracket \Sskip \rrbracket = 1_\Sigma$
+  \item $\llbracket x \terminal{:=} e \rrbracket(\sigma) = \sigma_{x \mapsto \llbracket e \rrbracket(\sigma)}$
+  \item $\llbracket s_1 \terminal{;} s_2 \rrbracket = \llbracket s_2 \rrbracket \circ \llbracket s_1 \rrbracket$
+  \item $\llbracket \Sif b \Sthen s_1 \Selse s_2 \rrbracket(\sigma) = \left\{\begin{array}{r@{\mbox{, dacă }}l} \llbracket s_1 \rrbracket(\sigma) & \llbracket b \rrbracket(\sigma) = 1
+  \\{} \llbracket s_2 \rrbracket(\sigma) & \mbox{nu}\end{array}\right.$
+  % \item $\llbracket \Swhile b \Sdo s \rrbracket(\sigma) = \left\{\begin{array}{r@{\mbox{, dacă }}l} \llbracket \Swhile b \Sdo s \rrbracket(\llbracket s \rrbracket(\sigma)) & \llbracket b \rrbracket(\sigma) = 1
+  % \\{} \sigma & \mbox{nu}\end{array}\right.$
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Semantica denotațională a lui IMP}{Semantica denotațională a lui while}
+
+Analizând regula de execuție "big-step" a instrucțiunii $\Swhile b \Sdo s$ putem observa că denotația instrucțiunii $\Swhile b \Sdo s$ trebuie să satisfacă următoarea relație:
+  $$\llbracket \Swhile b \Sdo s \rrbracket(\sigma) = \left\{\begin{array}{r@{\mbox{, dacă }}l} \llbracket \Swhile b \Sdo s \rrbracket(\llbracket s \rrbracket(\sigma)) & \llbracket b \rrbracket(\sigma) = 1
+   \\{} \sigma & \mbox{nu}\end{array}\right.$$
+
+Atunci $\llbracket \Swhile b \Sdo s \rrbracket$ este cel mai mic punct fix al funcției $F : (\Sigma \nrightarrow \Sigma) \to (\Sigma \nrightarrow \Sigma)$ definită prin:
+$$F(w)(\sigma) = \left\{\begin{array}{r@{\mbox{, dacă }}l} w(\llbracket s \rrbracket(\sigma)) & \llbracket b \rrbracket(\sigma) = 1
+ \\{} \sigma & \mbox{nu}\end{array}\right.$$
+
+\end{frame}
+
+\begin{frame}[fragile]{Semantica denotațională a lui IMP în Haskell}
+\begin{minipage}{.46\columnwidth}
+\begin{asciihs}
+type State = Id -> Int
+type DAExp = State -> Int
+type DBExp = State -> Bool
+type DStmt = State -> State
+
+denotAExp :: AExp -> DAExp
+denotAExp (Int n) s = n
+denotAExp (Var x) s = s x
+denotAExp (e1 :+: e2) s
+  = denotAExp e1 s
+  + denotAExp e2 s
+
+denotBExp :: BExp -> DBExp
+denotBExp (Bool b) s = b
+denotBExp (a1 :<=: a2) s
+  = denotAExp a1 s
+  <= denotAExp a2 s
+
+\end{asciihs}
+\end{minipage}
+\begin{minipage}{.53\columnwidth}
+\begin{asciihs}
+denotStmt :: Stmt -> DStmt
+denotStmt Skip = id
+denotStmt (s1 ::: s2) =
+  denotStmt s2 . denotStmt s1
+denotStmt (If c t e) s
+ |denotBExp c s = denotStmt t s
+ |otherwise     = denotStmt e s
+denotStmt (While c b) =
+  fix (\w s ->
+    if denotBExp b s
+      then w (denotStmt c s)
+      else s)
+\end{asciihs}
+\end{minipage}
+\end{frame}
+
+\end{document}
