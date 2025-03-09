@@ -16,5 +16,7 @@
     "**/CVS": true,
     "**/.DS_Store": true,
     "**/Thumbs.db": true
-}
+},
+"pandoc.pdfOptString": "-s -t beamer -H header.tex",
+"pandoc.render.openViewer": false
 }
