@@ -18,7 +18,7 @@ definiții (recursive) prin reguli.
 AExp ::= Int | AExp + AExp | AExp - AExp | AExp * AExp
 ```
 
-AExp e o submulțime a limbajului ce poate fi obținut din întregi si simbolurile '+', '-', '*'.
+AExp e o submulțime a limbajului ce poate fi obținut din întregi și simbolurile '+', '-', '*'.
 
 ### Exemplu: Definirea unei relații
 
@@ -111,7 +111,7 @@ Mulțimea submulțimilor lui $A$ închise la $R$ este o mulțime Moore.
 
 1. Fie $\cal N$ o mulțime de submulțimi ale lui $A$ închise la $R$ arbitrar aleasă
 
-2. \; Fie $r$ o regula din $R$ arbitrar aleasă
+2. \; Fie $r$ o regulă din $R$ arbitrar aleasă
 
 3. \; \; Presupunem că $\hyp(r) \subseteq \bigcap {\cal N}$
 
@@ -161,21 +161,37 @@ Dacă pentru orice regulă $r \in R$, putem deduce $P(\conc(r))$ presupunând c�
 8. Avem $N = M$ (din 7 și teorema de mai sus)
 
 
-## Exemplu: Accesibilitate
+## Exemplu: Accesibilitate / Definiție alternativă
 
 ### Teoremă
 
-Pentru orice element $a$ din mulțimea $M$ definită de sistemul de reguli $R$ există un arbore etichetat cu elemente din $M$ care
+Fie $M$ mulțimea definită de sistemul de reguli $R$.
+Definim lanțul crescător $(M_n)_{n\in \N}$ astfel:
+$M_0 = \emptyset$;\hfill
+$M_{n+1} = M_n \cup \{\conc(r) \mid r \in R, \hyp(r) \subseteq M_n \}$.
 
-- are rădăcina etichetată cu $a$
-- pentru orice nod, perechea dintre concatenarea etichetelor descendenților direcți și eticheta nodului este o regulă din $R$
+Atunci $M = \bigcup_{n\in \N}{M_n}$
 
 ### Demonstrație (prin inducție deductivă)
 
-1. Fie o regulă $r = (H, a) \in R$ arbitrar aleasă
-2. \; Presupun că pentru orice $h \in \hyp(r)$ există un arbore cu $A_h$ proprietatea enunțată în ipoteză
-3. \; Definesc arborele $A$ care are rădăcina etichetată cu $a$ și ca descendenți direcți arborii $A_h$ în ordinea specificată de $H$
-4. \; Avem că arborele $A$ satisface proprietatea din ipoteză, deci proprietatea ține pentru $\conc(r)$
+$\bigcup_{n\in \N}{M_n} \subseteq M$: demonstrez că pentru orice $n\in \N$, $M_n \subseteq M$ prin inducție după $n$.
+Cazul de bază $M_0 \subseteq M$ e trivial
+
+Pas de inducție. Presupun $M_n \subseteq M$. Fie $a \in M_{n + 1}$ arbitrar.
+
+  - dacă $a \in M_n$, gata
+  - dacă $a = \conc(r)$ unde $r \in R$ și $\hyp(r) \subseteq M_n$, atunci
+    $\hyp(r) \subseteq M$, deci $a \in M$ (m închisă).
+
+$M \subseteq \bigcup_{n\in \N}{M_n}$: inducție pe regulile $R$.
+
+Fie $r = (h_1h_2\cdots h_k, a)$ astfel încât pentru orice $i \in \{1, \ldots, k\}$,
+$h_i \in \bigcup_{n\in \N}{M_n}$. Pentru orice $i$, fie $n_i$ astfel încât
+$h_i \in M_{n_i}$.
+
+Fie $n = \max \{n_1, \ldots, n_k\}$. Atunci $\hyp(r) \subseteq M_n$, deci
+$a \in M_{n+1}$.
+
 
 ## Ambiguitate / neambiguitate
 
@@ -191,7 +207,7 @@ AExp ::= Int | AExp + AExp | AExp - AExp | AExp * AExp
 expresia `3 + 5 * 7` este ambiguă
 
 
-### Definiție (Neambiguitate)
+### Definiție (Neambiguitate / citire unică)
 
 Sistemul de reguli $R$ are proprietatea de __neambiguitate__ dacă, notând cu $M$ mulțimea definită de $R$,
 pentru orice $m \in M$, există o singură regulă $r\in R$ astfel
@@ -199,7 +215,7 @@ pentru orice $m \in M$, există o singură regulă $r\in R$ astfel
 
 ### Exemplu
 ```
-AExp ::= Int | + AExp AExp | - AExp AExp | * AExp AExp
+AExp ::= Int | (AExp + AExp) | (AExp - AExp) | (AExp * AExp)
 ```
 
 ## Definiție recursivă (pe reguli)
@@ -208,7 +224,7 @@ AExp ::= Int | + AExp AExp | - AExp AExp | * AExp AExp
 
 Fie $M$ mulțimea definită de sistemul de reguli $R$ cu proprietatea de neambiguitate.
 Fie o mulțime $B$, și pentru orice regulă $r = (a_1a_2\ldots a_n, a) \in R$, fie o
-funcție $g_r : B^n -> B$.
+funcție $g_r : B^n \to B$.
 Atunci există o unică funcție $f : M \to B$ cu proprietatea că pentru orice regulă
 $r = (a_1a_2\ldots a_n, a) \in R$ astfel încât $\hyp(r) \subseteq M$,
 $f(a) = g_r(f(a_1), f(a_2), \ldots, f(a_n))$.
@@ -219,7 +235,7 @@ Fie $G_f = \bigcup_{n\in \N}{G_n}$, unde $\left(G_n\right)_{n\in \N}$ este defin
 
 - $G_0 = \emptyset$
 
-- $G_{n+1} = G_n \cup \{(a, g_r(b_1, b_2, \ldots, b_m)) \mid r = (a_1a_2\ldots a_m, a) \in R\mbox{ și } (a_i, b_i) \in G_n, i\in \{1, \ldots, m\} \}$
+- $G_{n+1} = G_n \cup \{(a, g_r(b_1, b_2, \ldots, b_k)) \mid r = (a_1a_2\ldots a_k, a) \in R\mbox{ și } (a_i, b_i) \in G_n, i\in \{1, \ldots, k\} \}$
 
 Atunci $G_f$ este graficul unei funcții $f : A \to B$ cu proprietatea din enunț.
 
@@ -234,9 +250,9 @@ Atunci $G_f$ este graficul unei funcții $f : A \to B$ cu proprietatea din enun�
 
   Pentru orice  $i \in \{1, \ldots, k\}$ există un $n_i$ astfel încât $(h_i, b_i) \in G_{n_i}$. Fie $m = max \{n_1, \ldots n_k\}$
 
-  Atunci $(a, g_r(b_1, \ldots, b_k)) \in G_{m+1}$
+  Atunci $(a, g_r(b_1, \ldots, b_k)) \in G_{m+1} \subseteq G_f$
 
-- Demonstră că $G_f$ e funcțională
+- Demonstrăm că $G_f$ e funcțională
 
   Fie $(a, b), (a, b') \in G_f$. Atunci:
   - există $r = (h_1\cdots h_k, a), r' = (h'_1\cdots h'_{k'}, a) \in R$
@@ -318,7 +334,7 @@ Dacă $\langle a, \sigma \rangle \to \langle a', \sigma \rangle$, și $\langle a
 
 ### Demonstrație
 
-Inducție deductivă pe regulile de definire a relației într-un pas pentru expresii aritmetice.
+Inducție deductivă pe regulile de definire a relației într-un pas pentru expresii aritmetice. Tratăm doar câteva cazuri.
 
 - $\reg[Id]{\Ss{\cfg{x,\sigma}}{\cfg{i, \sigma}}}{}{i = \sigma(x)}$
 
@@ -373,10 +389,8 @@ Inducție deductivă pe regulile de definire a relației într-un pas pentru ins
 
 - $\reg[Seq]{\Ss{\cfg{\Sskip \terminal{;} s_2,\sigma}}{\cfg{s_2,\sigma}}}{}{}$ direct
 
-- $\reg[While]{
-   \Ss{\cfg{\Swhile b \Sdo {\it bl},\sigma}}{}}{}{}
-  $
+- $\reg[While]{\Ss{\cfg{\Swhile b \Sdo {\it bl},\sigma}}{}}{}{}$
 
-  \hfill $\cfg{\Sif b\Sthen \terminal{(} {\it bl}\terminal{;} {\Swhile b\Sdo {\it bl}} \terminal{)} \Selse {\Sskip},\sigma}$
+  $\cfg{\Sif b\Sthen \terminal{(} {\it bl}\terminal{;} {\Swhile b\Sdo {\it bl}} \terminal{)} \Selse {\Sskip},\sigma}$
 
   Aplicăm proprietatea de echivalență demonstrată anterior.
