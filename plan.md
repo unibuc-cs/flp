@@ -58,3 +58,12 @@
 
 14. Seminar 7, recapitulare
 
+
+
+
+Extra (pentru cei interesați de mai multe)
+
+Laborator 3. Denotational + Algebraic (recursion schemes)
+
+Laborator 9. PCF
+

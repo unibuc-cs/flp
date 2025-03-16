@@ -1,0 +1,67 @@
+\documentclass[xcolor=x11names,10pt, compress, usetitleprogressbar, romanian]{beamer}
+%\documentclass[xcolor=x11names,10pt, compress, handout, usetitleprogressbar]{beamer}
+
+
+\usepackage{pgf}
+\usepackage{tikz}
+\usetheme{CambridgeUS}
+\setbeamertemplate{enumerate items}[default]
+\usepackage{comment}
+\usepackage{amsmath,amssymb,amsxtra}
+\usepackage{xcolor}
+\usetikzlibrary{shapes.multipart}
+\usetikzlibrary{automata, positioning, arrows}
+\usepackage{float}
+\usepackage{graphicx,wrapfig}
+\usepackage{array,booktabs,calc}
+\usepackage{multirow}
+\usepackage{tabularx,colortbl}
+\usepackage{proof}
+\usetikzlibrary{positioning,arrows}
+\usepackage{babel}
+\usepackage{stmaryrd}
+\usepackage{soul}
+\usepackage{makecell}
+\usepackage{proof}
+\usepackage{soul}
+
+\newcommand\mydots{\hbox to 1em{.\hss.\hss.}}
+
+\DeclareSymbolFont{forpolishl}{T1}{cmr}{m}{n}
+\DeclareMathSymbol{\mathrmL}{0}{forpolishl}{'212} 
+
+
+\setbeamersize{text margin left=23pt,text margin right=15pt} 
+
+\definecolor{IntensColor}{HTML}{2E86C1}
+\definecolor{StateTransition}{HTML}{D6EAF8}
+\definecolor{MedianLightOrange}{RGB}{216,178,92}
+\definecolor{Orchid}{HTML}{8E44AD}
+\definecolor{True}{HTML}{229954}
+\definecolor{False}{HTML}{CB4335}
+
+\newcommand{\intens}[1] {{\color{IntensColor} #1}}
+\newcommand{\semW}[1]{\mathcal{M}\llbracket #1 \rrbracket}
+\newcommand{\conf}[2]{\langle #1, #2\rangle}
+\newcommand{\sel}[1]{{\color{Orchid} #1}}
+\newcommand{\true}[1]{{\color{True} #1}}
+\newcommand{\false}[1]{{\color{red} #1}}
+\newcommand{\Hoare}[3]{$\{#1\}$ \texttt{\sel{#2}} $\{#3\}$}
+\newcommand{\HoareM}[3]{\{#1\} \mathtt{\sel{#2}} \{#3\}}
+\newcommand{\WP}{\mathop{\textit{wp}}}
+\newcommand{\myWP}[3]{\ensuremath{\WP(\texttt{\sel{#1}},#2)\ \equiv\ #3}}
+\newcommand{\myWPS}[2]{\ensuremath{\WP(\texttt{\sel{#1}},#2)}}
+
+\newcommand{\Conf}[2]{\ensuremath{\langle #1\ ,\ #2\rangle}}
+\newcommand{\terminal}[1]{#1}
+
+\date{Anul II, Semestrul II, 2024/2025}
+\title{Fundamentele Limbajelor de programare}
+\institute[FMI @ Unibuc]{Facultatea de Matematică și Informatică, DL Info}
+\author{Denisa Diaconescu\thanks{Cursul Program Verification, master anul I. Traducerea și adaptarea: T.F. Șerbănuță}}
+
+\deftranslation[to=Romanian]{Example}{Exemplu}
+
+\newcommand{\vitem}{\vfill\item}
+
+%-------------------------------------------------

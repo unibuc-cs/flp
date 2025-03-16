@@ -1,0 +1,959 @@
+
+\begin{frame}{Prezentare generală}
+\tableofcontents
+\end{frame}
+
+%-------------------------------------------------------
+\section{Ce încercăm să rezolvăm?}
+%-------------------------------------------------------
+
+%-------------------------------------------------------
+\begin{frame}{Verificarea limbajelor imperative}
+
+\begin{itemize}
+	\item Limbajele imperative sunt construite în jurul ideii de \alert{stare a programului} \\(date stocate în memorie).
+	\medskip
+	\item Programele imperative sunt secvențe de \alert{comenzi care modifică această stare}.
+	\medskip \pause
+	\item Pentru a \intens{demonstra proprietăți ale programelor imperative}, avem nevoie de:
+	\begin{enumerate}
+		\item O modalitate de a scrie afirmații despre starea programului.
+		\item Reguli pentru manipularea și demonstrarea acestor afirmații.
+	\end{enumerate}
+	\medskip \pause
+	\item Acestea vor fi oferite de \alert{Logica Hoare}.
+\end{itemize}
+
+\end{frame}
+%-------------------------------------------------------
+
+%-------------------------------------------------------
+\section{Logica Hoare}
+%-------------------------------------------------------
+
+%-------------------------------------------------------
+\begin{frame}{C.A.R. (Tony) Hoare}
+
+\alert{Logica Hoare} a fost introdusă de \intens{Tony Hoare}.
+
+Tot el a inventat algoritmul \alert{Quicksort} în anul 1960 (avea 26 de ani).
+
+\begin{center}
+\includegraphics[scale=.5]{../images/Hoare.jpeg}
+\end{center}
+
+\end{frame}
+%-------------------------------------------------------
+
+
+\begin{comment}
+
+%-------------------------------------------------------
+\begin{frame}{Propositional Logic (PL)}
+
+\begin{center}
+\begin{tabular}{lclcl}
+\alert{Syntax} && \alert{Semantics} && \alert{Calculus} \\ \hline 
+
+Atomic formulas && Truth values && Natural Deduction \\
+(variables) && $\{true, false\}$  && \\ 
+
+$p,q,r,\mydots$ &&  &&  \\ [1em] \hline
+
+Connectives && Truth tables && Rules of inference \\
+$\vee,\wedge,\to,\neg$ && && \\[1em] \hline
+
+Formulas && Satisfiable &&  Proof\\
+$\varphi,\psi,\mydots$ &&  &&  \\ [1em]
+
+ && Validity &&  \\
+\end{tabular}
+
+\bigskip
+\intens{Soundness and Completeness:} Formula $\varphi$ is provable iff $\varphi$ is valid
+\end{center}
+\end{frame}
+%-------------------------------------------------------
+
+
+%-------------------------------------------------------
+\begin{frame}{Hoare Logic}
+
+\begin{center}
+\begin{tabular}{ccc}
+\alert{Syntax} & \alert{Semantics} & \alert{Calculus} \\ \hline
+
+$\neg \wedge \vee \to \forall \exists$ & FOL &  N/A\\ \hline
+
+$= + - \geq \leq \mydots$ & Arithmetics &  N/A\\ \hline
+
+\intens{\texttt{:= ; while}}  & State maps variables & N/A \\
+\intens{\texttt{if then else}} & to values (no pointers) &  \\ \hline
+
+\alert{$\{P\}$\texttt{ S }$\{Q\}$} &  If initial state satisfies $P$ & \sel{todo} \\
+& and \texttt{S} terminates then & \\
+& final state satisfies $Q$&
+
+\end{tabular}
+\end{center}
+\end{frame}
+%-------------------------------------------------------
+\end{comment}
+
+%-------------------------------------------------------
+\begin{frame}{Triplete Hoare}
+
+Un \alert{triplet Hoare}  \intens{$\{P\}$\texttt{ S }$\{Q\}$} are trei componente:
+\begin{description}
+	\item[P] o \alert{pre-condiție}
+	\item[S] un \alert{fragment de cod}
+	\item[Q] o \alert{post-condiție}
+\end{description}
+
+\alert{Pre-condiția} este o afirmație care se referă la \intens{starea de dinaintea} execuției codului.
+
+\alert{Post-condiția} este o afirmație care se referă la \intens{starea de după} execuția codului.
+
+\end{frame}
+%-------------------------------------------------------
+
+%-------------------------------------------------------
+\begin{frame}{Sintaxă}
+
+\alert{Pre-condiția} și \alert{post-condiția} se construiesc din \intens{variabilele programului}, \intens{numere}, \intens{relații aritmetice}, și vor folosi \intens{logică propozitională} pentru a combina afirmații simple.
+
+\begin{example}
+\begin{itemize}
+	\item $x = 3$
+	\item $x \neq y$
+	\item $x > 0$
+	\item $x = 4 \wedge y = 2$
+	\item $(x > y) \to (x = 2 * y)$
+	\item $\top$
+	\item $\bot$
+\end{itemize}
+\end{example}
+
+\end{frame}
+%-------------------------------------------------------
+
+%-------------------------------------------------------
+\begin{frame}{Semantica intuitivă}
+
+Reamintim că o \alert{stare} este dată de valorile (întregi) ale variabilelor de program (locațiilor de memorie).
+
+\medskip \pause
+\alert{Triplet Hoare:} $\{P\}$\texttt{ S }$\{Q\}$
+\begin{itemize}
+	\item \intens{dacă} $P$ e adevărată în starea de dinaintea execuției lui $S$
+	\item \intens{și}  execuția lui \texttt{S} se termină
+	\item \intens{atunci} $Q$ e adevărată în starea de după execuția lui $S$
+\end{itemize}
+
+
+\end{frame}
+%-------------------------------------------------------
+
+%-------------------------------------------------------
+\begin{frame}{Corectitudine parțială}
+
+Logica Hoare exprimă \alert{corectitudine parțială}!
+\begin{itemize}
+	\item Un program este \alert{parțial corect} dacă dă răspunsul așteptat atunci când se termină.
+	\item Nu greșește niciodată, dar e posibil să nu dea nici un răspuns.
+\end{itemize}
+
+\medskip \pause
+\begin{example}
+\vspace{-.2cm}
+\begin{center}
+$\{x=1\}$ \texttt{while x=1 do y:=2} $\{x=3\}$
+\end{center}
+este o afirmație \intens{adevărată} conform logicii Hoare.
+\begin{itemize}
+	\item dacă starea de dinaintea execuției satisface $x=1$ \alert{și} bucla while se termină, atunci starea de după satisface $x=3$. \sel{Dar bucla while nu se termină!}
+\end{itemize}
+
+\end{example}
+\end{frame}
+%-------------------------------------------------------
+
+%-------------------------------------------------------
+\begin{frame}{Corectitudinea parțială e suficientă}
+
+\alert{De ce nu insistăm asupra terminării?}
+\begin{itemize}
+	\item Poate că nu vrem terminare.
+	\item Simplifică logica (există variante și pentru corectitudine totală).
+	\item Există metode specializate pentru demonstrarea terminării, dacă vrem.
+\end{itemize}
+
+% We will come back to termination with the \alert{Weakest Precondition Calculus}.
+\end{frame}
+%-------------------------------------------------------
+
+
+%-------------------------------------------------------
+\begin{frame}{Cum?}
+
+\vspace{-.6cm}
+\begin{example}
+\smallskip
+Tripletele Hoare ne permit să facem afirmații precum:
+\vspace{-.2cm}
+\begin{center}
+$\{x>0\}$ \texttt{y:=0-x} $\{y < 0 \wedge x \neq y\}$
+\end{center}
+\pause
+Dacă $(x > 0)$ este adevărată \intens{înainte} de execuția instrucțiunii \texttt{y:=0-x}
+atunci $(y < 0 \wedge x \neq y)$ este adevărată \intens{după}. 
+
+\pause
+Această afirmație este în mod intuitiv adevărată.
+\intens{Cum o demonstrăm?}
+\end{example}
+
+\medskip \pause
+%We can use pre- and postconditions to specify the effect of a code fragment on the state, but \intens{how do we prove or disprove a Hoare Triple specification}?
+
+Avem nevoie de niște \intens{reguli} pentru a deduce (formal) astfel de triplete.
+Vom avea câte o regulă pentru fiecare din cele patru feluri de instrucțiuni (plus încă două alte reguli).
+\end{frame}
+%-------------------------------------------------------
+
+
+%-------------------------------------------------------
+\begin{frame}{Axioma atribuirii (Regula 1/6)}
+
+Atribuirile \sel{schimbă starea}, deci e de așteptat ca tripletele Hoare pentru atribuire să reflecte această schimbare.
+
+\medskip \pause
+\alert{Axioma atribuirii:} 
+\begin{center}
+\fbox{\intens{$\{Q(e)\}$ \texttt{x:=e} $\{Q(x)\}$}}
+\end{center}
+{\footnotesize
+($Q(x)$ este o proprietate asupra unei variabile $x$ și $Q(e)$ indică aceeași proprietate în care toate aparițiile lui $x$ au fost înlocuite de expresia $e$)
+}
+
+\medskip \pause
+Dacă vrem ca $x$ să aibă o anumită proprietate $Q$ \sel{după} atribuire, atunci acea proprietate trebuie să țină pentru expresia $e$ atribuită lui $x$ \intens{înainte} de execuția atribuirii.
+\end{frame}
+%-------------------------------------------------------
+
+
+%-------------------------------------------------------
+\begin{frame}{Axioma atribuirii}
+
+\begin{example}
+Regula \false{inversă} este falsă: \false{$\{Q(x)\}$ \texttt{x:=e} $\{Q(e)\}$}
+
+Dacă am aplica această "axiomă" greșită pre-condiției $x=0$ și fragmentului de cod \texttt{x:=1}, am obține
+\begin{center}
+\Hoare{x=0}{x:=1}{1=0}
+\end{center}
+care se citește "dacă $x=0$ initial și \texttt{x:=1} se temină, atunci $1=0$ după execuție".
+\end{example}
+\end{frame}
+%-------------------------------------------------------
+
+%-------------------------------------------------------
+\begin{frame}{Lucrăm invers, dinspre post-condiție spre pre-condiție}
+
+Ar putea părea natural să începem cu \false{pre-condiția} și să facem deducții \false{înspre post-condiție}, dar acesta nu e cel mai bun mod de a raționa folosind logica Hoare.
+	
+	\medskip
+Dimpotrivă, \true{pornim cu post-condiția și mergem "înapoi"}.
+
+\pause
+	\begin{example}
+		Pentru a aplica axioma pentru atribuire,
+		\begin{center}
+		\intens{$\{Q(e)\}$ \texttt{x:=e} $\{Q(x)\}$}
+		\end{center}
+		luăm post-condiția, o copiem în pre-condiție și apoi înlocuim toate aparițiile lui $x$ cu $e$.
+		
+		Observație: postcondiția poate avea una, mai multe, sau nici o apariție a lui $x$.
+		\intens{Toate vor fi înlocuite cu $e$ în pre-condiție!}
+	\end{example}
+
+\end{frame}
+%-------------------------------------------------------
+
+%-------------------------------------------------------
+\begin{frame}{Regula pentru atribuire}
+
+\vspace{-.6cm}
+\alert{Axioma atribuirii:} \intens{$\{Q(e)\}$ \texttt{x:=e} $\{Q(x)\}$}
+
+\medskip
+\begin{example}
+Presupunem că avem de executat \intens{\texttt{x:=2}} și că \sel{post-condiția dorită} este \intens{$y=x$}.
+
+O instanță a axiomei de atribuire:
+\pause
+\vspace{-.2cm}
+\begin{center}
+\Hoare{y=\intens{2}}{x:=2}{y=\intens{x}}
+\end{center}
+\end{example}
+\end{frame}
+%-------------------------------------------------------
+
+%-------------------------------------------------------
+%\begin{frame}{Regula pentru atribuire}
+%
+%You can always replace predicates by \alert{equivalent predicates}; just label your
+%proof step with \intens{"precondition equivalence"} or \intens{"postcondition equivalence"}.
+%
+%\medskip \pause
+%\begin{example}
+%How should we prove
+%\vspace{-.2cm}
+%\begin{center}
+%\Hoare{y>0}{x:=y+3}{x>3}?
+%\end{center}
+%\vspace{-.2cm} \pause
+%Start with the postcondition $x>3$ and apply the assignment axiom:
+%\vspace{-.2cm} 
+%\begin{center}
+%\Hoare{\intens{y+3}>3}{x:=y+3}{\intens{x}>3}
+%\end{center}
+%\vspace{-.2cm} \pause
+%Then use the fact that \intens{$y+3 > 3$} is equivalent with \intens{$y>0$} to get the result.
+%\end{example}
+%\end{frame}
+%-------------------------------------------------------
+
+
+%-------------------------------------------------------
+\begin{frame}{Regula pentru atribuire}
+
+\begin{example}
+Să zicem că vrem să demonstrăm
+\vspace{-.2cm} 
+\begin{center}
+\Hoare{y=2}{x:=y}{x>0}?
+\end{center}
+\vspace{-.2cm}  \pause
+Această aritmație este evident adevărată. Dar folosind axioma pentru atribuire obținem:
+\vspace{-.2cm}
+\begin{center}
+\Hoare{\intens{y}>0}{x:=y}{\intens{x}>0}?
+\end{center}
+\vspace{-.2cm} 
+Și \ldots {\color{red} $y>0$ nu este echivalentă cu $y=2$!}
+\end{example}
+\end{frame}
+%-------------------------------------------------------
+
+%-------------------------------------------------------
+\begin{frame}{Afirmații tari și slabe}
+
+O afirmație $P$ este \alert{mai tare} decât $Q$ dacă \alert{$P$ o implică pe $Q$}.
+
+Dacă $P$ este mai tare decât $Q$, atunci $P$ \intens{are mai multe șanse să fie falsă} decât $Q$.
+
+\pause
+\begin{example}[promisiune electorală]
+\begin{itemize}
+	\item {\em Voi menține șomajul sub $3\%$} este \alert{mai tare} decât
+	\item {\em Voi menține șomajul sub $15\%$}	
+\end{itemize}
+\end{example}
+
+\pause
+\alert{Cea mai tare} afirmație posibilă este \intens{$\bot$}.
+
+
+\alert{Cea mai slabă} afirmație posibilă este \intens{$\top$}.
+
+\end{frame}
+%-------------------------------------------------------
+
+%-------------------------------------------------------
+\begin{frame}{Post-condiții tari}
+
+\begin{example}
+Triplul Hoare \Hoare{x=5}{x:=x+1}{\false{x=6}} este mai
+
+informativ decât \Hoare{x=5}{x:=x+1}{\true{x>0}}.
+\end{example}
+
+\medskip \pause
+Dacă \alert{post-condiția} $Q_1$ este \alert{mai tare} decât $Q_2$, atunci \\ \Hoare{P}{S}{Q_1} este o afirmație \alert{mai tare} decât \Hoare{P}{S}{Q_2}.
+
+\medskip \pause
+\begin{example}
+Deoarece post-condiția \false{$x=6$} este \intens{mai tare} decât \true{$x>0$} (întrucât $x = 6 \to x > 0$),
+
+atunci \Hoare{x=5}{x:=x+1}{\false{x=6}} este o afirmație \intens{mai tare} 
+
+decât \Hoare{x=5}{x:=x+1}{\true{x>0}}. 
+\end{example}
+\end{frame}
+%-------------------------------------------------------
+
+
+%-------------------------------------------------------
+\begin{frame}{Pre-condiții slabe}
+
+\begin{example}
+Tripletul Hoare \Hoare{\true{x>0}}{x:=x+1}{x>1} este mai 
+
+informativ decât \Hoare{\false{x=5}}{x:=x+1}{x>1}.
+\end{example}
+
+\medskip
+Dacă o \alert{pre-condiție} $P_1$ este \alert{mai slabă} decât $P_2$, atunci \\ \Hoare{P_1}{S}{Q} este o afirmație \alert{mai tare} decât \Hoare{P_2}{S}{Q}.
+
+\medskip
+\begin{example}
+Deoarece pre-condiția \true{$x>0$} este \intens{mai slabă} decât \false{$x=5$},
+
+atunci \Hoare{\true{x>0}}{x:=x+1}{x>1} este o afirmație \intens{mai tare}
+
+decât  \Hoare{\false{x=5}}{x:=x+1}{x>1}. 
+\end{example}
+\end{frame}
+%-------------------------------------------------------
+
+%-------------------------------------------------------
+\begin{frame}{Regula de întărire a pre-condiției (Regula 2/6)}
+
+Este sigur (corect) să \alert{întărim} o \intens{pre-condiție}.
+
+\alert{Regula de întărire a pre-condiției:}
+\begin{center}
+\fbox{\intens{$\infer[\mbox{ dacă }P_s \to P_w ]{\{P_s\}\ \mathtt{S}\ \{Q\}}{\{P_w\}\ \mathtt{S}\ \{Q\}}$}}
+\end{center}
+
+\begin{example}
+\begin{center}
+$\infer[\mbox{ deoarece }\false{y=2} \to \true{y>0}]{\false{\{y=2\}}\ \mathtt{x := y}\ \{x>0\}}{\true{\{y>0\}}\ \mathtt{x := y}\ \{x>0\}}$
+\end{center}
+
+\end{example}
+\end{frame}
+%-------------------------------------------------------
+
+%-------------------------------------------------------
+\begin{frame}{Regula de slăbire a post-condiției (Regula 3/6)}
+
+Este sigur (corect) să {\em relaxăm} (\alert{slăbim}) o \intens{post-condiție}.
+
+\alert{Regula de slăbire a post-condiției:}
+\begin{center}
+\fbox{\intens{$\infer[\mbox{ dacă } Q_s \to Q_w ]{\{P\}\ \mathtt{S}\ \{Q_w\}}{\{P\}\ \mathtt{S}\ \{Q_s\}}$}}
+\end{center}
+
+\begin{example}
+\begin{center}
+$\infer[\mbox{ deoarece }\false{x>3} \to \true{x>1}]{\{x>2\}\ \mathtt{x := x+1}\ \true{\{x>1\}}}{{\{x>2\}}\ \mathtt{x := x+1}\ \false{\{x>3\}}}$
+\end{center}
+
+\end{example}
+\end{frame}
+%-------------------------------------------------------
+
+%-------------------------------------------------------
+\begin{frame}{Regula pentru secvențiere (Regula 4/6)}
+
+Programele imperative conțin instrucțiuni, care modifică starea \intens{secvențial}.
+
+\alert{Regula de secvențiere:}
+\begin{center}
+\fbox{\intens{$\infer{\{P\} \mathtt{S_1 ; S_2} \{R\}}{\{P\} \mathtt{S_1} \{Q\} & \{Q\} \mathtt{S_2} \{R\}}$}}
+\end{center}
+
+\pause
+\begin{example}
+\begin{center}
+$\infer{\HoareM{x>2}{\sel{x:=x+1\ ;\  x:=x+2}}{x>5}}{\HoareM{x>2}{\sel{x:=x+1}}{x>3} & \HoareM{x>3}{\sel{x:=x+2}}{x>5}}$
+\end{center}
+
+\end{example}
+\end{frame}
+%-------------------------------------------------------
+
+
+%-------------------------------------------------------
+\begin{frame}{Cum obținem condiția din mijloc?}
+
+De obicei, când aplicăm o regulă de forma
+\begin{center}
+\fbox{\intens{$\infer{\{P\} \mathtt{S_1 ; S_2} \{R\}}{\{P\} \mathtt{S_1} \{Q\} & \{Q\} \mathtt{S_2} \{R\}}$}}
+\end{center}
+pre-condiția $P$ și post-condiția $R$ ne vor fi date; totuși, de unde obținem $Q$?
+
+\pause
+Pornind de la ținta noastră, $R$, și \intens{mergând înapoi}!
+
+\begin{center}
+$\infer{\HoareM{x>2}{\sel{x:=x+1 ; x:=x+2}}{x>5}}{\HoareM{x>2}{\sel{x:=x+1}}{Q} & \HoareM{Q}{\sel{x:=x+2}}{x>5}}$
+\end{center}
+ 
+\end{frame}
+%-------------------------------------------------------
+
+%-------------------------------------------------------
+\begin{frame}{Cum scriem o demonstrație?}
+
+\vspace{-.6cm}
+\begin{example}
+Să zicem că vrem să demonstrăm
+\begin{center}
+\Hoare{x=3}{\sel{x:=x+1; x:=x+2}}{x>5}.
+\end{center}
+
+\pause
+\begin{enumerate}[<+->]
+	\item \Hoare{x+2 > 5}{\sel{x:=x+2}}{x>5} \hfill (Atribuire)
+	% \item \Hoare{x > 3}{\sel{x:=x+2}}{x>5} \hfill (1, Precondition Equivalence)
+	\item \Hoare{(x+1) + 2 > 5}{\sel{x:=x+1}}{x+2 > 5} \hfill (Atribuire)
+	% \item \Hoare{x > 2}{\sel{x:=x+1}}{x>3} \hfill (3, Precondition Equivalence)
+	\item \Hoare{(x+1) + 2 > 5}{\sel{x:=x+1 ; x:=x+2}}{x>5} \hfill (1,2, Sevențiere)
+	\item \Hoare{x=3}{\sel{x:=x+1; x:=x+2}}{x>5}. \hfill{(3, Întărirea pre-condiției)}
+
+	deoarece $x=3 \to (x+1) + 2 > 5$
+\end{enumerate}
+\end{example}
+
+Observați numerotarea pașilor și justificările!
+\end{frame}
+%-------------------------------------------------------
+
+%-------------------------------------------------------
+\begin{frame}{Regula pentru instrucțiunea {\tt if} (Regula 5/6)}
+
+\alert{Regula pentru {\tt if}:}
+\begin{center}
+\fbox{\intens{$\infer{\{P\}\ \mathtt{if\ b\ then\ S_1\ else\  S_2}\ \{Q\}}{\{P \wedge b\}\ \mathtt{S_1}\ \{Q\} & \{P \wedge \neg b\}\ \mathtt{S_2}\ \{Q\}}$}}
+\end{center}
+
+\pause
+\begin{itemize}
+	\item Când se execută o instrucțiune {\tt if}, se va executa ori $\mathtt{S_1}$ ori $\mathtt{S_2}$.
+	\item De aceea, ca în urma execuției să fie validă afirmația $Q$, trebuie ca \alert{ambele} ramuri $\mathtt{S_1}$ și $\mathtt{S_2}$ să facă $Q$ adevărată.
+	\item Asemănător, dacă pre-condiția pentru {\tt if} este $P$, ea trebuie să fie \alert{o} pre-condiție pentru \alert{ambele} ramuri $\mathtt{S_1}$  și $\mathtt{S_2}$.
+	\item Alegerea dintre $\mathtt{S_1}$ și $\mathtt{S_2}$ depinde de validitatea expresiei $b$ în starea inițială; deci putem presupune $b$ ca \alert{o} pre-condiție pentru $\mathtt{S_1}$ și $\neg b$ ca \alert{o} pre-condiție pentru $\mathtt{S_2}$.
+\end{itemize}
+\end{frame}
+%-------------------------------------------------------
+
+%-------------------------------------------------------
+\begin{frame}{Regula pentru If}
+
+\alert{Regula pentru {\tt if}:}
+\begin{center}
+\fbox{\intens{$\infer{\{P\}\ \mathtt{if\ b\ then\ S_1\ else\  S_2}\ \{Q\}}{\{P \wedge b\}\ \mathtt{S_1}\ \{Q\} & \{P \wedge \neg b\}\ \mathtt{S_2}\ \{Q\}}$}}
+\end{center}
+
+\begin{example}
+
+Să zicem că vrem să demonstrăm
+
+\begin{center}
+\Hoare{x>3}{\sel{if  x>2 then y:=1 else y:=-1}}{y>0}
+\end{center}
+\pause
+Regula pentru {\tt if} ne spune că e suficient să demonstrăm:
+\begin{enumerate}[I]
+	\item \Hoare{(x>3) \wedge \intens{(x > 2)}}{\sel{y:=1}}{y>0}
+	\item \Hoare{(x>3) \wedge \intens{\neg(x>2)}}{\sel{y:=-1}}{y>0}
+\end{enumerate}
+\end{example}
+\end{frame}
+%-------------------------------------------------------
+
+%-------------------------------------------------------
+\begin{frame}{Regula pentru If}
+
+\begin{example}[cont.]
+Pentru I. \Hoare{(x>3) \wedge (x > 2)}{\sel{y:=1}}{y>0} avem demonstrația:
+\begin{enumerate}[<+->]
+	\item \Hoare{1>0}{y:=1}{y>0} \hfill (Atribuire)
+	\item \Hoare{(x>3) \wedge (x > 2)}{y:=1}{y >0}  \hfill (1, Întărirea pre-condiției)
+
+	deoarece $(x>3) \wedge (x > 2) \to 1>0$
+\end{enumerate}
+
+\medskip 
+\onslide<3->{Pentru II. \Hoare{(x>3) \wedge \neg(x>2)}{\sel{y:=-1}}{y>0} avem demonstrația:}
+\begin{enumerate}[<+->]
+{\setcounter{enumi}{2}}
+	\item \Hoare{-1>0}{y:=-1}{y>0} \hfill (Atribuire)
+	\item \Hoare{(x>3) \wedge \neg(x>2)}{y:=-1}{y>0}  \hfill (3, Întărirea pre-condiției)
+
+	   deoarece $(x>3) \wedge \neg(x>2) \to -1 > 0 $
+\end{enumerate}
+
+\medskip
+\onslide<5->{Putem concluziona:}
+\begin{enumerate}[<+->]
+	{\setcounter{enumi}{4}}
+	\item \Hoare{x>3}{\sel{if  x>2 then y:=1 else y:=-1}}{y>0} \hfill (2, 4, If)
+\end{enumerate}	
+\end{example}
+\end{frame}
+%-------------------------------------------------------
+
+%-------------------------------------------------------
+\begin{frame}{Regula pentru If}
+
+{\color{red}\underline{Exercițiu:}} 
+
+Cum ați scrie o regulă pentru o instrucțiune condițională fără \intens{else}?
+\begin{center}
+\texttt{if b then S}
+\end{center}
+
+\end{frame}
+%-------------------------------------------------------
+
+%-------------------------------------------------------
+\begin{frame}{Regula pentru While (Regula 6/6)}
+
+\vspace{-.6cm}
+\alert{Regula pentru While:}
+\begin{center}
+\fbox{\intens{$\infer{\{P\}\ \mathtt{while\ b\ do\ S}\ \{P\wedge \neg b\}}{\{P \wedge b\}\ \mathtt{S}\ \{P\}}$}}
+\end{center}
+
+\pause
+\begin{itemize}
+	\item $P$ este numit \alert{invariantul buclei}
+	\item $P$ este adevărată înainte de a intra în buclă, și este păstrată adevărată de execuția corpului buclei, $S$ (deși nu neapărat și în timpul execuției lui $S$).
+	\item Dacă execuția buclei se temină condiția de control trebuie să fie falsă, deci $\neg b$ apare în post-condiție.
+	\item Pentru a executa corpul buclei, \texttt{S}, $b$ trebuie să fie adevărată, deci $b$ apare în pre-condiția lui $S$.
+\end{itemize}
+\end{frame}
+%-------------------------------------------------------
+
+%-------------------------------------------------------
+\begin{frame}{Aplicarea regulii pentru While}
+
+\begin{center}
+\begin{tabular}{ccc}
+$\infer{\{P\}\ \mathtt{while\ b\ do\ S}\ \{P\wedge \neg b\}}{\{P \wedge b\}\ \mathtt{S}\ \{P\}}$ &&  $\{P\}\ \mathtt{while\ b\ do\ S}\ \{Q\}$
+\end{tabular}
+\end{center}
+
+\begin{itemize}
+	\item \false{Partea cea mai grea} este descoperirea \alert{invariantului}. 
+
+	\item Este nevoie de \alert{intuiție}. \false{Nu există algoritm} care să găsească invariantul.
+
+	\item Post-condiția obținută după aplicarea regulii e de forma $P\wedge \neg b$.
+	
+	 E posibil ca post-condiția dorită, $Q$, să fie diferită! 
+
+	\item Dacă $(P \wedge \neg b) \to Q$, putem folosi regula de \intens{slăbire a post-condiției}.
+\end{itemize}
+
+\begin{center}
+$
+\infer[\mbox{ deoarece }P \wedge \neg b \to Q]{\{P\}\ \mathtt{while\ b\ do\ S}\ \{Q\}}
+{
+\infer{\{P\}\ \mathtt{while\ b\ do\ S}\ \{P\wedge \neg b\}}{\{P \wedge b\}\ \mathtt{S}\ \{P\}}
+}
+$
+\end{center}
+\end{frame}
+%-------------------------------------------------------
+
+%-------------------------------------------------------
+\begin{frame}{Regula pentru While}
+
+\begin{example}
+Să zicem că vrem să găsim o pre-condiție $P$ astfel încât
+\begin{center}
+\Hoare{P}{while (n>0) do n:=n-1}{n=0}
+\end{center} 
+\pause
+Vrem un invariant $P$ astfel încât
+\begin{itemize}
+	\item $P$ este menținut adevărat de corpul buclei
+	\item $P \wedge \neg(n>0) \to (n=0)$
+\end{itemize}
+\pause
+\alert{$P \equiv n\geq 0$} pare o alegere rezonabilă pentru un astfel de invariant.
+
+Premiza regulii pentru while este satisfăcută de axioma de atribuire.
+
+
+\end{example}
+\end{frame}
+%-------------------------------------------------------
+
+%-------------------------------------------------------
+\begin{frame}{Regula pentru While}
+
+\begin{example}[cont.]
+	Demonstrăm că
+\begin{center}
+\Hoare{n \geq 0}{while (n>0) do n:=n-1}{n=0}
+\end{center}
+
+\begin{enumerate}[<+->]
+	\item \Hoare{n-1 \geq 0}{n:=n-1}{n \geq 0} \hfill (Atribuire)
+	\item \Hoare{n\geq 0 \wedge n > 0}{n:=n-1}{n \geq 0} \hfill (1, Întărirea pre-condiției)
+	
+		deoarece $n\geq 0 \wedge n > 0 \to n-1 \geq 0$
+	\item \Hoare{n \geq 0}{while (n>0) do n:=n-1}{n \geq 0 \wedge \neg(n > 0)} \hfill (2, While)
+	\item \Hoare{n \geq 0}{while (n>0) do n:=n-1}{n = 0} \hfill (3, Slăbirea post-condiției)
+
+		deoarece $n \geq 0 \wedge \neg(n > 0) \to n = 0$
+\end{enumerate}
+%\pause
+%There are other invariants we could have chosen, such as $n=0$ and $\bot$.
+%
+%The one we chose was "better" because it gave us a \intens{weaker} precondition.
+\end{example}
+\end{frame}
+%-------------------------------------------------------
+
+%-------------------------------------------------------
+\begin{frame}{Sistemul de reguli pentru Logica Hoare}
+
+\begin{description}
+\item[Atribuire:] \fbox{\intens{$\{Q(e)\}$ \texttt{x:=e} $\{Q(x)\}$}}
+
+\vitem[Întărire pre:] \fbox{\intens{$\infer[\mbox{ dacă } P_s \to P_w]{\{P_s\}\ \mathtt{S}\ \{Q\}}{\{P_w\}\ \mathtt{S}\ \{Q\}}$}}
+
+\vitem[Slăbire post:] \fbox{\intens{$\infer[\mbox{ dacă } Q_s \to Q_w]{\{P\}\ \mathtt{S}\ \{Q_w\}}{\{P\}\ \mathtt{S}\ \{Q_s\}}$}}
+
+\vitem[Secvențiere:] \fbox{\intens{$\infer{\{P\} \mathtt{S_1 ; S_2} \{R\}}{\{P\} \mathtt{S_1} \{Q\} & \{Q\} \mathtt{S_2} \{R\}}$}}
+
+\vitem[If:] \fbox{\intens{$\infer{\{P\}\ \mathtt{if\ b\ then\ S_1\ else\  S_2}\ \{Q\}}{\{P \wedge b\}\ \mathtt{S_1}\ \{Q\} & \{P \wedge \neg b\}\ \mathtt{S_2}\ \{Q\}}$}}
+
+\vitem[While:] \fbox{\intens{$\infer{\{P\}\ \mathtt{while\ b\ do\ S}\ \{P\wedge \neg b\}}{\{P \wedge b\}\ \mathtt{S}\ \{P\}}$}}
+\end{description}
+\end{frame}
+%-------------------------------------------------------
+
+%-------------------------------------------------------
+\begin{frame}{Un program simplu}
+\begin{example}
+\intens{Suma primelor $n$ numere naturale impare este $n^2$.} 
+
+Program:
+
+\hspace{.5cm} \texttt{i := 0;}
+
+\hspace{.5cm} \texttt{s := 0;}
+
+\hspace{.5cm} \texttt{while (i $\neq$ n) do}
+
+\hspace{.8cm} \texttt{i := i+1;}
+
+\hspace{.8cm} \texttt{s := s+(2*i-1)}
+
+\medskip
+Țintă: \Hoare{\top}{Program}{s = n^2}
+\end{example}
+\end{frame}
+%-------------------------------------------------------
+
+%-------------------------------------------------------
+\begin{frame}{Un program simplu}
+\begin{example}[cont.]
+Să vedem câteva exemple:
+\begin{itemize}
+	\item $1 = 1 = 1^2$
+	\item $1 + 3 = 4 = 2^2$
+	\item $1 + 3 + 5 = 9 = 3^2$
+	\item $1 + 3 + 5 + 7 = 16 = 4^2$
+\end{itemize}
+
+Pare să meargă. Să vedem dacă putem și demonstra!
+
+\medskip
+Tintă: \Hoare{\top}{Program}{s = n^2}
+\end{example}
+\end{frame}
+%-------------------------------------------------------
+
+%-------------------------------------------------------
+\begin{frame}{Un program simplu}
+\begin{example}[cont.]
+\intens{Mai întăi, avem nevoie de un invariant $P$.}
+
+\medskip
+\begin{columns}
+\begin{column}{0.4\textwidth}
+\fbox{\intens{$\infer{\{P\}\ \mathtt{while\ \true{b}\ do\ \false{S}}\ \{P\wedge \neg \true{b}\}}{\{P \wedge \true{b}\}\ \mathtt{S}\ \{P\}}$}}
+\end{column}
+\begin{column}{0.4\textwidth}
+\texttt{while \true{(i $\neq$ n)} do}
+
+\hspace{.3cm} \false{\texttt{i := i+1;}}
+
+\hspace{.3cm} \false{\texttt{s := s+(2*i-1)}}
+
+$\{s = n^2\}$
+\end{column}
+\end{columns}
+
+\medskip
+Din regula pentru while, vrem ca \intens{$P \wedge (i = n) \to (s = n^2)$}, ca să putem aplica regula de slăbire a post-condiției.
+
+La fiecare trecere prin corpul buclei, $i$ e incrementat și $s$ trece la următorul pătrat perfect.
+
+\pause
+\intens{Invariantul \alert{$P \equiv (s = i^2)$} pare rezonabil.}
+\end{example}
+\end{frame}
+%-------------------------------------------------------
+
+
+%-------------------------------------------------------
+\begin{frame}{Un program simplu}
+% \begin{example}[cont.]
+Verificăm că $P \equiv (s = i^2)$ este invariant: \intens{deducem \Hoare{P \wedge (i \neq n)}{S}{P}}
+
+\pause
+\begin{enumerate}[<+->]
+	\vitem \Hoare{s+(2*i-1)=i^2}{s:=s+(2*i-1)}{s=i^2} \hfill (Atribuire)
+	\vitem \Hoare{s+(2*(i+1)-1)=(i+1)^2}{i:=i+1}{s+(2*i-1)=i^2} \hfill (Atribuire)
+	\vitem \Hoare{s+(2*(i+1)-1)=(i+1)^2}{i:=i+1;\ s:=s+(2*i-1)}{s=i^2} \\ \hfill(1, 2, Sevențiere)
+	\vitem \Hoare{s = i^2 \wedge i \neq n}{i:=i+1;\ s:=s+(2*i-1)}{s=i^2} \\ \hfill(3 Întărirea pre-condiției)
+
+	  deoarece $s = i^2 \wedge i \neq n \to s+(2*(i+1)-1)=(i+1)^2$
+\end{enumerate}
+% \end{example}
+\end{frame}
+%-------------------------------------------------------
+
+% \addtocounter{framenumber}{-1}
+%-------------------------------------------------------
+% \begin{frame}{A simple program}
+% \begin{example}[cont.]
+% Check $P \equiv (s = i^2)$ is an invariant: \intens{prove \Hoare{P \wedge (i \neq n)}{S}{P}}
+% 
+% \begin{center}
+% $\infer
+% {\HoareM{s = i^2 \wedge i \neq n}{i:=i+1;\ s:=s+(2*i-1)}{s=i^2}}
+% {\HoareM{s=i^2 \wedge i \neq n}{i:=i+1}{Q} & \HoareM{Q}{s:=s+(2*i-1)}{s=i^2}}$
+% \end{center}
+% 
+% $Q$ is $\{s+(2*i-1)=i^2\}$
+% \begin{enumerate}
+	% \item \Hoare{s+(2*i-1)=i^2}{s:=s+(2*i-1)}{s=i^2} \hfill (Assignment)
+	% \item 
+	% \item \Hoare{s=i^2 \wedge i \neq n}{i:=i+1}{Q}
+	% \item \Hoare{s = i^2 \wedge i \neq n}{i:=i+1;\ s:=s+(2*i-1)}{s=i^2} \hfill (1,3, Sequencing)
+% \end{enumerate}
+% \vspace{.65cm}
+% \end{example}
+% \end{frame}
+% -------------------------------------------------------
+% 
+% \addtocounter{framenumber}{-1}
+% -------------------------------------------------------
+% \begin{frame}{A simple program}
+% \begin{example}[cont.]
+% Check $P \equiv (s = i^2)$ is an invariant: \intens{prove \Hoare{P \wedge (i \neq n)}{S}{P}}
+% 
+% \begin{center}
+% $\infer
+% {\HoareM{s = i^2 \wedge i \neq n}{i:=i+1;\ s:=s+(2*i-1)}{s=i^2}}
+% {\HoareM{s=i^2 \wedge i \neq n}{i:=i+1}{Q} & \HoareM{Q}{s:=s+(2*i-1)}{s=i^2}}$
+% \end{center}
+% 
+% $Q$ is $\{s+(2*i-1)=i^2\}$
+% \begin{enumerate}
+	% \item \Hoare{s+(2*i-1)=i^2}{s:=s+(2*i-1)}{s=i^2} \hfill (Assignment)
+	% \item 
+	% \item \Hoare{s=i^2 \wedge i \neq n}{i:=i+1}{s+(2*i-1)=i^2}
+	% \item \Hoare{s = i^2 \wedge i \neq n}{i:=i+1;\ s:=s+(2*i-1)}{s=i^2} \hfill (1,3, Sequencing)
+% \end{enumerate}
+% \vspace{.65cm}
+% \end{example}
+% \end{frame}
+% -------------------------------------------------------
+% \addtocounter{framenumber}{-1}
+% -------------------------------------------------------
+% \begin{frame}{A simple program}
+% \begin{example}[cont.]
+% Check $P \equiv (s = i^2)$ is an invariant: \intens{prove \Hoare{P \wedge (i \neq n)}{S}{P}}
+% 
+% \begin{center}
+% $\infer
+% {\HoareM{s = i^2 \wedge i \neq n}{i:=i+1;\ s:=s+(2*i-1)}{s=i^2}}
+% {\HoareM{s=i^2 \wedge i \neq n}{i:=i+1}{Q} & \HoareM{Q}{s:=s+(2*i-1)}{s=i^2}}$
+% \end{center}
+% 
+% $Q$ is $\{s+(2*i-1)=i^2\}$
+% \begin{enumerate}
+	% \item \Hoare{s+(2*i-1)=i^2}{s:=s+(2*i-1)}{s=i^2} \hfill (Assignment)
+        %  \item \Hoare{s+(2*(i+1)-1)=(i+1)^2}{i:=i+1}{s+(2*i-1)=i^2} \hfill  (Assignment)
+	% \item \Hoare{s=i^2 \wedge i \neq n}{i:=i+1}{s+(2*i-1)=i^2} \onslide<2->{\hfill (2, Strength. Precond.)}
+	% \item \Hoare{s = i^2 \wedge i \neq n}{i:=i+1;\ s:=s+(2*i-1)}{s=i^2} \hfill (1,3, Sequencing)
+% \end{enumerate}
+% \onslide<3->{So far, so good. }
+% \end{example}
+% \end{frame}
+%-------------------------------------------------------
+
+%-------------------------------------------------------
+\begin{frame}{Un program simplu}
+\begin{example}[cont.]
+\intens{Completarea demonstrației \Hoare{\top}{Program}{s = n^2}}
+
+\ldots
+\begin{enumerate}[<+->]
+{\setcounter{enumi}{3}}
+	\item \Hoare{s = i^2 \wedge i \neq n}{i:=i+1;\ s:=s+(2*i-1)}{s=i^2}
+	\item \Hoare{s=i^2}{while ... s:=s+(2*i-1)}{s=i^2 \wedge \neg (i \neq n)} \hfill(4, While)
+	\item \Hoare{s=i^2}{while ... s:=s+(2*i-1)}{s=n^2}\\ \hfill(5, Slăbirea post-condiției)
+
+	deoarece $s=i^2 \wedge \neg (i \neq n) \to s = n^2$
+	\item \Hoare{0 = i^2}{s:= 0}{s = i^2} \hfill (Atribuire)
+	\item \Hoare{0 = 0^2}{i:= 0}{0 = i^2} \hfill (Atribuire)
+	\item \Hoare{\top}{i:= 0}{0 = i^2} \hfill (8, Întărirea pre-condiției)
+
+	deoarece $\top \to 0 = 0^ 2$
+	\item \Hoare{\top}{i := 0;\ s := 0}{s = i^2} \hfill(7,9, Secvențiere)
+	\item \Hoare{\top}{Program}{s=n^2} \hfill(10, 6, Secvențiere)
+\end{enumerate} 
+\end{example}
+\end{frame}
+%-------------------------------------------------------
+
+%-------------------------------------------------------
+%\begin{frame}{Hoare Logic}
+%
+%\begin{center}
+%\begin{tabular}{ccc}
+%\alert{Syntax} & \alert{Semantics} & \alert{Calculus} \\ \hline
+%
+%$\neg \wedge \vee \to \forall \exists$ & FOL &  N/A\\ \hline
+%
+%$= + - \geq \leq \mydots$ & Arithmetics &  N/A\\ \hline
+%
+%\intens{\texttt{:= ; while}}  & State maps variables & N/A \\
+%\intens{\texttt{if then else}} & to values (no pointers) &  \\ \hline
+%
+%\alert{$\{P\}$\texttt{ S }$\{Q\}$} &  If initial state satisfies $P$ & 6 Inference\\
+%& and \texttt{S} terminates then & Rules \\
+%& final state satisfies $Q$&
+%
+%\end{tabular}
+%\end{center}
+%\end{frame}
+%-------------------------------------------------------
+
+%-------------------------------------------------------
+\begin{frame}{Bibliografie}
+
+{\footnotesize
+\begin{itemize}
+	\item Lecture Notes on "Formal Methods for Software Engineering", Australian National University, Rajeev Gor\'{e}.
+	\item Mike Gordon, "Specification and Verification I", chapters 1 and 2. 
+	\item Michael Huth, Mark Ryan, "Logic in Computer Science: Modeling and Reasoning about Systems", 2nd edition, Cambridge University Press, 2004.
+	\item Krzysztof R. Apt, Frank S. de Boer, Ernst-R\"{u}diger Olderog, "Verification of Sequential and Concurrent Programs", 3rd edition,  Springer.
+\end{itemize}
+}
+\end{frame}
+%-------------------------------------------------------
