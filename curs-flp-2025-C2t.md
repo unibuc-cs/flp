@@ -3,7 +3,7 @@ author: Traian Florin Șerbănuță și Andrei Sipoș
 institute: Facultatea de Matematică și Informatică, DL Info
 date: Anul II, Semestrul II, 2024/2025
 title: Fundamentele limbajelor de programare
-subtitle: Mulțimi definite de reguli
+subtitle: Mulțimi definite de reguli\thanks{Inspirat de prezentarea dl. prof. V.E. Căzănescu}
 theme: CambridgeUS
 ---
 
@@ -78,7 +78,7 @@ verificăm că are proprietatea căutată.
 ### Definiție
 
 Fie o mulțime $A$ fixată. Numim __regulă de definire__ peste mulțimea $A$, o
-pereche $(H, a) \in A^\ast \times A$[^1].
+pereche $(H, a) \in A^\ast \times A$ \hfill ($A^\ast$ este monoidul cuvintelor peste $A$).
 
 Dată fiind o regulă de definire $r = (a_1a_2\ldots a_n, a)$, definim:
 
@@ -97,8 +97,6 @@ Fie $B$ o submulțime a lui $A$.
 $B$ este închisă la o regulă de definire $r$ dacă $\hyp(r) \subseteq B$ implică $\conc(r) \in B$.
 
 $B$ este inchisă la sistemul de reguli de definire $R$ dacă este închisă la toate regulile din $R$
-
-[^1]: $A^\ast$ este monoidul cuvintelor peste $A$.
 
 ## Submulțimile închise sunt o mulțime Moore
 
@@ -328,7 +326,7 @@ Putem apoi deduce imediat că $\langle w, \sigma \rangle \Downarrow \langle \sig
 
 ## Semantica small-step este simulată de cea big-step
 
-### Expresii artimetice
+### Expresii aritmetice
 
 Dacă $\langle a, \sigma \rangle \to \langle a', \sigma \rangle$, și $\langle a', \sigma \rangle \Downarrow \langle i \rangle$, atunci $\langle a, \sigma \rangle \Downarrow \langle i \rangle$.
 
@@ -338,7 +336,7 @@ Inducție deductivă pe regulile de definire a relației într-un pas pentru exp
 
 - $\reg[Id]{\Ss{\cfg{x,\sigma}}{\cfg{i, \sigma}}}{}{i = \sigma(x)}$
 
-  $\Bs{\cfg{i, \sigma}}{\cfg{i}}$ și $\Bs{\cfg{x. \sigma}}{\cfg{i}}$
+  $\Bs{\cfg{i, \sigma}}{\cfg{i}}$ și $\Bs{\cfg{x, \sigma}}{\cfg{i}}$
 
 - $\reg{\Ss{\cfg{a_1 + a_2,\sigma}}{\cfg{a_1' + a_2,\sigma}}}{\Ss{\cfg{a_1,\sigma}}{\cfg{a_1',\sigma}}}{}$
 
@@ -350,16 +348,6 @@ Inducție deductivă pe regulile de definire a relației într-un pas pentru exp
 
   Avem $\Bs{\cfg{i, \sigma}}{\cfg{i}}$ și $\Bs{\cfg{i_1, \sigma}}{\cfg{i_1}}$,
   $\Bs{\cfg{i_2, \sigma}}{\cfg{i_2}}$, de unde $\Bs{\cfg{i_1 + i_2, \sigma}}{\cfg{i}}$
-
-## Semantica small-step este simulată de cea big-step
-
-### Expresii booleene
-
-Dacă $\langle b, \sigma \rangle \to \langle b', \sigma \rangle$, și $\langle b', \sigma \rangle \Downarrow \langle t \rangle$, atunci $\langle a, \sigma \rangle \Downarrow \langle t \rangle$.
-
-### Demonstrație
-
-Asemănător ca pentru expresii aritmetice, folosind și rezultatul deja demonstrat.
 
 ## Semantica small-step este simulată de cea big-step
 
