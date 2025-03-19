@@ -3,7 +3,7 @@ author: Traian Florin Șerbănuță și Andrei Sipoș
 institute: Facultatea de Matematică și Informatică, DL Info
 date: Anul II, Semestrul II, 2024/2025
 title: Fundamentele limbajelor de programare
-subtitle: 0. Aspecte organizatorice. Introducere istorică. Planul cursului.
+subtitle: Aspecte organizatorice. Introducere istorică. Planul cursului.
 theme: CambridgeUS
 ---
 
@@ -33,16 +33,16 @@ la pagina:
 
 Activităţile didactice vor fi ţinute de către următorii oameni:
 
--   curs:
-    -   seriile 23, 24: Traian Florin Şerbănuţă
-    -   seria 25: Andrei Sipoş
+- curs:
+  - seriile 23, 24: Traian Florin Şerbănuţă
+  - seria 25: Andrei Sipoş
 
--   laborator:
-    -   grupele 231, 242: Horaţiu Cheval
-    -   grupa 232: Andrei Burduşa
-    -   grupele 233, 234: Ioan Teodorescu
-    -   grupa 241: Ana Pantilie
-    -   grupele 243, 244, 251, 252: Andrei Sipoş
+- laborator:
+  - grupele 231, 242: Horaţiu Cheval
+  - grupa 232: Andrei Burduşa
+  - grupele 233, 234: Ioan Teodorescu
+  - grupa 241: Ana Pantilie
+  - grupele 243, 244, 251, 252: Andrei Sipoş
 
 ## Notare
 

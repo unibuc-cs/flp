@@ -9,7 +9,7 @@ theme: CambridgeUS
 
 ## Motivație
 
-În descrirea formală a diverse concepte informatice, întâlnim deseori
+În descrierea formală a diverse concepte informatice, întâlnim deseori
 definiții (recursive) prin reguli.
 
 ### Exemplu: descrierea sintaxei unui limbaj
@@ -279,7 +279,7 @@ Atunci $G_f$ este graficul unei funcții $f : A \to B$ cu proprietatea din enun�
 
   Folosind proprietatea de mai sus.
 
-- Pentru orice $s$ instrucțiune și $\sigma$ stare există o unică stare $\sigma'$ astfel încât $\langle s, \sigma \rangle \Downarrow \langle \sigma' \rangle$
+- Pentru orice $s$ instrucțiune și $\sigma$ stare există cel mult o stare $\sigma'$ astfel încât $\langle s, \sigma \rangle \Downarrow \langle \sigma' \rangle$
 
   Demonstrație: prin inducție pe structura instrucțiunilor.
 
