@@ -26,4 +26,4 @@ clean:
 %.tex: %.md header.tex Makefile
 	pandoc $< -o $@ -s -t beamer -H header.tex
 
-.PHONY: all clean
+.PHONY: all clean 03-logica-Hoare/03-logica-Hoare.pdf

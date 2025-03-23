@@ -53,10 +53,10 @@ Tot el a inventat algoritmul \alert{Quicksort} în anul 1960 (avea 26 de ani).
 
 \begin{center}
 \begin{tabular}{lclcl}
-\alert{Syntax} && \alert{Semantics} && \alert{Calculus} \\ \hline 
+\alert{Syntax} && \alert{Semantics} && \alert{Calculus} \\ \hline
 
 Atomic formulas && Truth values && Natural Deduction \\
-(variables) && $\{true, false\}$  && \\ 
+(variables) && $\{true, false\}$  && \\
 
 $p,q,r,\mydots$ &&  &&  \\ [1em] \hline
 
@@ -124,14 +124,17 @@ Un \alert{triplet Hoare}  \intens{$\{P\}$\texttt{ S }$\{Q\}$} are trei component
 
 \begin{example}
 \begin{itemize}
-	\item $x = 3$
-	\item $x \neq y$
-	\item $x > 0$
+	\item $x = 3$, $\neg (x = y)$, $\neg (0 \leq x)$
 	\item $x = 4 \wedge y = 2$
-	\item $(x > y) \to (x = 2 * y)$
-	\item $\top$
-	\item $\bot$
+	\item $(\neg y \leq x) \to (x = 2 * y)$
+	\item $\texttt{true}$, $\texttt{false}$
 \end{itemize}
+\end{example}
+
+Dacă avem nevoie de o logică mai puternică, putem folosi \alert{logica de ordinul I}.
+\begin{example}
+Pentru a exprima că valoarea variabilei de program $x$ este un pătrat perfect,
+putem scrie $\exists n. x = n * n$.
 \end{example}
 
 \end{frame}
@@ -206,7 +209,7 @@ $\{x>0\}$ \texttt{y:=0-x} $\{y < 0 \wedge x \neq y\}$
 \end{center}
 \pause
 Dacă $(x > 0)$ este adevărată \intens{înainte} de execuția instrucțiunii \texttt{y:=0-x}
-atunci $(y < 0 \wedge x \neq y)$ este adevărată \intens{după}. 
+atunci $(y < 0 \wedge x \neq y)$ este adevărată \intens{după}.
 
 \pause
 Această afirmație este în mod intuitiv adevărată.
@@ -217,7 +220,22 @@ Această afirmație este în mod intuitiv adevărată.
 %We can use pre- and postconditions to specify the effect of a code fragment on the state, but \intens{how do we prove or disprove a Hoare Triple specification}?
 
 Avem nevoie de niște \intens{reguli} pentru a deduce (formal) astfel de triplete.
-Vom avea câte o regulă pentru fiecare din cele patru feluri de instrucțiuni (plus încă două alte reguli).
+Vom avea câte o regulă pentru fiecare din cele cinci feluri de instrucțiuni (plus încă două alte reguli).
+\end{frame}
+%-------------------------------------------------------
+
+
+%-------------------------------------------------------
+\begin{frame}{Axioma pentru \texttt{skip} (Regula 0/6)}
+
+\texttt{skip} nu face nimic, deci e de așteptat ca tripletele Hoare pentru \texttt{skip} reflecte acest lucru.
+
+\medskip
+\alert{Axioma pentru \texttt{skip}:}
+\begin{center}
+\fbox{\intens{$\{Q\}$ \texttt{skip} $\{Q\}$}}
+\end{center}
+
 \end{frame}
 %-------------------------------------------------------
 
@@ -228,7 +246,7 @@ Vom avea câte o regulă pentru fiecare din cele patru feluri de instrucțiuni (
 Atribuirile \sel{schimbă starea}, deci e de așteptat ca tripletele Hoare pentru atribuire să reflecte această schimbare.
 
 \medskip \pause
-\alert{Axioma atribuirii:} 
+\alert{Axioma atribuirii:}
 \begin{center}
 \fbox{\intens{$\{Q(e)\}$ \texttt{x:=e} $\{Q(x)\}$}}
 \end{center}
@@ -261,7 +279,7 @@ care se citește "dacă $x=0$ initial și \texttt{x:=1} se temină, atunci $1=0$
 \begin{frame}{Lucrăm invers, dinspre post-condiție spre pre-condiție}
 
 Ar putea părea natural să începem cu \false{pre-condiția} și să facem deducții \false{înspre post-condiție}, dar acesta nu e cel mai bun mod de a raționa folosind logica Hoare.
-	
+
 	\medskip
 Dimpotrivă, \true{pornim cu post-condiția și mergem "înapoi"}.
 
@@ -272,7 +290,7 @@ Dimpotrivă, \true{pornim cu post-condiția și mergem "înapoi"}.
 		\intens{$\{Q(e)\}$ \texttt{x:=e} $\{Q(x)\}$}
 		\end{center}
 		luăm post-condiția, o copiem în pre-condiție și apoi înlocuim toate aparițiile lui $x$ cu $e$.
-		
+
 		Observație: postcondiția poate avea una, mai multe, sau nici o apariție a lui $x$.
 		\intens{Toate vor fi înlocuite cu $e$ în pre-condiție!}
 	\end{example}
@@ -315,7 +333,7 @@ O instanță a axiomei de atribuire:
 %\end{center}
 %\vspace{-.2cm} \pause
 %Start with the postcondition $x>3$ and apply the assignment axiom:
-%\vspace{-.2cm} 
+%\vspace{-.2cm}
 %\begin{center}
 %\Hoare{\intens{y+3}>3}{x:=y+3}{\intens{x}>3}
 %\end{center}
@@ -331,7 +349,7 @@ O instanță a axiomei de atribuire:
 
 \begin{example}
 Să zicem că vrem să demonstrăm
-\vspace{-.2cm} 
+\vspace{-.2cm}
 \begin{center}
 \Hoare{y=2}{x:=y}{x>0}?
 \end{center}
@@ -341,7 +359,7 @@ Această aritmație este evident adevărată. Dar folosind axioma pentru atribui
 \begin{center}
 \Hoare{\intens{y}>0}{x:=y}{\intens{x}>0}?
 \end{center}
-\vspace{-.2cm} 
+\vspace{-.2cm}
 Și \ldots {\color{red} $y>0$ nu este echivalentă cu $y=2$!}
 \end{example}
 \end{frame}
@@ -358,7 +376,7 @@ Dacă $P$ este mai tare decât $Q$, atunci $P$ \intens{are mai multe șanse să 
 \begin{example}[promisiune electorală]
 \begin{itemize}
 	\item {\em Voi menține șomajul sub $3\%$} este \alert{mai tare} decât
-	\item {\em Voi menține șomajul sub $15\%$}	
+	\item {\em Voi menține șomajul sub $15\%$}
 \end{itemize}
 \end{example}
 
@@ -387,9 +405,9 @@ Dacă \alert{post-condiția} $Q_1$ este \alert{mai tare} decât $Q_2$, atunci \\
 \begin{example}
 Deoarece post-condiția \false{$x=6$} este \intens{mai tare} decât \true{$x>0$} (întrucât $x = 6 \to x > 0$),
 
-atunci \Hoare{x=5}{x:=x+1}{\false{x=6}} este o afirmație \intens{mai tare} 
+atunci \Hoare{x=5}{x:=x+1}{\false{x=6}} este o afirmație \intens{mai tare}
 
-decât \Hoare{x=5}{x:=x+1}{\true{x>0}}. 
+decât \Hoare{x=5}{x:=x+1}{\true{x>0}}.
 \end{example}
 \end{frame}
 %-------------------------------------------------------
@@ -399,7 +417,7 @@ decât \Hoare{x=5}{x:=x+1}{\true{x>0}}.
 \begin{frame}{Pre-condiții slabe}
 
 \begin{example}
-Tripletul Hoare \Hoare{\true{x>0}}{x:=x+1}{x>1} este mai 
+Tripletul Hoare \Hoare{\true{x>0}}{x:=x+1}{x>1} este mai
 
 informativ decât \Hoare{\false{x=5}}{x:=x+1}{x>1}.
 \end{example}
@@ -413,7 +431,7 @@ Deoarece pre-condiția \true{$x>0$} este \intens{mai slabă} decât \false{$x=5$
 
 atunci \Hoare{\true{x>0}}{x:=x+1}{x>1} este o afirmație \intens{mai tare}
 
-decât  \Hoare{\false{x=5}}{x:=x+1}{x>1}. 
+decât  \Hoare{\false{x=5}}{x:=x+1}{x>1}.
 \end{example}
 \end{frame}
 %-------------------------------------------------------
@@ -492,7 +510,7 @@ Pornind de la ținta noastră, $R$, și \intens{mergând înapoi}!
 \begin{center}
 $\infer{\HoareM{x>2}{\sel{x:=x+1 ; x:=x+2}}{x>5}}{\HoareM{x>2}{\sel{x:=x+1}}{Q} & \HoareM{Q}{\sel{x:=x+2}}{x>5}}$
 \end{center}
- 
+
 \end{frame}
 %-------------------------------------------------------
 
@@ -578,7 +596,7 @@ Pentru I. \Hoare{(x>3) \wedge (x > 2)}{\sel{y:=1}}{y>0} avem demonstrația:
 	deoarece $(x>3) \wedge (x > 2) \to 1>0$
 \end{enumerate}
 
-\medskip 
+\medskip
 \onslide<3->{Pentru II. \Hoare{(x>3) \wedge \neg(x>2)}{\sel{y:=-1}}{y>0} avem demonstrația:}
 \begin{enumerate}[<+->]
 {\setcounter{enumi}{2}}
@@ -593,7 +611,7 @@ Pentru I. \Hoare{(x>3) \wedge (x > 2)}{\sel{y:=1}}{y>0} avem demonstrația:
 \begin{enumerate}[<+->]
 	{\setcounter{enumi}{4}}
 	\item \Hoare{x>3}{\sel{if  x>2 then y:=1 else y:=-1}}{y>0} \hfill (2, 4, If)
-\end{enumerate}	
+\end{enumerate}
 \end{example}
 \end{frame}
 %-------------------------------------------------------
@@ -601,7 +619,7 @@ Pentru I. \Hoare{(x>3) \wedge (x > 2)}{\sel{y:=1}}{y>0} avem demonstrația:
 %-------------------------------------------------------
 \begin{frame}{Regula pentru If}
 
-{\color{red}\underline{Exercițiu:}} 
+{\color{red}\underline{Exercițiu:}}
 
 Cum ați scrie o regulă pentru o instrucțiune condițională fără \intens{else}?
 \begin{center}
@@ -640,13 +658,13 @@ $\infer{\{P\}\ \mathtt{while\ b\ do\ S}\ \{P\wedge \neg b\}}{\{P \wedge b\}\ \ma
 \end{center}
 
 \begin{itemize}
-	\item \false{Partea cea mai grea} este descoperirea \alert{invariantului}. 
+	\item \false{Partea cea mai grea} este descoperirea \alert{invariantului}.
 
 	\item Este nevoie de \alert{intuiție}. \false{Nu există algoritm} care să găsească invariantul.
 
 	\item Post-condiția obținută după aplicarea regulii e de forma $P\wedge \neg b$.
-	
-	 E posibil ca post-condiția dorită, $Q$, să fie diferită! 
+
+	 E posibil ca post-condiția dorită, $Q$, să fie diferită!
 
 	\item Dacă $(P \wedge \neg b) \to Q$, putem folosi regula de \intens{slăbire a post-condiției}.
 \end{itemize}
@@ -669,7 +687,7 @@ $
 Să zicem că vrem să găsim o pre-condiție $P$ astfel încât
 \begin{center}
 \Hoare{P}{while (n>0) do n:=n-1}{n=0}
-\end{center} 
+\end{center}
 \pause
 Vrem un invariant $P$ astfel încât
 \begin{itemize}
@@ -698,7 +716,7 @@ Premiza regulii pentru while este satisfăcută de axioma de atribuire.
 \begin{enumerate}[<+->]
 	\item \Hoare{n-1 \geq 0}{n:=n-1}{n \geq 0} \hfill (Atribuire)
 	\item \Hoare{n\geq 0 \wedge n > 0}{n:=n-1}{n \geq 0} \hfill (1, Întărirea pre-condiției)
-	
+
 		deoarece $n\geq 0 \wedge n > 0 \to n-1 \geq 0$
 	\item \Hoare{n \geq 0}{while (n>0) do n:=n-1}{n \geq 0 \wedge \neg(n > 0)} \hfill (2, While)
 	\item \Hoare{n \geq 0}{while (n>0) do n:=n-1}{n = 0} \hfill (3, Slăbirea post-condiției)
@@ -717,7 +735,8 @@ Premiza regulii pentru while este satisfăcută de axioma de atribuire.
 \begin{frame}{Sistemul de reguli pentru Logica Hoare}
 
 \begin{description}
-\item[Atribuire:] \fbox{\intens{$\{Q(e)\}$ \texttt{x:=e} $\{Q(x)\}$}}
+\item[Skip:] \fbox{\intens{$\{Q\}$ \texttt{skip} $\{Q\}$}}
+\vitem[Atribuire:] \fbox{\intens{$\{Q(e)\}$ \texttt{x:=e} $\{Q(x)\}$}}
 
 \vitem[Întărire pre:] \fbox{\intens{$\infer[\mbox{ dacă } P_s \to P_w]{\{P_s\}\ \mathtt{S}\ \{Q\}}{\{P_w\}\ \mathtt{S}\ \{Q\}}$}}
 
@@ -735,7 +754,7 @@ Premiza regulii pentru while este satisfăcută de axioma de atribuire.
 %-------------------------------------------------------
 \begin{frame}{Un program simplu}
 \begin{example}
-\intens{Suma primelor $n$ numere naturale impare este $n^2$.} 
+\intens{Suma primelor $n$ numere naturale impare este $n^2$.}
 
 Program:
 
@@ -830,17 +849,17 @@ Verificăm că $P \equiv (s = i^2)$ este invariant: \intens{deducem \Hoare{P \we
 % \begin{frame}{A simple program}
 % \begin{example}[cont.]
 % Check $P \equiv (s = i^2)$ is an invariant: \intens{prove \Hoare{P \wedge (i \neq n)}{S}{P}}
-% 
+%
 % \begin{center}
 % $\infer
 % {\HoareM{s = i^2 \wedge i \neq n}{i:=i+1;\ s:=s+(2*i-1)}{s=i^2}}
 % {\HoareM{s=i^2 \wedge i \neq n}{i:=i+1}{Q} & \HoareM{Q}{s:=s+(2*i-1)}{s=i^2}}$
 % \end{center}
-% 
+%
 % $Q$ is $\{s+(2*i-1)=i^2\}$
 % \begin{enumerate}
 	% \item \Hoare{s+(2*i-1)=i^2}{s:=s+(2*i-1)}{s=i^2} \hfill (Assignment)
-	% \item 
+	% \item
 	% \item \Hoare{s=i^2 \wedge i \neq n}{i:=i+1}{Q}
 	% \item \Hoare{s = i^2 \wedge i \neq n}{i:=i+1;\ s:=s+(2*i-1)}{s=i^2} \hfill (1,3, Sequencing)
 % \end{enumerate}
@@ -848,23 +867,23 @@ Verificăm că $P \equiv (s = i^2)$ este invariant: \intens{deducem \Hoare{P \we
 % \end{example}
 % \end{frame}
 % -------------------------------------------------------
-% 
+%
 % \addtocounter{framenumber}{-1}
 % -------------------------------------------------------
 % \begin{frame}{A simple program}
 % \begin{example}[cont.]
 % Check $P \equiv (s = i^2)$ is an invariant: \intens{prove \Hoare{P \wedge (i \neq n)}{S}{P}}
-% 
+%
 % \begin{center}
 % $\infer
 % {\HoareM{s = i^2 \wedge i \neq n}{i:=i+1;\ s:=s+(2*i-1)}{s=i^2}}
 % {\HoareM{s=i^2 \wedge i \neq n}{i:=i+1}{Q} & \HoareM{Q}{s:=s+(2*i-1)}{s=i^2}}$
 % \end{center}
-% 
+%
 % $Q$ is $\{s+(2*i-1)=i^2\}$
 % \begin{enumerate}
 	% \item \Hoare{s+(2*i-1)=i^2}{s:=s+(2*i-1)}{s=i^2} \hfill (Assignment)
-	% \item 
+	% \item
 	% \item \Hoare{s=i^2 \wedge i \neq n}{i:=i+1}{s+(2*i-1)=i^2}
 	% \item \Hoare{s = i^2 \wedge i \neq n}{i:=i+1;\ s:=s+(2*i-1)}{s=i^2} \hfill (1,3, Sequencing)
 % \end{enumerate}
@@ -877,13 +896,13 @@ Verificăm că $P \equiv (s = i^2)$ este invariant: \intens{deducem \Hoare{P \we
 % \begin{frame}{A simple program}
 % \begin{example}[cont.]
 % Check $P \equiv (s = i^2)$ is an invariant: \intens{prove \Hoare{P \wedge (i \neq n)}{S}{P}}
-% 
+%
 % \begin{center}
 % $\infer
 % {\HoareM{s = i^2 \wedge i \neq n}{i:=i+1;\ s:=s+(2*i-1)}{s=i^2}}
 % {\HoareM{s=i^2 \wedge i \neq n}{i:=i+1}{Q} & \HoareM{Q}{s:=s+(2*i-1)}{s=i^2}}$
 % \end{center}
-% 
+%
 % $Q$ is $\{s+(2*i-1)=i^2\}$
 % \begin{enumerate}
 	% \item \Hoare{s+(2*i-1)=i^2}{s:=s+(2*i-1)}{s=i^2} \hfill (Assignment)
@@ -916,7 +935,7 @@ Verificăm că $P \equiv (s = i^2)$ este invariant: \intens{deducem \Hoare{P \we
 	deoarece $\top \to 0 = 0^ 2$
 	\item \Hoare{\top}{i := 0;\ s := 0}{s = i^2} \hfill(7,9, Secvențiere)
 	\item \Hoare{\top}{Program}{s=n^2} \hfill(10, 6, Secvențiere)
-\end{enumerate} 
+\end{enumerate}
 \end{example}
 \end{frame}
 %-------------------------------------------------------
@@ -950,7 +969,7 @@ Verificăm că $P \equiv (s = i^2)$ este invariant: \intens{deducem \Hoare{P \we
 {\footnotesize
 \begin{itemize}
 	\item Lecture Notes on "Formal Methods for Software Engineering", Australian National University, Rajeev Gor\'{e}.
-	\item Mike Gordon, "Specification and Verification I", chapters 1 and 2. 
+	\item Mike Gordon, "Specification and Verification I", chapters 1 and 2.
 	\item Michael Huth, Mark Ryan, "Logic in Computer Science: Modeling and Reasoning about Systems", 2nd edition, Cambridge University Press, 2004.
 	\item Krzysztof R. Apt, Frank S. de Boer, Ernst-R\"{u}diger Olderog, "Verification of Sequential and Concurrent Programs", 3rd edition,  Springer.
 \end{itemize}

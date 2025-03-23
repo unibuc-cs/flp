@@ -55,6 +55,8 @@
 \newcommand{\ttop}{\pmb{\top}}
 
 \newcommand{\terminal}[1]{\ensuremath\mathrel{\text{\ttfamily #1}}}
+\newcommand{\ttrue}{\terminal{true}}
+\newcommand{\tfalse}{\terminal{false}}
 \newcommand{\twhile}{\terminal{while}}
 \newcommand{\tdo}{\terminal{do}}
 \newcommand{\tif}{\terminal{if}}
@@ -62,6 +64,8 @@
 \newcommand{\telse}{\terminal{else}}
 \newcommand{\tskip}{\terminal{skip}}
 
+\newcommand{\Strue}{\ttrue}
+\newcommand{\Sfalse}{\tfalse}
 \newcommand{\Swhile}{\twhile}
 \newcommand{\Sdo}{\tdo}
 \newcommand{\Sif}{\tif}
@@ -106,12 +110,20 @@
 % \tikzstyle{line} = [draw, -latex']
 % \tikzstyle{cloud} = [draw, ellipse,fill=red!20, node distance=3cm,
 %     minimum height=2em]
+\makeatletter
+\newcommand{\specialcell}[1]{\ifmeasuring@#1\else\omit$\displaystyle#1$\ignorespaces\fi}
+\makeatother
 
 \newcommand{\spc}{\hspace{.5em}}
 \newcommand{\Sdaca}{\mathrel{\textit{dacă}}}
-\newcommand{\reg}[4][]{\ifthenelse{\equal{#1}{}}{}{{\scriptstyle(\textsc{#1})}\spc}\ifthenelse{\equal{#3}{}}{#2}{\frac{#3}{#2}}\spc{\ifthenelse{\equal{#4}{}}{}{\Sdaca #4\spc}}}
+\newcommand{\reg}[4][]{\ifthenelse{\equal{#3}{}}{#2}{\frac{#3}{#2}}\spc{\ifthenelse{\equal{#4}{}}{}{\Sdaca #4\spc}}\ifthenelse{\equal{#1}{}}{}{{{\spc\spc\scriptstyle(\textsc{#1})}}}}
 \renewcommand{\ss}[3][]{{\ensuremath {#2} \xrightarrow{#1} {#3}}}
 \newcommand{\Ss}{\displaystyle\ss}
 \newcommand{\bs}[2]{{\ensuremath {#1} \Downarrow {#2}}}
 \newcommand{\Bs}{\displaystyle\bs}
 \newcommand{\cfg}[1]{{\ensuremath \langle{#1}\rangle}}
+
+\newcommand{\hoare}[3]{\{#1\}\spc\mathtt{#2}\spc\{#3\}}
+\newcommand{\Hoare}{\displaystyle\hoare}
+\newcommand{\deduces}[2]{{#1}\vdash{#2}}
+\newcommand{\satisfies}[2]{{#1}\vDash{#2}}
