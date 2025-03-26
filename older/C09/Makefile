@@ -1,1 +1,6 @@
-include ../basic.mk
+all: C09.pdf
+
+%.pdf: %.md ../../header.tex Makefile
+	pandoc $< -o $@ -s -t beamer -H ../../header.tex
+
+.PHONY: all
