@@ -1,0 +1,1055 @@
+\documentclass[xcolor=pdftex,romanian,colorlinks]{beamer}
+%\documentclass[xcolor=pdftex,handout,romanian,colorlinks]{beamer}
+
+\usepackage[export]{adjustbox}
+\usepackage{../sty/tslides}
+\usepackage[all]{xy}
+\usepackage{pgfplots}
+\usepackage{flowchart}
+\usepackage{todonotes}
+\usetikzlibrary{arrows,positioning,calc}
+\lstset{language=Haskell}
+\lstset{escapeinside={(*@}{@*)}}
+\PrerenderUnicode{ăĂîÎȘșȚțâÂ}
+\usepackage{amsmath}
+
+
+%\usepackage{xcolor}
+%\definecolor{IntensColor}{HTML}{2E86C1}
+%\definecolor{StateTransition}{HTML}{D6EAF8}
+%\definecolor{MedianLightOrange}{RGB}{216,178,92}
+%\definecolor{Orchid}{HTML}{8E44AD}
+%\definecolor{True}{HTML}{229954}
+%\definecolor{False}{HTML}{CB4335}
+
+\input{../sty/commands}
+\definecolor{section-color}{HTML}{23373b} %mDarkTeal
+%\AtBeginSection[]{
+%  \begin{frame}
+%  \vfill
+%  \centering
+%  \begin{beamercolorbox}[sep=8pt,center,shadow=true,rounded=true]{title}
+%    \usebeamerfont{title}\insertsectionhead\par%
+%  \end{beamercolorbox}
+%  \vfill
+%  \end{frame}
+%}
+
+
+
+\title[FLP]{Fundamentele limbajelor de programare}
+\subtitle{C07}
+\date{}
+
+
+\begin{document}
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\setlength{\leftmargini}{12pt}
+
+
+%================================================
+\section{\color{section-color} Lambda calcul cu tipuri simple (cont.)}
+%================================================
+
+%%------------------------------------------------
+%\begin{frame}{Tipuri simple}
+%
+%Mulțimea  \alert{tipurilor simple}  \hspace{.2cm}
+% \intens{$\mathbb{T} = \mathbb{V}\ |\ \mathbb{T} \rightarrow \mathbb{T}$}
+%\vspace{-.2cm}
+%\begin{itemize}
+%	\item \alert{(Tipul variabilă)} Dacă $\alpha \in \mathbb{V}$, atunci $\alpha \in \mathbb{T}$.
+%	\item \alert{(Tipul săgeată)} Dacă $\sigma,\tau \in \mathbb{T}$, atunci  $(\sigma \rightarrow \tau) \in \mathbb{T}$.
+%\end{itemize}
+%
+%
+%Mulțimea \alert{$\lambda$-termenilor cu pre-tipuri $\Lambda_\mathbb{T}$} \hspace{.2cm}
+%\intens{$\Lambda_\mathbb{T} = x\ |\ \app{\Lambda_\mathbb{T}}{\Lambda_\mathbb{T}}\ |\ \abs{\type{x}{\mathbb{T}}}{\Lambda_\mathbb{T}}$}
+%
+%
+%\begin{itemize}
+%	\item O \alert{afirmație} este o expresie de forma $\type{M}{\sigma}$, unde $M \in \Lambda_\mathbb{T}$ și $\sigma\in \mathbb{T}$.\\
+%	\item O \alert{declarație} este o afirmație de forma $\type{x}{\sigma}$.
+%	\item Un \alert{context} $\Gamma$ este o listă de declarații cu subiecți diferiți.
+%	\item O \alert{judecată} este o expresie de forma $\Gamma \vdash \type{M}{\sigma}$.
+%\end{itemize}
+%
+%\alert{Sistem de deducție pentru calculul Church $\lambda\hspace{-.1cm}\to$}
+%\vspace{-.6cm}
+%\begin{center}
+%{\footnotesize
+%\begin{tabular}{lll}
+%\infer[(var)]
+%	{\Gamma \vdash \type{x}{\sigma}}
+%	{}
+%%------------------
+%&
+%\infer[(\to_E)]
+%	{\Gamma \vdash \type{\app{M}{N}}{\tau}}
+%	 {\Gamma \vdash \type{M}{\sigma \to \tau} \hspace{.5cm} \Gamma \vdash \type{N}{\sigma}}
+%%------------------
+%&
+%\infer[(\to_I)]
+%	{\Gamma \vdash \type{(\abs{\type{x}{\sigma}}{M})}{\sigma \to \tau} }
+%	 {\Gamma, \type{x}{\sigma} \vdash \type{M}{\tau}}\\
+% dacă $\type{x}{\sigma}\in \Gamma$ 	 & &\\	 
+%\end{tabular}
+%}	 
+%\end{center}
+%
+%Un termen $M$  în calculul $\lambda\hspace{-.1cm}\to$ este \alert{legal} dacă $\Gamma \vdash \type{M}{\rho}$.
+%
+%\end{frame}
+
+%%------------------------------------------------
+%\begin{frame}{Ce probleme putem să rezolvăm în teoria tipurilor?}
+%
+%\intens{\textit{Well-typedness (Typability/Type Inference)}}
+%
+%Se reduce la a verifica dacă un termen este \alert{legal}.
+%Concret, trebuie să găsim un context și un tip dacă termenul este legal, altfel să arătăm de ce nu se poate.
+%\vspace{-.3cm}
+%\begin{center}
+%$? \vdash \type{term}{?}$
+%\end{center}
+%O variațiune a problemei este \intens{\textit{Type Assignment}} în care contextul este dat și trebuie să găsim tipul.
+%\vspace{-.3cm}
+%\begin{center}
+%$context \vdash \type{term}{?}$
+%\end{center}
+%
+%\end{frame}
+
+%------------------------------------------------
+\begin{frame}{Ce problemă vrem să rezolvăm în cursul de astăzi?}
+
+\intens{\textit{Type Inference}}
+
+Pentru un lambda termen $M$ fără tipuri, vrem să adnotăm termenul $M$ cu tipuri obținând $\overline{M}$ și să rezolvăm problema
+\vspace{-.3cm}
+\begin{center}
+$? \vdash \type{\overline{M}}{?}$
+\end{center}
+(să găsim un context și un tip, pentru a avea o judecată legală).
+
+\vspace{.2cm}  
+\textbf{\intens{Exemple:}}
+\vspace{-.2cm}
+\begin{itemize}
+	\item Pentru termenul {\color{True}$\app{(\abs{z}{\abs{u}{z}})}{(\app{y}{x})}$}, am putea obține
+	\begin{center}
+	$\{\type{x}{\alpha, \type{y}{\alpha \to \beta}}\} \vdash \type{\app{(\abs{\type{z}{\beta}}{\abs{\type{u}{\gamma}}{z}})}{(\app{y}{x})}}{\gamma \to \beta}$
+	\end{center}
+	\vspace{.2cm}
+	\item Pentru termenul {\color{False}$\app{x}{x}$} nu putem să rezolvăm problema.
+\end{itemize}
+\end{frame}
+
+%------------------------------------------------
+\begin{frame}{Tipuri simple}
+
+%Mulțimea  \alert{tipurilor simple}  \hspace{.2cm}
+% \intens{$\mathbb{T} = \mathbb{V}\ |\ \mathbb{T} \rightarrow \mathbb{T}$}
+
+%Mulțimea \alert{$\lambda$-termenilor cu pre-tipuri $\Lambda_\mathbb{T}$} \hspace{.2cm}
+%\intens{$\Lambda_\mathbb{T} = x\ |\ \app{\Lambda_\mathbb{T}}{\Lambda_\mathbb{T}}\ |\ \abs{\type{x}{\mathbb{T}}}{\Lambda_\mathbb{T}}$}
+
+\vspace{.2cm}
+\begin{minipage}{15cm}
+\hspace{-1cm}
+\begin{tabular}{cc}
+\alert{Sistemul $\lambda\hspace{-.1cm}\to$} & 
+\onslide<2->{\alert{Sistemul $\lambda\hspace{-.1cm}\to$ cu constrângeri}}
+\\[.6em] 
+$\Gamma \vdash \type{M}{\sigma}$
+& 
+\onslide<3->{$\Gamma \vdash \type{M}{\sigma} \const{C}$}
+\\[1em] 
+%------------------
+\infer[(var)]
+	{\Gamma \vdash \type{x}{\sigma}}
+	{} dacă $\type{x}{\sigma} \in \Gamma$
+ &  
+ \onslide<4->{
+\infer[(var^*)]
+	{\Gamma \cup \{\type{x}{\tau}\}\vdash \type{x}{\sigma} \const{\{\sigma \egf{} \tau\}}}
+	{} 
+ }
+\\[1em] 
+%------------------
+\infer[(\to_I)]
+	{\Gamma \vdash \type{(\abs{\type{x}{\sigma}}{M})}{\sigma \to \tau} }
+	 {\Gamma, \type{x}{\sigma} \vdash \type{M}{\tau}}
+  & 
+\onslide<5->{
+ \infer[(\to_I^*)]
+	{\Gamma \vdash \type{(\abs{\type{x}{\sigma}}{M})}{\tau} \const{C} }
+	 {\Gamma, \type{x}{\sigma} \vdash \type{M}{\tau'} \const{C'} \vspace{.1cm}\\ {\color{False} C = C' \cup \{\tau \egf{} \sigma \to \tau'\}}}
+	 }
+\\[1em] 
+ %------------------
+\infer[(\to_E)]
+	{\Gamma \vdash \type{\app{M}{N}}{\tau}}
+	 {\Gamma \vdash \type{M}{\sigma \to \tau} \hspace{.5cm} \Gamma \vdash \type{N}{\sigma}}
+  & 
+\onslide<6->{
+\hspace{.4cm}
+\infer[(\to_E^*)]
+	{\Gamma \vdash \type{\app{M}{N}}{\tau} \const{C}}
+	 {\Gamma \vdash \type{M}{\tau_1}\const{C_1} \hspace{.5cm} \Gamma \vdash \type{N}{\tau_2} \const{C_2} \vspace{.1cm}\\  {\color{False} C = C_1 \cup C_2 \cup \{\tau_1 \egf{} \tau_2 \to \tau\}}}
+}
+\\[1em]
+\onslide<7->{$\sigma, \tau$ variabile de tip}
+& 
+\onslide<7->{$\sigma, \tau, \tau', \tau_1, \tau_2$ variabile de tip}
+\end{tabular}
+\end{minipage}
+
+\end{frame}
+
+%%------------------------------------------------
+%\begin{frame}{Exemplu}
+%\begin{center}
+%{\footnotesize
+%\begin{minipage}{10cm}
+%\begin{center}
+%\begin{tabular}{cc}
+%\infer[(var^*)]
+%	{\Gamma \cup \{\type{x}{\tau}\}\vdash \type{x}{\sigma} \const{\{\sigma = \tau\}}}
+%	{} 
+%&
+%% \infer[(\to_I^*)]
+%%	{\Gamma \vdash \type{(\abs{\type{x}{\sigma}}{M})}{\sigma \to \tau} \const{C} }
+%%	 {\Gamma, \type{x}{\sigma} \vdash \type{M}{\tau} \const{C}}
+% \infer[(\to_I^*)]
+%	{\Gamma \vdash \type{(\abs{\type{x}{\sigma}}{M})}{\tau} \const{C} }
+%	 {\Gamma, \type{x}{\sigma} \vdash \type{M}{\tau'} \const{C'} \vspace{.1cm}\\ {\color{False} C = C' \cup \{\tau = \sigma \to \tau'\}}}
+%\end{tabular}
+%
+%\vspace{.6cm}
+%\begin{tabular}{c}
+%\infer[(\to_E^*)]
+%	{\Gamma \vdash \type{\app{M}{N}}{\tau} \const{C}}
+%	 {\Gamma \vdash \type{M}{\tau_1}\const{C_1} \hspace{.5cm} \Gamma \vdash \type{N}{\tau_2} \const{C_2} \vspace{.1cm}\\  {\color{False} C = C_1 \cup C_2 \cup \{\tau_1 = \tau_2 \to \tau\}}}
+%\end{tabular}
+%\end{center}
+%\end{minipage}
+%}
+%\end{center}
+%
+%\vspace{.2cm}
+%{\footnotesize
+%\begin{center}
+%\begin{tabular}{c}
+%\hspace{-.6cm}
+%\infer[(\to_E^*)]
+%	{
+%	\onslide<1->{\underbrace{\{\type{x}{\alpha, \type{y}{\alpha \to \beta}}\}}_{\Gamma} \vdash \type{\app{(\abs{\type{z}{\beta}}{\abs{\type{u}{\gamma}}{z}})}{(\app{y}{x})}}{\gamma \to \beta} \const{C}}
+%	}
+%	{
+%		\onslide<2->{
+%	\infer[(\to_I^*)]
+%	{\Gamma  \vdash 	\type{\abs{\type{z}{\beta}}{\abs{\type{u}{\gamma}}{z}}}{\tau_1} \const{C_1}}
+%	{ 
+%	\infer[(\to_I^*)]
+%	{\Gamma \cup \{\type{z}{\beta}\} \vdash \type{\abs{\type{u}{\gamma}}{z}}{\tau_1'} \const{C_1'}}
+%	{\Gamma \cup \{\type{z}{\beta}, \type{u}{\gamma}\} \vdash \type{z}{\delta} \const{D}  \vspace{.1cm}\\ 
+%	{\color{False} C_1' = D \cup \{\tau_1' = (\gamma \to \delta)\}}
+%	}
+%	 \vspace{.1cm}\\ 
+%	{\color{False} C_1 = C_1' \cup \{\tau_1 = (\beta \to \tau_1')\} }
+%	}
+%	}
+%	\quad \quad
+%		\onslide<2->{
+%	\infer[(\to_E^*)]
+%	{\Gamma  \vdash \type{\app{y}{x}}{\tau_2} \const{C_2}}
+%	{
+%	\Gamma  \vdash \type{y}{\sigma_1} \const{C_2'} \quad
+%	\Gamma \vdash \type{x}{\sigma_2} \const{C_2''} \vspace{.1cm}\\ 
+%	{\color{False} C_2 = C_2' \cup C_2'' \cup \{\sigma_1 = \sigma_2 \to \tau_2\}}	
+%	}
+%	 \vspace{.2cm}\\ 
+%	{\color{False} C = C_1 \cup C_2 \cup \{\tau_1 = (\tau_2 \to (\gamma \to \beta))}\}}
+%	}
+%\end{tabular}
+%\end{center}
+%}
+%\end{frame}
+%
+%%------------------------------------------------
+%\begin{frame}{Exemplu}
+%\vspace{-.2cm}
+%\begin{center}
+%{\footnotesize
+%\begin{minipage}{10cm}
+%\begin{center}
+%\begin{tabular}{c}
+%\infer[(var^*)]
+%	{\Gamma \cup \{\type{x}{\tau}\}\vdash \type{x}{\sigma} \const{\{\sigma = \tau\}}}
+%	{} 
+%\end{tabular}
+%\end{center}
+%\end{minipage}
+%}
+%\end{center}
+%
+%\vspace{-.6cm}
+%{\footnotesize
+%\begin{center}
+%\begin{tabular}{c}
+%\hspace{-.6cm}
+%\infer[(\to_E^*)]
+%	{
+%	\onslide<1->{\underbrace{\{\type{x}{\alpha, \type{y}{\alpha \to \beta}}\}}_{\Gamma} \vdash \type{\app{(\abs{\type{z}{\beta}}{\abs{\type{u}{\gamma}}{z}})}{(\app{y}{x})}}{\gamma \to \beta} \const{C}}
+%	}
+%	{
+%		\onslide<1->{
+%	\infer[(\to_I^*)]
+%	{\Gamma  \vdash 	\type{\abs{\type{z}{\beta}}{\abs{\type{u}{\gamma}}{z}}}{\tau_1} \const{C_1}}
+%	{ 
+%	\infer[(\to_I^*)]
+%	{\Gamma \cup \{\type{z}{\beta}\} \vdash \type{\abs{\type{u}{\gamma}}{z}}{\tau_1'} \const{C_1'}}
+%	{\Gamma \cup \{\type{z}{\beta}, \type{u}{\gamma}\} \vdash \type{z}{\delta} \const{D}  \vspace{.1cm}\\ 
+%	{\color{False} C_1' = D \cup \{\tau_1' = (\gamma \to \delta)\}}
+%	}
+%	 \vspace{.1cm}\\ 
+%	{\color{False} C_1 = C_1' \cup \{\tau_1 = (\beta \to \tau_1')\} }
+%	}
+%	}
+%	\quad \quad
+%		\onslide<1->{
+%	\infer[(\to_E^*)]
+%	{\Gamma  \vdash \type{\app{y}{x}}{\tau_2} \const{C_2}}
+%	{
+%	\Gamma  \vdash \type{y}{\sigma_1} \const{C_2'} \quad
+%	\Gamma \vdash \type{x}{\sigma_2} \const{C_2''} \vspace{.1cm}\\ 
+%	{\color{False} C_2 = C_2' \cup C_2'' \cup \{\sigma_1 = \sigma_2 \to \tau_2\}}	
+%	}
+%	 \vspace{.2cm}\\ 
+%	{\color{False} C = C_1 \cup C_2 \cup \{\tau_1 = (\tau_2 \to (\gamma \to \beta))}\}}
+%	}
+%\end{tabular}
+%\end{center}
+%
+%\vspace{-.4cm}
+%\begin{tabular}{cc}
+%\hspace{-1cm}
+%\begin{tabular}{l}
+%$D= \{\delta = \beta\}$  \\
+%$C_1' = \{\delta = \beta, \tau_1' = (\gamma \to \delta)\}$ \\
+%$C_1 = \{\delta = \beta, \tau_1' = (\gamma \to \delta), \tau_1 = (\beta \to \tau_1')\}$ 
+%\end{tabular}
+%&
+%\begin{tabular}{l}
+%$C_2' = \{\sigma_1 = \alpha \to \beta\}$  \\
+%$C_2'' = \{\sigma_2 = \alpha\}$ \\
+%$C_2 = \{\sigma_1 = \alpha \to \beta, \sigma_2 = \alpha, \sigma_1 = \sigma_2 \to \tau_2\}$
+%\end{tabular} 
+%\end{tabular}
+%\begin{center}
+%$C = \{\delta = \beta, \tau_1' = (\gamma \to \delta), \tau_1 = (\beta \to \tau_1'), \sigma_1 = \alpha \to \beta, \sigma_2 = \alpha,$ \\ $\sigma_1 = \sigma_2 \to \tau_2, \tau_1 = (\tau_2 \to (\gamma \to \beta))\}$
+%\end{center}
+%
+%  \vspace{-.2cm}
+%%\hspace{-.4cm}\intens{Nu vă speriați!} Constrângerile de mai sus spun doar că ar trebui ca $\alpha = \sigma_2$ și $\beta = \delta$.
+%\hspace{-.4cm}\intens{Nu vă speriați!} e mai simplu decât pare.
+%}
+%\end{frame}
+
+%------------------------------------------------
+\begin{frame}{Sistemul $\lambda\hspace{-.1cm}\to$ cu constrângeri}
+
+O judecată de forma $\Gamma \vdash \type{M}{\sigma} \const{C}$ este \alert{legală} dacă constrângerile din $C$ au o "soluție".
+
+\vspace{.2cm}
+De exemplu, judecata de mai jos este legală
+\vspace{-.2cm}
+\begin{center}
+$\{\type{x}{\alpha, \type{y}{\alpha \to \beta}}\} \vdash \type{\app{(\abs{\type{z}{\beta}}{\abs{\type{u}{\gamma}}{z}})}{(\app{y}{x})}}{\gamma \to \beta} \const{C}$, unde\\ 
+$C = \{\delta \egf{} \beta, \tau_1' \egf{} (\gamma \to \delta), \tau_1 \egf{} (\beta \to \tau_1'), \sigma_1 \egf{} \alpha \to \beta, \sigma_2 \egf{} \alpha,$ \\ $\sigma_1 \egf{} \sigma_2 \to \tau_2, \tau_1 \egf{} (\tau_2 \to (\gamma \to \beta))\}$
+\end{center}
+
+$C$ are "soluție" și spune, de exemplu, că ar trebui ca $\alpha = \sigma_2$ și $\beta = \delta$. 
+
+În slide-urile următoare dăm mai multe detalii despre ce înseamnă acest lucru.
+\end{frame}
+
+%------------------------------------------------
+\begin{frame}{Type Inference}
+
+Fie $M$ un lambda termen fără tipuri.
+
+Construim un context \alert{$\Gamma_M$} pentru $M$:
+\vspace{-.2cm}
+\begin{center}
+$\Gamma_M = \{\type{x}{X}\ |\ x \in FV(M)\}$
+\end{center}
+\vspace{-.2cm}
+(toate variabilele de tip $X$ introduse mai sus sunt noi și distincte)
+
+
+  \vspace{.2cm}
+Adnotăm $M$ cu tipuri pentru variabilele legate obținând \alert{$\overline{M}$} prin inducție după structura lui $M$ astfel:
+\vspace{-.2cm}
+\begin{itemize}
+	\item dacă $M = x$, atunci $\overline{M} = M$
+	\item dacă $M = \app{M_1}{N_1}$, atunci $\overline{M} = \app{\overline{M_1}}{\overline{N_1}}$
+	\item dacă $M = \abs{x}{N}$, atunci $\overline{M} = \abs{\type{x}{X}}{\overline{N}}$, unde $X$ este o variabilă de tip nouă
+\end{itemize}
+\end{frame}
+
+%------------------------------------------------
+\begin{frame}{Type Inference}
+
+Fie $M$ un lambda termen fără tipuri.
+
+Dacă există o constrângere de tipuri \alert{$C_M$} și o variabilă de tip nouă $V$ astfel  încât 
+\vspace{-.2cm}
+\begin{center}
+$\Gamma_M \vdash \type{\overline{M}}{V} \const{C_M}$
+\end{center}
+\vspace{-.2cm}
+este o judecată legală, atunci $M$ este \textit{typable}. \\
+(soluția o găsim prin $C_M$)
+\end{frame}
+
+%------------------------------------------------
+\begin{frame}{Type Inference - Exemplul 1}
+
+{\footnotesize
+
+Fie $M_1 = \app{(\abs{z}{\abs{u}{z}})}{(\app{y}{x})}$.  \\
+Obținem $\Gamma_{M_1} = \{\type{x}{X}, \type{y}{Y}\}$ și $\overline{M_1} = \app{(\abs{\type{z}{Z}}{\abs{\type{u}{U}}{z}})}{(\app{y}{x})}$.
+
+\vspace{-.4cm}
+\begin{center}
+\begin{tabular}{c}
+\hspace{-.6cm}
+\infer[(\to_E^*)]
+	{
+	\onslide<1->{\Gamma_{M_1} \vdash \type{\app{(\abs{\type{z}{Z}}{\abs{\type{u}{U}}{z}})}{(\app{y}{x})}}{V} \const{C_{M_1}}}
+	}
+	{
+		\onslide<1->{
+	\infer[(\to_I^*)]
+	{\Gamma_{M_1}  \vdash 	\type{\abs{\type{z}{Z}}{\abs{\type{u}{U}}{z}}}{\tau_1} \const{C_1}}
+	{ 
+	\infer[(\to_I^*)]
+	{\Gamma_{M_1} \cup \{\type{z}{Z}\} \vdash \type{\abs{\type{u}{U}}{z}}{\tau_1'} \const{C_1'}}
+	{\Gamma_{M_1} \cup \{\type{z}{Z}, \type{u}{U}\} \vdash \type{z}{\delta} \const{D}  \vspace{.1cm}\\ 
+	{\color{False} C_1' = D \cup \{\tau_1' \egf{} (U \to \delta)\}}
+	}
+	 \vspace{.1cm}\\ 
+	{\color{False} C_1 = C_1' \cup \{\tau_1 \egf{} (Z \to \tau_1')\} }
+	}
+	}
+	\quad \quad
+		\onslide<1->{
+	\infer[(\to_E^*)]
+	{\Gamma_{M_1}  \vdash \type{\app{y}{x}}{\tau_2} \const{C_2}}
+	{
+	\Gamma_{M_1}  \vdash \type{y}{\sigma_1} \const{C_2'} \quad
+	\Gamma_{M_1} \vdash \type{x}{\sigma_2} \const{C_2''} \vspace{.1cm}\\ 
+	{\color{False} C_2 = C_2' \cup C_2'' \cup \{\sigma_1 \egf{} \sigma_2 \to \tau_2\}}	
+	}
+	 \vspace{.2cm}\\ 
+	{\color{False} C_{M_1} = C_1 \cup C_2 \cup \{\tau_1 \egf{} (\tau_2 \to V)}\}}
+	}
+\end{tabular}
+\end{center}
+
+\vspace{-.4cm}
+\begin{tabular}{cc}
+\hspace{-1cm}
+\begin{tabular}{l}
+$D= \{\delta \egf{} Z\}$  \\
+$C_1' = \{\delta \egf{} Z, \tau_1' \egf{} (U \to \delta)\}$ \\
+$C_1 = \{\delta \egf{} Z, \tau_1' \egf{} (U \to \delta), \tau_1 \egf{} (Z \to \tau_1')\}$ 
+\end{tabular}
+&
+\begin{tabular}{l}
+$C_2' = \{\sigma_1 \egf{} Y\}$  \\
+$C_2'' = \{\sigma_2 \egf{} X\}$ \\
+$C_2 = \{\sigma_1 \egf{} Y, \sigma_2 \egf{} X, \sigma_1 \egf{} \sigma_2 \to \tau_2\}$
+\end{tabular} 
+\end{tabular}
+\begin{center}
+$C_{M_1} = \{\delta \egf{} Z, \tau_1' \egf{} (U \to \delta), \tau_1 \egf{} (Z \to \tau_1'), \sigma_1 \egf{} Y, \sigma_2 \egf{} X,$ \\ $\sigma_1 \egf{} \sigma_2 \to \tau_2, \tau_1 \egf{} (\tau_2 \to V)\}$
+\end{center}
+
+Constrângerile $C_{M_1}$ au "soluție". Ce înseamnă asta?
+}
+\end{frame}
+
+%------------------------------------------------
+\begin{frame}{Type Inference - Exemplul 2}
+
+{\footnotesize
+
+Fie $M_2 = \app{x}{x}$.  \\
+Obținem $\Gamma_{M_2} = \{\type{x}{X}\}$ și $\overline{M_2} = M_2$.
+
+\begin{center}
+\begin{tabular}{c}
+\infer[(\to_E^*)]
+	{ \{\type{x}{X}\} \vdash \type{(\app{x}{x})}{V} \const{C_{M_2}}
+	}
+	{
+	\{\type{x}{X}\} \vdash \type{x}{\tau_1}\const{C_1} \quad \{\type{x}{X}\} \vdash \type{x}{\tau_2} \const{C_2} \vspace{.1cm}\\  {\color{False} C_M = C_1 \cup C_2 \cup \{\tau_1 \egf{} \tau_2 \to V\}}
+	}
+\end{tabular}
+\end{center}
+
+\begin{tabular}{l}
+$C_1 = \{\tau_1 \egf{} X\}$  \\
+$C_2 = \{\tau_2 \egf{} X\}$ \\
+$C_{M_2} = \{\tau_1 \egf{} X, \tau_2 \egf{} X, \tau_1 \egf{} \tau_2 \to V\}$
+\end{tabular} 
+
+Constrângerile $C_{M_2}$ nu au "soluție". Ce înseamnă asta?
+
+\pause
+Constrângerile au "soluție" dacă se pot \intens{unifica}.
+}
+\end{frame}
+
+%================================================
+\section{\color{section-color} Unificare}
+%================================================
+
+\begin{frame}{Termeni}
+
+\intens{Alfabet:}
+\vspace{-.2cm}
+\begin{itemize}
+	\item $\mathcal{F}$ o mulțime de simboluri de funcții de aritate cunoscută
+	\item $\mathcal{V}$ o mulțime numărabilă de variabile 
+	\item $\mathcal{F}$ și $\mathcal{V}$ sunt disjuncte
+\end{itemize}
+
+  \bigskip
+\intens{Termeni peste $\mathcal{F}$ si $\mathcal{V}$:}
+\vspace{-.2cm}
+\begin{align*}
+t \ ::= \ x\ |\ f(t_1,\ldots,t_n)
+\end{align*}
+\vspace{-1cm}
+\begin{itemize}
+	\item $n \geq 0$
+	\item $x$ este o variabilă
+	\item $f$ este un simbol de funcție de aritate $n$ 
+\end{itemize}
+
+  \bigskip
+Pentru ușurință, considerăm funcțiile în forma prefixată.
+\end{frame}
+
+%---------------------------------------------------------------------
+\begin{frame}{Termeni}
+\intens{Notații:}
+\vspace{-.2cm}
+\begin{itemize}
+	\item \intens{constante:} simboluri de funcții de aritate $0$
+	\item $x,y,z,\ldots$ pentru variabile
+	\item $a,b,c,\ldots$ pentru constante
+	\item $f,g,h,\ldots$ pentru simboluri de funcții arbitrare
+	\item $s,t,u,\ldots$ pentru termeni
+	\item $var(t)$ mulțimea variabilelor care apar în $t$
+	\item ecuații $s \egf{} t$ pentru o pereche de termeni
+	\item $Trm_{\mathcal{F,\mathcal{V}}}$ mulțimea termenilor peste $\mathcal{F}$ și $\mathcal{V}$
+\end{itemize}
+
+\end{frame}
+
+%---------------------------------------------------------------------
+\begin{frame}{Termeni}
+
+{\color{True} Exemple:}
+\begin{itemize}
+	\item $f(x,g(x,a),y)$ este un termen, unde $f$ are aritate $3$, $g$ are aritate $2$, $a$ este o constanta
+	\item $var(f(x,g(x,a),y)) = \{x,y\}$
+\end{itemize}
+\end{frame}
+
+%---------------------------------------------------------------------
+\begin{frame}{Legătura cu teoria tipurilor}
+
+Mulțimea  \alert{tipurilor simple}  \hspace{.2cm}
+ \intens{$\mathbb{T} = \mathbb{V}\ |\ \mathbb{T} \rightarrow \mathbb{T}$}
+ 
+În acest caz, avem alfabetul:
+\vspace{-.2cm}
+\begin{itemize}
+	\item $\mathcal{F} = \{\to\}$, iar aritatea lui $\to$ este $2$
+	\item $\mathcal{V} = \mathbb{V}$
+\end{itemize}
+
+\vspace{.4cm}
+Dacă avem și alte tipuri, extindem $\mathcal{F}$ cu noi simboluri. De exemplu,
+\vspace{-.2cm}
+\begin{itemize}
+	\item $\UnitT, \VoidT$ cu aritate $0$ (deci constante)
+	\item $\BoolT, \texttt{Nat}$ cu aritate $0$ (deci constante)
+	\item $\texttt{Maybe}, \texttt{List}$ cu aritate $1$
+	\item $\times$ cu aritate $2$
+	\item $\ldots$
+\end{itemize}
+
+
+\end{frame}
+
+%---------------------------------------------------------------------
+\begin{frame}{Substituții}
+
+O \intens{substituție} $\Theta$ este o funcție (parțială) de la variabile la termeni,
+\vspace{-.2cm}
+	\begin{center}
+	\intens{$\Theta: \mathcal{V} \to Trm_{\mathcal{F,\mathcal{V}}}$}
+	\end{center}
+
+\medskip
+{\color{True} Exemplu:}
+
+În notația uzuală, $\Theta = \{ a/x,\ g(w)/y, b/z\}$. 
+%În notația uzuală, $\Theta = \{ x/a,\ y/g(w), z/b\}$. 
+
+Substituția $\Theta$ este identitate pe restul variabilelor.
+
+Notație alternativă $\Theta = \{x \mapsto a, y \mapsto g(w), z \mapsto b\}$.
+
+
+\end{frame}
+%---------------------------------------------------------------------
+
+%---------------------------------------------------------------------
+\begin{frame}{Substituții}
+
+Substituțiile sunt o modalitate de a înlocui variabile cu alți termeni.
+
+Substituțiile se aplică simultan pe toate variabilele.
+
+
+\medskip
+\intens{Aplicarea unei substituții} $\Theta$ unui termen $t$:
+\begin{align*}
+\Theta(t) = 
+\left\{
+	\begin{array}{ll}
+		\Theta(x), \mbox{ dacă } t = x \\
+		f(\Theta(t_1),\ldots,\Theta(t_n)), \mbox{ dacă } t = f(t_1,\ldots,t_n) \\
+	\end{array}
+\right. 
+\end{align*}
+
+ {\color{True} Exemplu:}
+\begin{itemize}
+	\item $\Theta = \{x \mapsto f(x,y), y \mapsto g(a) \}$
+	\item $t = f(x,g(f(x,f(y,z))))$
+	\item $\Theta(t) = f(f(x,y),g(f(f(x,y),f(g(a),z))))$
+\end{itemize}
+\end{frame}
+%---------------------------------------------------------------------
+
+%---------------------------------------------------------------------
+\begin{frame}{Substituții}
+
+\vspace{.2cm}
+Două substituții $\Theta_1$ și $\Theta_2$ se pot compune \[\intens{\Theta_1 ; \Theta_2}\] \\(aplicăm întâi $\Theta_1$, apoi $\Theta_2$).
+
+ 
+ {\color{True} Exemplu:}
+	\begin{itemize}
+		\item $\intens{t = h(u,v,x,y,z)}$
+		 
+		\item \intens{$\Theta_1 = \{ x \mapsto f(y),\ y \mapsto f(a),\ z \mapsto u \}$}
+		\item \intens{$\Theta_2 = \{y \mapsto g(a),\ u \mapsto z,\ v \mapsto f(f(a))\}$}
+		 	\medskip 
+		\item $\intens{(\Theta_1 ; \Theta_2)(t) =}\  {\Theta_2}({\Theta_1}(t)) = {\Theta_2}( h(u, v, f(y), f(a), u)) = $ \\ \hspace{1.4cm}$\intens{= h(z,f(f(a)), f(g(a)), f(a), z)}$	
+		  \medskip
+		\item $\intens{(\Theta_2 ; \Theta_1)(t) = }\ {\Theta_1}({\Theta_2}(t)) = {\Theta_1}(h(z,f(f(a)),x, g(a), z))$ \\ \hspace{1.4cm} $\intens{= h(u,f(f(a)), f(y), g(a), u)}$
+	\end{itemize}
+
+
+\end{frame}
+%---------------------------------------------------------------------
+
+%---------------------------------------------------------------------
+\begin{frame}{Unificare}
+
+ Doi termeni $t_1$ și $t_2$ \intens{se unifică} dacă există o substituție $\Theta$ astfel încât
+ \vspace{-.2cm}
+	\begin{center}
+	\intens{$\Theta(t_1) = \Theta(t_2)$}.
+	\end{center}
+	
+În acest caz, $\Theta$ se numește un \intens{unificator} al termenilor $t_1$ și $t_2$.
+	
+	\medskip  
+Un unificator $\Theta$ pentru $t_1$ și $t_2$ este \intens{cel mai general unificator} (\intens{cmgu,mgu}) dacă pentru orice alt unificator $\Theta'$ pentru $t_1$ și $t_2$, există o substituție $\Delta$ astfel încât
+ \vspace{-.2cm}
+	\begin{center}
+	\intens{$\Theta' = \Theta ; \Delta$}.
+	\end{center}
+\end{frame}
+%---------------------------------------------------------------------
+
+%------------------------------------------------------------------------
+\begin{frame}{Unificatori}
+
+ {\color{True} Exemplu:}
+\begin{itemize}
+	\item $\intens{t = x + (y * y)} = +(x,*(y,y))$
+	\vspace{.1cm}
+	\item $\intens{t' = x + (y * x)} = +(x,*(y,x))$
+	 
+	\vspace{.1cm}
+	\item $\Theta = \{x \mapsto y\}$
+	\begin{itemize}
+		\item $\Theta(t) = y + (y * y)$
+		\item $\Theta(t') = y + (y * y)$
+		\item $\Theta$ este \intens{cmgu}
+	\end{itemize}
+	 
+	\vspace{.1cm}
+	\item $\Theta'= \{x \mapsto 0, y \mapsto 0\}$
+		\begin{itemize}
+		\item $\Theta'(t) = 0 + (0 * 0)$
+		\item $\Theta'(t') = 0 + (0 * 0)$
+		 
+		\item $\Theta' = \Theta ; \{y \mapsto 0\}$
+		 
+		\item $\Theta'$ este \intens{unificator}, dar nu este \intens{cmgu}
+	\end{itemize}
+\end{itemize}
+
+\end{frame}
+
+%%------------------------------------------------------------------------
+%\begin{frame}{Algoritmul de unificare}
+%\begin{itemize}
+%	\item Pentru o mulțime finită de termeni \intens{$\{t_1,\ldots, t_n\}$, $n \geq 2$}, \intens{algoritmul de unificare }stabilește dacă există un cmgu.
+%	\vspace{.2cm}
+%	\item Există algoritmi mai eficienți, dar îl alegem pe acesta pentru simplitatea sa.
+%	\vspace{.2cm}  
+%	\item Algoritmul lucrează cu două liste:
+%	\begin{itemize}
+%		\item \intens{Lista soluție: $S$}
+%		\item \intens{Lista de rezolvat: $R$}		
+%	\end{itemize}
+%	\vspace{.2cm}  
+%	\item \intens{Inițial:}
+%	\begin{itemize}
+%		\item \intens{Lista soluție: $S = \emptyset$}
+%		\item \intens{Lista de rezolvat: $R = \{t_1 \egf{} t_2, \ldots, t_{n-1} \egf{} t_n\}$}	 \\
+%		\intens{$\egf{}$} este un simbol nou care ne ajută să formăm perechi de termeni ("ecuații")	
+%	\end{itemize}
+%\end{itemize}
+%\end{frame}
+%
+%%------------------------------------------------------------------------
+%\begin{frame}{Algoritmul de unificare}
+%Algoritmul constă în aplicarea regulilor de mai jos:
+%\begin{itemize}
+%	\vspace{.2cm}  
+%	\item \intens{SCOATE}
+%		\begin{itemize}
+%			\item orice ecuație de forma \intens{$t \egf{} t$} din \intens{$R$} este \intens{eliminată}.
+%		\end{itemize}
+%	\vspace{.2cm}  
+%	\item \intens{DESCOMPUNE}
+%		\begin{itemize}
+%			\item orice ecuație de forma \intens{$f(t_1,\ldots,t_n) \egf{} f(t_1',\ldots,t_n')$} din \intens{$R$} este \intens{înlocuită} cu ecuațiile \intens{$t_1\egf{}t_1', \ldots, t_n \egf{}t_n'$}.
+%		\end{itemize}
+%	\vspace{.2cm}  
+%	\item \intens{REZOLVĂ}
+%	\begin{itemize}
+%			\item orice ecuație de forma \intens{$x \egf{} t$} sau \intens{$t \egf{} x$} din \intens{$R$}, unde \intens{variabila $x$ nu apare în termenul $t$}, este \intens{mutată} sub forma \intens{$x \egf{} t$} în \intens{$S$}. \\\intens{\^In toate celelalte ecuații} (din $R$ și $S$), \intens{$x$ este înlocuit cu $t$}.	
+%		\end{itemize}
+%\end{itemize}
+%\end{frame}
+%
+%%------------------------------------------------------------------------
+%\begin{frame}{Algoritmul de unificare}
+%Algoritmul \intens{se termină normal} dacă \intens{$R = \emptyset$}.\\
+% În acest caz, \intens{$S$ conține cmgu}.
+%
+%\vspace{.5cm}  
+%Algoritmul este oprit cu concluzia {\color{False} inexistenței unui unificator} dacă:
+%\begin{enumerate}
+%	\item În $R$ există o ecuație de forma
+%	\begin{center}
+%	{\color{False}$f(t_1,\ldots,t_n) \egf{} g(t_1',\ldots,t_k')$} cu {\color{False}$f \neq g$}.
+%	\end{center}
+%	\item În $R$ există o ecuație de forma {\color{False}$x \egf{} t$} sau {\color{False}$t \egf{} x$} și {\color{False}variabila $x$ apare în termenul $t$}.
+%\end{enumerate}
+%\end{frame}
+%
+%%------------------------------------------------------------------------
+%\begin{frame}{Algoritmul de unificare - schemă}
+%
+%\begin{center}
+%\begin{minipage}{15cm}
+%\hspace{-.6cm}
+%\begin{tabular}{|c|c|c|}
+%\hline
+%& \intens{Lista soluție} & \intens{Lista de rezolvat} \\
+%& \intens{S} & \intens{R} \\  \hline \hline
+%\intens{Inițial} & $\emptyset$ & $t_1 \egf{} t_1',\ldots, t_n \egf{} t_n'$ \\  \hline \hline
+%\intens{SCOATE} & $S$ & $R'$, \intens{$t \egf{} t$} \\  \cline{2-3} 
+% & $S$ & $R'$ \\ \hline \hline
+% \intens{DESCOMPUNE} & $S$ & $R'$, \intens{$f(t_1,\ldots,t_n) \egf{} f(t_1',\ldots,t_n')$} \\ \cline{2-3}
+% & $S$ & $R'$, \intens{$t_1\egf{}t_1', \ldots t_n \egf{}t_n'$} \\ \hline \hline
+% \intens{REZOLVĂ} & $S$ & $R'$, \intens{$x \egf{} t$} sau \intens{$t \egf{} x$}, $x$ nu apare în $t$ \\ \cline{2-3}
+% & \intens{$x \egf{} t$}, \intens{$S[x / t]$} & \intens{$R'[x / t]$} \\ \hline \hline
+% \intens{Final} & $S$ & \intens{$\emptyset$} \\ \hline 
+%\end{tabular}
+%
+%\vspace{.4cm}
+%\intens{$S[x/ t]$}: în toate ecuațiile din $S$, $x$ este înlocuit cu $t$
+%\end{minipage}
+%\end{center}
+%\end{frame}
+%
+%%------------------------------------------------------------------------
+%\begin{frame}{Exemplul 1}
+%\vspace{.4cm}
+%
+%
+%{\color{True} Ecuațiile $\{g(y) \egf{}x,\ f(x,h(x),y) \egf{} f(g(z),w,z)\}$ au cmgu?}
+%
+%\pause
+%{\footnotesize
+%\begin{center}
+%\begin{tabular}{|c|c|c|}
+%\hline
+%$S$ & $R$ & \\ \hline 
+%$\emptyset$ & $g(y) \egf{} x,\ f(x,h(x),y) \egf{} f(g(z),w,z)$ & {\scriptsize   \intens{REZOLVĂ}}  \\ \hline  
+%$\intens{x \egf{} g(y)}$ & $f(\intens{g(y)},h(\intens{g(y)}),y) \egf{} f(g(z),w,z)$   & {\scriptsize   \intens{DESCOMPUNE}}   \\ \hline  
+%$x \egf{} g(y)$ & $g(y) \egf{} g(z),\ h(g(y)) \egf{} w,\ y \egf{} z$ & {\scriptsize   \intens{REZOLVĂ}}   \\ \hline  
+%$\intens{w \egf{} h(g(y))},$ & $g(y) \egf{} g(z),\ y \egf{} z$ & {\scriptsize  \intens{REZOLVĂ}}   \\
+%$\ x \egf{} g(y)$ & &   \\ \hline 
+%$\intens{y \egf{} z}, x \egf{} g(\intens{z}),$ & $g(\intens{z}) \egf{} g(z)$ & {\scriptsize \intens{SCOATE}} \\
+%$w \egf{} h(g(\intens{z}))$ & &   \\ \hline  
+%$y \egf{} z, x \egf{} g(z), $ & $\emptyset$ & \\
+%$w \egf{} h(g(z))$ & &   \\ \hline 
+%\end{tabular}
+%\end{center}
+%}
+%
+%\intens{$\Theta = \{y \mapsto z,\ x \mapsto g(z),\ w \mapsto h(g(z)) \}$ este cmgu.} 
+%
+%
+%\end{frame}
+%
+%%------------------------------------------------------------------------
+%\begin{frame}{Exemplul 2}
+%
+%
+%{\color{True} Ecuațiile $\{g(y) \egf{} x,\ f(x,h(y),y) \egf{} f(g(z),b,z)\}$ au cmgu?}
+%
+%
+%\begin{center}
+% {\footnotesize
+%\begin{tabular}{|c|c|c|}
+%\hline
+%$S$ & $R$ & \\ \hline
+%$\emptyset$ & $g(y) \egf{} x,\ f(x,h(y),y) \egf{} f(g(z),b,z)$ &{\scriptsize \intens{REZOLVĂ}} \\ \hline
+%$\intens{x \egf{} g(y)}$ & $f(\intens{g(y)},h(y),y) \egf{} f(g(z),b,z)$   & {\scriptsize \intens{DESCOMPUNE}} \\ \hline
+%$x \egf{} g(y)$ & $g(y) \egf{} g(z),\ {\color{False}h(y) \egf{} b},\ y \egf{} z$ & {\scriptsize {\color{False}- EȘEC - }} \\ \hline
+%\end{tabular}
+%}
+%\end{center}
+% 
+% 
+%\begin{itemize}
+%	\item {\color{False}$h$ și $b$ sunt simboluri de funcții diferite!}
+%	\item Nu există unificator pentru acești termeni.
+%\end{itemize}
+%
+%\end{frame}
+%
+%%------------------------------------------------------------------------
+%\begin{frame}{Exemplul 3}
+%
+%
+%{\color{True} Ecuațiile $\{g(y) \egf{} x,\ f(x,h(x),y) \egf{} f(y,w,z)\}$ au cmgu?}
+%
+%
+%\begin{center}
+% {\footnotesize
+%\begin{tabular}{|c|c|c|}
+%\hline
+%$S$ & $R$ & \\ \hline
+%$\emptyset$ & $g(y) \egf{} x,\ f(x,h(x),y) \egf{} f(y,w,z)$ &{\scriptsize \intens{REZOLVĂ}} \\ \hline
+%$\intens{x \egf{} g(y)}$ & $f(\intens{g(y)},h(\intens{g(y)}),y) \egf{} f(y,w,z)$   & {\scriptsize \intens{DESCOMPUNE}} \\ \hline
+%$x \egf{} g(y)$ & ${\color{False}g(y) \egf{} y},\ h(g(y)) \egf{} w,\ y \egf{} z$ & {\scriptsize {\color{False}- EȘEC - }} \\ \hline
+%\end{tabular}
+%}
+%\end{center}
+% 
+%\begin{itemize}
+%	\item {\color{False}\^In ecuația ${g(y) \egf{} y}$, variabila $y$ apare în termenul $g(y)$.}
+%	\item Nu există unificator pentru aceste ecuații.
+%\end{itemize}
+%\end{frame}
+%
+%
+%%------------------------------------------------------------------------
+%\begin{frame}{Exemplul 4}
+%
+%Înapoi la constrângerea obținută când am vorbit de \textit{type inference} pentru termenul {\color{True} $M_1 = \app{(\abs{z}{\abs{u}{z}})}{(\app{y}{x})}$}.
+%
+%Am obținut constrângerile
+%\begin{center}
+%\intens{$C_{M_1} = \{\delta \egf{} Z, \tau_1' \egf{} (U \to \delta), \tau_1 \egf{} (Z \to \tau_1'), \sigma_1 \egf{} Y, \sigma_2 \egf{} X,$ \\ $\sigma_1 \egf{} \sigma_2 \to \tau_2, \tau_1 \egf{} (\tau_2 \to V)\}$}
+%\end{center}
+%\begin{itemize}
+%	\item $\to$ simbol de funcție de aritate $2$
+%	\item $\delta, \tau_1, \tau_1', \tau_2, \sigma_1, \sigma_2, X,Y, Z, U, V$ variabile
+%\end{itemize}
+%
+%
+%\end{frame}
+%
+%%------------------------------------------------------------------------
+%\begin{frame}{Exemplul 4 (cont.)}
+%
+%\vspace{-.4cm}
+%\begin{center}
+% {\footnotesize
+% \begin{minipage}{15cm}
+% \hspace{-.6cm}
+%\begin{tabular}{|c|c|c|}
+%\hline
+%$S$ & $R$ & \\ \hline
+%$\emptyset$ & $\intens{\delta} \egf{} Z,\ \tau_1' \egf{} (U \to \intens{\delta}),\ \tau_1 \egf{} (Z \to \tau_1'),\ \sigma_1 \egf{} Y$ &  {\scriptsize \intens{REZ.}} \\
+%& $\sigma_2 \egf{} X,\ \sigma_1 \egf{} \sigma_2 \to \tau_2,\ \tau_1 \egf{} (\tau_2 \to V)$ & \\ \hline
+%$\delta \egf{} Z$ & $\intens{\tau_1'} \egf{} (U \to Z),\ \tau_1 \egf{} (Z \to \intens{\tau_1'}),\ \sigma_1 \egf{} Y$ &  {\scriptsize \intens{REZ.}} \\
+%& $\sigma_2 \egf{} X,\ \sigma_1 \egf{} \sigma_2 \to \tau_2,\ \tau_1 \egf{} (\tau_2 \to V)$ & \\ \hline
+%$\delta \egf{} Z,\ \tau_1' \egf{} (U \to Z)$ & $\intens{\tau_1} \egf{} (Z \to (U \to Z)),\ \sigma_1 \egf{} Y$ &  {\scriptsize \intens{REZ.}} \\
+%& $\sigma_2 \egf{} X,\ \sigma_1 \egf{} \sigma_2 \to \tau_2,\ \intens{\tau_1} \egf{} (\tau_2 \to V)$ & \\ \hline
+%$\delta \egf{} Z,\ \tau_1' \egf{} (U \to Z),$ & $\sigma_1 \egf{} Y,\ \sigma_2 \egf{} X,\ \sigma_1 \egf{} \sigma_2 \to \tau_2,$ &  {\scriptsize \intens{DESC.}} \\
+%$\tau_1 \egf{} (Z \to (U \to Z))$ & $(Z \to (U \to Z)) \egf{} (\tau_2 \to V)$ & \\ \hline
+%$\delta \egf{} Z,\ \tau_1' \egf{} (U \to Z),$ & $\intens{\sigma_1} \egf{} Y,\ \sigma_2 \egf{} X,\ \intens{\sigma_1} \egf{} \sigma_2 \to \tau_2,$ &  {\scriptsize \intens{REZ.}} \\
+%$\tau_1 \egf{} (Z \to (U \to Z))$ & $Z \egf{} \tau_2,\ U \to Z \egf{} V$ & \\ \hline
+%$\delta \egf{} Z,\ \tau_1' \egf{} (U \to Z),$ & $\intens{\sigma_2} \egf{} X,\ Y \egf{} \intens{\sigma_2} \to \tau_2,$ &  {\scriptsize \intens{REZ.}} \\
+%$\tau_1 \egf{} (Z \to (U \to Z)),$ & $Z \egf{} \tau_2,\ U \to Z \egf{} V$ & \\
+%$\sigma_1 \egf{} Y$ & & \\ \hline
+%$\delta \egf{} Z,\ \tau_1' \egf{} (U \to Z),$ & $Y \egf{} X \to \intens{\tau_2},$ &  {\scriptsize \intens{REZ.}} \\
+%$\tau_1 \egf{} (Z \to (U \to Z)),$ & $Z \egf{} \intens{\tau_2},\ U \to Z \egf{} V$ & \\
+%$\sigma_1 \egf{} Y, \sigma_2 \egf{} X$ & & \\ \hline
+%
+%\end{tabular}
+%\end{minipage}
+%}
+%\end{center}
+% 
+%\end{frame}
+%
+%%------------------------------------------------------------------------
+%\begin{frame}{Exemplul 4 (cont.)}
+%
+%\vspace{-.4cm}
+%\begin{center}
+% {\footnotesize
+% \begin{minipage}{15cm}
+% \hspace{-.6cm}
+%\begin{tabular}{|c|c|c|}
+%\hline
+%$S$ & $R$ & \\ \hline
+%$\delta \egf{} Z,\ \tau_1' \egf{} (U \to Z),$ & $\intens{Y} \egf{} X \to Z, \ U \to Z \egf{} V$ &  {\scriptsize \intens{REZ.}} \\
+%$\tau_1 \egf{} (Z \to (U \to Z)),$ & $$ & \\
+%$\sigma_1 \egf{} \intens{Y}, \sigma_2 \egf{} X,\ \tau_2 \egf{} Z$ & & \\ \hline
+%$\delta \egf{} Z,\ \tau_1' \egf{} (U \to Z),$ & $U \to Z \egf{} V$ &  {\scriptsize \intens{REZ.}} \\
+%$\tau_1 \egf{} (Z \to (U \to Z)),$ & $$ & \\
+%$\sigma_1 \egf{} X \to Z, \sigma_2 \egf{} X,\ \tau_2 \egf{} Z$ & & \\
+%$Y \egf{} X \to Z$ & & \\ \hline
+%$\delta \egf{} Z,\ \tau_1' \egf{} (U \to Z),$ &  &   \\
+%$\tau_1 \egf{} (Z \to (U \to Z)),$ & $$ & \\
+%$\sigma_1 \egf{} X \to Z, \sigma_2 \egf{} X,\ \tau_2 \egf{} Z$ & & \\
+%$Y \egf{} X \to Z,\ V \egf{} U \to Z $ & & \\ \hline
+%
+%\end{tabular}
+%\end{minipage}
+%}
+%\end{center}
+%
+%{\footnotesize \intens{Constrângerile se pot unifica!}}
+%\end{frame}
+%
+%%------------------------------------------------------------------------
+%\begin{frame}{Exemplul 5}
+%
+%Înapoi la constrângerea obținută când am vorbit de \textit{type inference} pentru termenul {\color{False}$M_2 = \app{x}{x}$}.
+%
+%Am obținut constrângerile
+%\begin{center}
+%\intens{$C_{M_2} = \{\tau_1 \egf{} X, \tau_2 \egf{} X, \tau_1 \egf{} \tau_2 \to V\}$}
+%\end{center}
+%\vspace{-.2cm}
+%\begin{itemize}
+%	\item $\to$ simbol de funcție de aritate $2$
+%	\item $\tau_1,  \tau_2, V$ variabile
+%\end{itemize}
+%
+%
+%\end{frame}
+%
+%%------------------------------------------------------------------------
+%\begin{frame}{Exemplul 5 (cont.)}
+%
+%\vspace{-.4cm}
+%
+% {\footnotesize
+% \begin{center}
+%\begin{tabular}{|c|c|c|}
+%\hline
+%$S$ & $R$ & \\ \hline
+%$\emptyset$ & $\intens{\tau_1} \egf{} X,\ \tau_2 \egf{} X,\ \intens{\tau_1} \egf{} \tau_2 \to V$ &  {\scriptsize \intens{REZ.}} \\  \hline
+%$\tau_1 \egf{} X$ & $\intens{\tau_2} \egf{} X,\ X \egf{} \intens{\tau_2} \to V$ &  {\scriptsize \intens{REZ.}} \\  \hline
+%$\tau_1 \egf{} X,\ \tau_2 \egf{} X$ & ${\color{False}X \egf{} X \to V}$ &  {\scriptsize {\color{False}- EȘEC -}} \\  \hline
+%\end{tabular}
+%\end{center}
+%}
+%
+% \begin{itemize}
+%	\item {\color{False}\^In ecuația ${X \egf{} X \to V}$, variabila $X$ apare în termenul $X \to V$.}
+%	\item Nu există unificator pentru aceste ecuații.
+%\end{itemize}
+%\end{frame}
+%
+
+%------------------------------------------------
+\begin{frame}
+  \vfill
+  \centering
+
+\textbf{\large \alert{Quiz time!}}
+
+\includegraphics[scale=.35]{../Quiz/C07-Q1.png}
+
+ \url{https://tinyurl.com/C07-Quiz1}
+  \vfill
+\end{frame}
+
+%---------------------------------------------
+\begin{frame}
+  \vfill
+  \centering
+
+\textbf{Vacanță plăcută!}
+
+  \vfill
+\end{frame}
+\end{document}
+
+
+
+
+
+
+
