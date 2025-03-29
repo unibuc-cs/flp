@@ -9,6 +9,10 @@
 \usepackage[romanian,english]{babel}
 \selectlanguage{romanian}
 
+
+\newcommand{\HRule}{\vspace{-2ex}\begin{center}\rule{0.75\linewidth}{0.1mm}\end{center}\vspace{-1ex}}
+
+
 \setbeamertemplate{section page}
 {
     \begingroup
@@ -24,6 +28,10 @@
 
 \definecolor{IntensColor}{HTML}{2E86C1}
 \definecolor{False}{HTML}{CB4335}
+\definecolor{True}{HTML}{28B463}
+
+\newcommand{\fcolor}[1]{{\color{False}#1}}
+\newcommand{\tcolor}[1]{{\color{True}#1}}
 
 \newcommand{\ueq}{\mathrel{\stackrel{\cdot}{=}}}
 \newcommand{\ureg}{\displaystyle\frac}

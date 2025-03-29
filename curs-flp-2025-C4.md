@@ -615,44 +615,24 @@ MD = BG, BG = HU, HU = verde
 
 #  Unificare
 
-
-## Termeni
-
-### Alfabet:
-
--   $\mathcal{F}$ o mulțime de simboluri de funcții de aritate cunoscută
-
--   $\mathcal{V}$ o mulțime numărabilă de variabile
-
--   $\mathcal{F}$ și $\mathcal{V}$ sunt disjuncte
-
-### Termeni peste $\mathcal{F}$ si $\mathcal{V}$:
-$$\begin{aligned}
-t \ ::= \ x\ |\ f(t_1,\ldots,t_n)
-\end{aligned}$$
-
--   $n \geq 0$
-
--   $x$ este o variabilă
-
--   $f$ este un simbol de funcție de aritate $n$
-
 ## Termeni (Notații)
 
--   $x,y,z,\ldots$ pentru variabile
+- $x,y,z,\ldots$ pentru variabile
 
--   $a,b,c,\ldots$ pentru constante (simboluri de funcții de aritate $0$)
+- $f,g,h,\ldots$ pentru simboluri de funcții arbitrare
+  - _Aritatea_ lui $f$ e numărul de argumente ale simbolului $f$
 
--   $f,g,h,\ldots$ pentru simboluri de funcții arbitrare
 
--   $s,t,u,\ldots$ pentru termeni
+- $a,b,c,\ldots$ pentru constante (simboluri de funcții fără argumente)
 
--   $Var(t)$ mulțimea variabilelor care apar în $t$
+- $s,t,u,\ldots$ pentru termeni, formați din:
+  - variabile, constante,
+  - prin aplicarea de simboluri
+  - de un număr finit de ori
 
--   ecuații $s\ueq t$ pentru o pereche de termeni
+- $Var(t)$ mulțimea variabilelor care apar în $t$
 
--   $Trm_{\mathcal{F,\mathcal{V}}}$ mulțimea termenilor peste
-    $\mathcal{F}$ și $\mathcal{V}$
+- ecuații $s\ueq t$ pentru o pereche de termeni
 
 ## Termeni (Exemple)
 
@@ -669,78 +649,39 @@ t \ ::= \ x\ |\ f(t_1,\ldots,t_n)
 
 ## Substituții
 
-O substituție $\Theta$ este o funcție (parțială) de la variabile la
-termeni,
-$$\Theta: \mathcal{V} \to Trm_{\mathcal{F,\mathcal{V}}}$$
-
-### Exemplu:
-
-În notația uzuală, $\Theta = \{ a/x,\ g(w)/y, b/z\}$.
-
-Substituția $\Theta$ este identitate pe restul variabilelor.
-
-Notație alternativă
-$\Theta = \{x \mapsto a, y \mapsto g(w), z \mapsto b\}$.
-
-## Substituții
-
 - Substituțiile sunt o modalitate de a înlocui variabile cu alți termeni.
 
 - Substituțiile se aplică simultan pe toate variabilele.
 
-- Aplicarea unei substituții $\Theta$ unui termen $t$:
+__Aplicarea unei substituții – Exemplu:__
 
-  $$\begin{aligned}
-  \Theta(t) =
-  \left\{
-      \begin{array}{ll}
-          \Theta(x), \mbox{ dacă } t = x \\
-          f(\Theta(t_1),\ldots,\Theta(t_n)), \mbox{ dacă } t = f(t_1,\ldots,t_n) \\
-      \end{array}
-  \right.
-  \end{aligned}$$
+- $\Theta = \{\tcolor{x \mapsto f(x,y)}, \fcolor{y \mapsto g(a)} \}$
 
-__Exemplu:__
+- $t = f(\tcolor{x},g(f(\tcolor{x},f(\fcolor{y},z))))$
 
-- $\Theta = \{x \mapsto f(x,y), y \mapsto g(a) \}$
-
-- $t = f(x,g(f(x,f(y,z))))$
-
-- $\Theta(t) = f(f(x,y),g(f(f(x,y),f(g(a),z))))$
-
-## Substituții
-
-Două substituții $\Theta_1$ și $\Theta_2$ se pot compune
-$${\color{IntensColor} \Theta_1 ; \Theta_2}$$\
-(aplicăm întâi $\Theta_1$, apoi $\Theta_2$).
-
-__Exemplu:__
-
--   ${\color{IntensColor} t = h(u,v,x,y,z)}$
-
--    $\Theta_1 = \{ x \mapsto f(y),\ y \mapsto f(a),\ z \mapsto u \}$
-
--    $\Theta_2 = \{y \mapsto g(a),\ u \mapsto z,\ v \mapsto f(f(a))\}$
-
--   ${\color{IntensColor} (\Theta_1 ; \Theta_2)(t) =}\  {\Theta_2}({\Theta_1}(t)) = {\Theta_2}(h(u, v, f(y), f(a), u)) =$\
-    ${\color{IntensColor} = h(z,f(f(a)), f(g(a)), f(a), z)}$
-
--   ${\color{IntensColor} (\Theta_2 ; \Theta_1)(t) = }\ {\Theta_1}({\Theta_2}(t)) = {\Theta_1}(h(z,f(f(a)),x, g(a), z))$\
-    ${\color{IntensColor} = h(u,f(f(a)), f(y), g(a), u)}$
+- $\Theta(t) = f(\tcolor{f(x,y)},g(f(\tcolor{f(x,y)},f(\fcolor{g(a)},z))))$
 
 ## Unificare
 
-Doi termeni $t_1$ și $t_2$ se unifică dacă există o substituție $\Theta$
-astfel încât
+Doi termeni $t_1$ și $t_2$ se __unifică__ dacă există valori pentru variabile,
+adică o substituție $\Theta$, care egalează cei doi termeni:
+
 $$\Theta(t_1) = \Theta(t_2)$$
 
-În acest caz, $\Theta$ se numește un unificator al termenilor $t_1$ și
+În acest caz, $\Theta$ se numește __unificator__ al termenilor $t_1$ și
 $t_2$.
 
-Un unificator $\Theta$ pentru $t_1$ și $t_2$ este cel mai general
-unificator (cmgu,mgu) dacă pentru orice alt unificator $\Theta'$ pentru
-$t_1$ și $t_2$, există o substituție $\Delta$ astfel încât
-$$\Theta' = \Theta ; \Delta$$
+Spunem ca un termen $t$ e __mai general__ decât un termen $t'$ dacă $t'$ se obține
+din $t$ prin "specializarea" unor variabile, adică înlocuirea lor cu termeni.
+
+- Formal, există o substituție $\Delta$ astfel încât $t' = \Delta(t)$
+- De exemplu, $f(x, a, y)$ este mai general decât $f(g(y), a, h(b))$
+
+Spunem că un unificator $\Theta$ e __mai general__ decât alt unificator $\Theta'$
+dacă
+există o substituție $\Delta$ astfel încât $\Theta'(x) = \Delta(\Theta(x))$
+pentru orice variabilă $x$
+
 
 ## Unificatori (Exemplu)
 
@@ -754,7 +695,6 @@ $$\Theta' = \Theta ; \Delta$$
 
     -   $\Theta(t') = y + (y * y)$
 
-    -   $\Theta$ este cmgu
 
 -   $\Theta'= \{x \mapsto 0, y \mapsto 0\}$
 
@@ -764,124 +704,109 @@ $$\Theta' = \Theta ; \Delta$$
 
     -   $\Theta' = \Theta ; \{y \mapsto 0\}$
 
-    -   $\Theta'$ este unificator, dar nu este cmgu
+-  $\Theta$ este mai general decât $\Theta'$ (e chiar cel mai general)
 
 
-#  Algoritmul de unificare
+#  Un algoritm de unificare
 
-## Algoritmul de unificare
+## Algoritm de unificare – inițializare
 
-- Pentru o mulțime finită de termeni $\{t_1,\ldots, t_n\}$,
-  $n \geq 2$,\
-  algoritmul de unificare stabilește dacă există un cmgu.
+Pentru o mulțime (finită) de ecuații $\{t_1 \ueq t'_1,\ldots, t_n \ueq t'_n\}$,
+algoritmul calculează (dacă există) un unificator $\Theta$ pentru toate ecuațiile.
+$$\Theta(t_1) = \Theta(t'_1), \ldots, \Theta(t_n) = \Theta(t'_n)$$
 
-- Există algoritmi mai eficienți,\
-  dar îl alegem pe acesta pentru simplitatea sa.
+Algoritmul lucrează cu două obiecte:
 
-- Algoritmul lucrează cu două liste:
+  - Lista de rezolvat: $R$
 
- - Lista soluție: $S$
+  - Substituția calculată: $S$
 
- - Lista de rezolvat: $R$
-
-- Inițial:
-
-  -  Lista soluție: $S = \emptyset$
+Inițial:
 
   - Lista de rezolvat:
-    $R = \{t_1\ueq t_2, \ldots, t_{n-1}\ueq t_n\}$\
-    $\ueq$ este un simbol nou care ne ajută să
-    formăm perechi de termeni ("ecuații")
+    $R = \{t_1\ueq t'_1, \ldots, t_n\ueq t'_n\}$
 
+  -  Substituția calculată: $S = \emptyset$ – identitatea
 
-## Algoritmul de unificare
+## Algoritm de unificare – execuție
 
 Algoritmul constă în aplicarea nedeterministă a regulilor de mai jos:
 
 SCOATE
 
-: orice ecuație de forma $t\ueq t$ din $R$ este eliminată.
+: o ecuație de forma $t\ueq t$ din $R$ este eliminată.
 
 DESCOMPUNE
 
-: orice ecuație de forma
+: o ecuație de forma
   $f(t_1,\ldots,t_n)\ueq f(t_1',\ldots,t_n')$
   din $R$ este înlocuită cu ecuațiile
   $t_1\ueq t_1', \ldots, t_n\ueq t_n'$.
 
-ORIENTEAZĂ
-
-: o ecuaţie de forma $t=x$ din $R$ cu $x \in V$ şi $t \notin V$ este înlocuită
-  cu $x=t$;
-
 REZOLVĂ
 
-: orice ecuație de forma $x\ueq t$ din $R$, unde variabila
+: o ecuație de forma $x\ueq t$ sau $t\ueq x$ din $R$, unde variabila
   $x$ nu apare în termenul $t$, este mutată sub forma
-  $x\ueq t$ în $S$.\
-  În toate celelalte ecuații (din $R$ și $S$), $x$ este înlocuit
+  $x\mapsto t$ în $S$.\
+  În toți ceilalți termeni (din $R$ și $S$), $x$ este înlocuit
   cu $t$.
+
+\HRule
 
 EȘEC (conflict)
 
-: o ecuaţie de forma $f(s_1,\ldots,s_n)\ueq g(t_1,\ldots,t_m)$ din $R$, unde
-  $f \neq g$, produce eşec;
+: există în $R$ o ecuaţie de forma\
+  $f(s_1,\ldots,s_n)\ueq g(t_1,\ldots,t_m)$ cu $f \neq g$.
 
 EȘEC (ciclu)
 
-: o ecuaţie de forma $x=t$ din $R$ cu $t \neq x$ şi $x \in Var(t)$
-  produce eşec;
+: există în $R$ o ecuaţie de forma\
+  $x\ueq t$ sau $t\ueq x$ cu $t \neq x$ şi $x \in Var(t)$.
 
-## Algoritmul de unificare
+## Algoritm de unificare – terminare
 
 Algoritmul se termină normal dacă $R = \emptyset$.\
-În acest caz, $S$ conține cmgu.
+În acest caz, $S$ este _cel mai general unificator_ pentru intrarea dată.
 
 Algoritmul este oprit cu concluzia inexistenței unui unificator dacă
 este folosită vreuna din regulile care produce eșec
 
 
-## Algoritmul de unificare - schemă
+## Algoritm de unificare - schemă
 
 ::: center
   ------------------------- ------------------------------------ -------------------------------------------------------------------------------------------------------
                                Lista soluție                                                      Lista de rezolvat
                                      S                                                                    R
 
-     Inițial                    $\emptyset$                           $t_1\ueq t_1',\ldots, t_n\ueq t_n'$
+     Inițial                   $\emptyset$                           $t_1\ueq t_1',\ldots, t_n\ueq t_n'$
 
      SCOATE                   $\ureg{S}{S}$                                          $\ureg{R', t\ueq t}{R'}$
 
    DESCOMPUNE                       $\ureg{S}{S}$                     $\ureg{R', f(t_1, \ldots, t_n)\ueq f(t_1', \ldots t_n')}{R', t_1\ueq t_1', \ldots t_n\ueq t_n'}$
 
-    ORIENTEAZĂ                      $\ureg{S}{S}$                               $\ureg{R', t \ueq x}{R', x\ueq t}$ dacă $t$ nu variabliă
-
-
-     REZOLVĂ                   $\ureg{S}{x\ueq t, S[x := t]}$                  $\ureg{R', x\ueq t}{R'[x := t]}$ dacă $x \not\in Var(t)$
+     REZOLVĂ                   $\ureg{S}{x\mapsto t, S[x := t]}$                  $\ureg{R', x\ueq t}{R'[x := t]}$ dacă $x \not\in Var(t)$
 
 
       Final                         $S$                                    $\emptyset$
   ------------------------- ------------------------------------ -----------------------------------------------------------------------------------------------------------
 :::
 
-$S[x := t]$: în toate ecuațiile din $S$, $x$ este înlocuit cu $t$
+- $R[x := t]$: $x$ este înlocuit cu $t$ în toate ecuațiile din $R$
+- $S[x := t]$: $x$ este înlocuit cu $t$ în $S(y)$ pentru orice varibilă $y$
+- în regula REZOLVĂ putem avea și $t \ueq x$ în $R'$
 
 ## Exemplu: $\{g(y)\ueq x,\ f(x,h(x),y)\ueq f(g(z),w,z)\}$
 
 ::: center
-                                     $S$                                                                  $R$
-  ------------------------------------------------------------------------- ----------------------------------------------------------------------------------- -------------------
-                                                 $\emptyset$                          $g(y)\ueq x,\ f(x,h(x),y)\ueq f(g(z),w,z)$                                  \tiny ORIENTEAZĂ
-                                                 $\emptyset$                          ${\color{IntensColor}x\ueq g(y)},\ f(x,h(x),y)\ueq f(g(z),w,z)$             \tiny REZOLVĂ
-                            ${\color{IntensColor} x\ueq g(y)}$                 $f({\color{IntensColor} g(y)},h({\color{IntensColor} g(y)}),y)\ueq f(g(z),w,z)$    \tiny DESCOMPUNE
-                                       $x\ueq g(y)$                                            $g(y)\ueq g(z),\ h(g(y))\ueq w,\ y\ueq z$                          \tiny ORIENTEAZĂ
-                                       $x\ueq g(y)$                                            $g(y)\ueq g(z),\ {\color{IntensColor}w\ueq h(g(y))},\ y\ueq z$     \tiny REZOLVĂ
-                          ${\color{IntensColor} w\ueq h(g(y))},$                   $g(y)\ueq g(z),\ y\ueq z$                                                      \tiny REZOLVĂ
-                                      $\ x\ueq g(y)$
-   ${\color{IntensColor} y\ueq z}, x\ueq g({\color{IntensColor} z}),$              $g({\color{IntensColor} z})\ueq g(z)$                                          \tiny SCOATE
-                           $w\ueq h(g({\color{IntensColor} z}))$
-   $y\ueq z, x\ueq g(z),$                                                       $\emptyset$
-   $w\ueq h(g(z))$
+   $S$                                                                                                                                    $R$                                                                                                     pas
+  -------------------------------------------------------------------------------------------------------------------------------------- ----------------------------------------------------------------------------------------------------- -------------------
+   $\scriptscriptstyle\emptyset$                                                                                                           $\scriptscriptstyle g(y)\ueq x,\ f(x,h(x),y)\ueq f(g(z),w,z)$                                         \tiny REZOLVĂ
+   $\scriptscriptstyle{\color{IntensColor} x\mapsto g(y)}$                                                                                 $\scriptscriptstyle f({\color{IntensColor} g(y)},h({\color{IntensColor} g(y)}),y)\ueq f(g(z),w,z)$    \tiny DESCOMPUNE
+   $\scriptscriptstyle x\mapsto g(y)$                                                                                                      $\scriptscriptstyle g(y)\ueq g(z),\ h(g(y))\ueq w,\ y\ueq z$                                          \tiny REZOLVĂ
+   $\scriptscriptstyle{\color{IntensColor} w\mapsto h(g(y))},x\mapsto g(y)$                                                                $\scriptscriptstyle g(y)\ueq g(z),\ y\ueq z$                                                          \tiny REZOLVĂ
+   $\scriptscriptstyle {\color{IntensColor} y\mapsto z}, x\mapsto g({\color{IntensColor} z}), w\mapsto h(g({\color{IntensColor} z}))$      $\scriptscriptstyle g({\color{IntensColor} z})\ueq g(z)$                                              \tiny SCOATE
+   $\scriptscriptstyle y\mapsto z, x\mapsto g(z), w\mapsto h(g(z))$                                                                        $\scriptscriptstyle \emptyset$
 :::
 $\Theta = \{y \mapsto z,\ x \mapsto g(z),\ w \mapsto h(g(z)) \}$ este
 cmgu.
@@ -904,11 +829,10 @@ cmgu.
 
 ::: center
       $S$                                                   $R$
-  -------------- ----------------------------------------------------------------------------------- --------------------
-   $\emptyset$    $g(y)\ueq x,\ f(x,h(x),y)\ueq f(y,w,z)$                                             \tiny DESCOMPUNE
-   $\emptyset$    $g(y)\ueq x,\ x \ueq y,\ h(x) \ueq w,\ y\ueq z$                                     \tiny REZOLVĂ
-   $x\ueq y$      $g(y)\ueq {\color{IntensColor}y},\ h({\color{IntensColor}y}) \ueq w,\ y\ueq z$      \tiny ORIENTEAZĂ
-   $x\ueq y$      ${\color{False}y \ueq g(y)},\ h(y) \ueq w,\ y\ueq z$                                \tiny EȘEC (ciclu)
+  --------------- ----------------------------------------------------------------------------------- --------------------
+   $\emptyset$     $g(y)\ueq x,\ f(x,h(x),y)\ueq f(y,w,z)$                                             \tiny DESCOMPUNE
+   $\emptyset$     $g(y)\ueq x,\ x \ueq y,\ h(x) \ueq w,\ y\ueq z$                                     \tiny REZOLVĂ
+   $x\mapsto y$    ${\color{False} g(y)\ueq y},\ h(y) \ueq w,\ y\ueq z$                                \tiny EȘEC (ciclu)
 :::
 
 -   În ecuația ${g(y)\ueq y}$, variabila $y$ apare în
