@@ -64,7 +64,7 @@ una dintre următoarele forme:
 
 -   $\forall x A$, unde $x \in V$ şi $A$ este o aserţiune.
 
-Considerăm cunoscută prescurtările $A \to B$ pentru $(\neg A) \lor B$, $\exists x A$ pentru $\neg \forall x \neg A$
+Considerăm cunoscute prescurtările $A \to B$ pentru $(\neg A) \lor B$, $\exists x A$ pentru $\neg \forall x \neg A$
 
 ## Substituţia
 

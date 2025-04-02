@@ -198,7 +198,7 @@ atunci `griffin(X)`{.prolog} este adevărat.
 
 ## Interpretarea din punctul de vedere al logicii
 
-Mai multe reguli cu același Head reprezintă posibilități de defini același predicat.
+Mai multe reguli cu același Head reprezintă posibilități de a defini același predicat.
 
 **Exemplu.**
 
@@ -627,8 +627,8 @@ MD = BG, BG = HU, HU = verde
 
 - $s,t,u,\ldots$ pentru termeni, formați din:
   - variabile, constante,
-  - prin aplicarea de simboluri
-  - de un număr finit de ori
+  - prin aplicarea de simboluri \
+    de un număr finit de ori
 
 - $Var(t)$ mulțimea variabilelor care apar în $t$
 
@@ -704,7 +704,7 @@ pentru orice variabilă $x$
 
     -   $\Theta' = \Theta ; \{y \mapsto 0\}$
 
--  $\Theta$ este mai general decât $\Theta'$ (e chiar cel mai general)
+-  $\Theta$ este mai general decât $\Theta'$ (e chiar cel mai general unificator)
 
 
 #  Un algoritm de unificare
