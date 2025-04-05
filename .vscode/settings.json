@@ -18,5 +18,6 @@
     "**/CVS": true
 },
 "pandoc.pdfOptString": "-s -t beamer -H header.tex",
-"pandoc.render.openViewer": false
+"pandoc.render.openViewer": false,
+"makefile.configureOnOpen": false
 }
