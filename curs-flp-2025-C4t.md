@@ -3,7 +3,7 @@ author: Traian Florin Șerbănuță și Andrei Sipoș
 institute: Facultatea de Matematică și Informatică, DL Info
 date: Anul II, Semestrul II, 2024/2025
 title: Fundamentele limbajelor de programare
-subtitle: Semantica Logicii Hoare. Cea mai slabă precondiție.
+subtitle: Programare Logică (de ordinul I). Unificare. Universul Herbrand
 theme: CambridgeUS
 ---
 
@@ -400,25 +400,22 @@ acum imediat că pentru orice $v: V \to A$, avem:
 
 -   $\mathcal{A}\models^v \exists x \varphi$ ddacă există $a\in A$ cu $\mathcal{A}\models^{v_{x \leftarrow a}} \varphi$.
 
-## Evaluarea enunţurilor
+## Satifacerea enunţurilor
 
-Aşadar, dacă $\mathcal{A}=(A,(A_s)_{s \in F \cup R})$ este o
-$\sigma$-structură şi $\varphi$ este enunţ, pentru orice $v_1$,
-$v_2 : V \to A$, avem
-$\|\varphi\|^\mathcal{A}_{v_1}=\|\varphi\|^\mathcal{A}_{v_2}$, deci este
-echivalent faptul că pentru orice $v:V \to A$,
-$\|\varphi\|^\mathcal{A}_v=1$ cu faptul că există $v: V\to A$ cu
-$\|\varphi\|^\mathcal{A}_v=1$. Numim această stare de fapt cu
-$$\mathcal{A} \models\varphi$$ şi spunem că $\mathcal{A}$ **satisface**
-$\varphi$ sau că $\mathcal{A}$ este **model** pentru $\varphi$.
+Fie $\mathcal{A}=(A,(A_s)_{s \in F \cup R})$ o
+$\sigma$-structură şi $\varphi$ un enunţ.
 
-## Semnul $\models$ în logica de ordinul I
+Atunci, pentru orice $v_1$, $v_2 : V \to A$, avem
+$$\mathcal{A}\models^{v_1} \varphi\mbox{ ddacă }\mathcal{A}\models^{v_2} \varphi,$$
+deci sunt echivalente următoarele două afirmații:
+
+- $\mathcal{A} \models\varphi$, adică pentru orice $v:V \to A$, $\mathcal{A}\models^{v} \varphi$
+- există $v: V\to A$ cu $\mathcal{A}\models^{v} \varphi$.
+
+## Concepte înrudite
 
 Vom defini următoarele concepte, precum şi noi semnificaţii ale semnului
 $\models$, prin analogie cu logica propoziţională:
-
--   Dacă $\varphi\in E_\sigma$ şi $\varphi$ este valid, vom scrie
-    $\models \varphi$.
 
 -   Spunem că $\varphi\in E_\sigma$ este **satisfiabil** dacă există
     $\mathcal{A}$ cu $\mathcal{A}\models \varphi$.
@@ -456,7 +453,6 @@ $\sigma$-structură $\mathcal{A}$ cu $\mathcal{A}\models\Gamma$; că este
 Următoarele proprietăţi se demonstrează perfect analog celor din logica
 propoziţională.
 
-### Proprietăţi
 Fie $\Gamma \subseteq E_\sigma$, $\Delta \subseteq\Gamma$ şi
 $\mathcal{A}$ o $\sigma$-structură. Avem următoarele:
 
@@ -478,7 +474,8 @@ $\mathcal{A} \models \varphi$. Această noţiune are următoarele
 proprietăţi analoage celor din logica propoziţională şi demonstrabile
 similar.
 
-### Proprietăţi
+__Proprietăți__
+
 Fie $\Gamma \subseteq E_\sigma$, $\Delta \subseteq\Gamma$ şi
 $\varphi$, $\psi \in E_\sigma$. Avem următoarele:
 
@@ -501,7 +498,7 @@ $\sigma$-formulelor atomice relaţionale fără variabile.
 
 Spunem că o $\sigma$-structură este **Herbrand** atunci când universul
 ei este $\widetilde{T}_\sigma$, iar simbolurile de funcţie sunt
-interpretate de ele însele". Observăm că o $\sigma$-structură Herbrand
+interpretate "de ele însele". Observăm că o $\sigma$-structură Herbrand
 este complet determinată de mulţimea $J$ a acelor formule din $B_\sigma$
 adevărate în ea. Pentru orice submulţime $J$ a lui $B_\sigma$ şi orice
 enunţ $\varphi$, spunem că $J \models_H \varphi$ atunci când structura
@@ -559,7 +556,6 @@ $A'_0 \in \bigcap K$, deci $\bigcap K\models_H A'_0$.
 :::
 
 Pentru orice program $P$, notăm $M_P := \bigcap K_P \in K_P$.
-:::
 
 ## Proprietăţi
 
@@ -567,6 +563,7 @@ Pentru orice program $P$, notăm $M_P := \bigcap K_P \in K_P$.
 Pentru orice program $P$,
 $M_P = \{\varphi\in B_\sigma \mid P \models \varphi\}$.
 
+::: block
 ### Demonstraţie
 Pentru $\supseteq$", fie $\varphi\in B_\sigma$ cu
 $P \models \varphi$. Fie $J \in K_P$. Vrem $\varphi\in J$. Cum
@@ -580,3 +577,6 @@ $J_\mathcal{A} \models_H P$, deci $J_\mathcal{A} \in K_P$. Rezultă
 $M_P \subseteq J_\mathcal{A}$, deci $\varphi\in J_\mathcal{A}$, adică
 $J_\mathcal{A} \models_H \varphi$. Rezultă
 $\mathcal{A} \models \varphi$.
+:::
+
+Numim $M_P$ __modelul Herbrand__ asociat programului $P$

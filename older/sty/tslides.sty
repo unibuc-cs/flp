@@ -2,8 +2,27 @@
 \ProvidesPackage{tslides}[2012/02/14 Package for typesetting slides.]
 
 %\mode<presentation>
-%\usetheme{CambridgeUS}
-\usetheme{metropolis}
+\usetheme{CambridgeUS}
+
+
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{headline}{}{}
+\addtobeamertemplate{headline}{}{\textcolor{white}{\rule{\paperwidth}{5pt}}}
+\setbeamertemplate{footline}[frame number]{}
+
+\setbeamertemplate{section page}
+{
+    \begingroup
+    \centering
+    {\usebeamerfont{section name}\usebeamercolor[fg]{section name}Secțiunea~\insertsectionnumber}
+    \vskip1em\par
+    \begin{beamercolorbox}[sep=12pt,center]{section title}
+      \usebeamerfont{section title}\insertsection\par
+    \end{beamercolorbox}
+  \endgroup
+}
+
+% \usetheme{metropolis}
 %\beamertemplatenavigationsymbolsempty
 \newtranslation[to=Romanian]{Theorem}{Teorem\u a}
 \newtranslation[to=Romanian]{Definition}{Definiție}
@@ -50,10 +69,8 @@
 %\end{beamercolorbox}%
 %}
 
-\author{}
-\author{Traian-Florin Șerbănuță \\ Andrei Sipoș}
-\institute[UB]{Departamentul de Informatică, FMI, UB\\
-}
+\author{Traian Florin Șerbănuță și Andrei Sipoș}
+\institute[UB]{Departamentul de Informatică, FMI, UB}
 
 
 %\newcommand{\structured}[1]{#1}
