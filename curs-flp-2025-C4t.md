@@ -3,11 +3,11 @@ author: Traian Florin Șerbănuță și Andrei Sipoș
 institute: Facultatea de Matematică și Informatică, DL Info
 date: Anul II, Semestrul II, 2024/2025
 title: Fundamentele limbajelor de programare
-subtitle: Programare Logică (de ordinul I). Unificare. Universul Herbrand
+subtitle: Programare Logică.  Corectitudinea algoritmului de unificare.
 theme: CambridgeUS
 ---
 
-# Termeni de ordinul I
+# Programare Logică (de ordinul I)
 
 ## Logica de ordinul I
 
@@ -29,9 +29,9 @@ Dacă $\sigma = (F,R,r)$ este o signatură de ordinul I, atunci numim:
 
 - **simbolurile de funcţie** ale lui $\sigma$ – elementele lui $F$ 
 
--  $r(s)$ **aritatea** lui $s$ – pentru orice $s \in F \cup R$
+- $r(s)$ **aritatea** lui $s$ – pentru orice $s \in F \cup R$
 
-- **constantele** lui $\sigma$ – acele $s\in F$ pentru care $r(s)=0$
+- **constantele** lui $\sigma$ – acele $f\in F$ pentru care $r(f)=0$
 
 ## Termeni
 
@@ -41,83 +41,127 @@ definite prin următoarele două (scheme de) reguli:
 
 - $v$ e termen, pentru orice $v \in V$
 
-- dacă $t_1,\ldots,t_{r(s)}$ sunt termeni, \
-  atunci $st_1\ldots t_{r(s)}$ e termen \
-  pentru orice $s \in F$.\
-  (în particular, dacă $r(s) = 0$, atunci $s$ este termen)
+- dacă $t_1,\ldots,t_{r(f)}$ sunt termeni, \
+  atunci $f\,t_1\ldots t_{r(f)}$ e termen \
+  pentru orice $f \in F$.\
+  (în particular, dacă $r(f) = 0$, atunci $f$ este termen)
 
 Mulţimea termenilor peste $\sigma$ se va nota cu $T_\sigma$.
+
+### Convenții de scriere
+
+Presupunând că $V$, $F$, $R$ nu conțin simbolurile $($, $)$, și $,$\
+putem scrie $f(t_1, \ldots, t_{r(f)})$ în loc de $f\,t_1\cdots t_{r(s)}$ dacă
+$r(f) > 0$.
 
 ## Mulţimea variabilelor unui termen
 
 $Var : T_\sigma \to \mathcal{P}(V)$, definită prin:
 
--   pentru orice $x \in V$, $Var(x):=\{x\}$;
+- pentru orice $x \in V$, $Var(x):=\{x\}$;
 
--   pentru orice $s \in F$ şi orice $t_1,\ldots,t_{r(s)} \in T_\sigma$,
-    $Var(st_1\ldots t_{r(s)}):=Var(t_1) \cup \ldots \cup Var(t_{r(s)})$ \
-    (în particular, dacă $r(s)=0$, $Var(s)=\emptyset$).
+- pentru orice $f \in F$ şi orice $t_1,\ldots,t_{r(f)} \in T_\sigma$,
+  $Var(f\,t_1\cdots t_{r(f)}):=Var(t_1) \cup \ldots \cup Var(t_{r(s)})$ \
+  (în particular, dacă $r(f)=0$, $Var(f)=\emptyset$).
 
 Notăm cu $\widetilde{T}_\sigma$ mulţimea termenilor fără variabile.
 
+## Formule atomice
+
+Fie $\sigma=(F,R,r)$ o signatură.
+
+- O formulă atomică **ecuaţională** sau doar **ecuaţie** e un șir de forma\
+  ${=}tu$, cu $t$, $u \in T_\sigma$
+
+- O formulă atomică **relațională** e un șir de forma\
+  $p\,t_1\cdots t_{r(p)}$ cu $p\in R$ şi $t_1,\ldots,t_n\in T_\sigma$
+
+- O **formulă atomică** este fie o ecuație fie o formulă atomică relațională
+
+Mulţimea formulelor atomice peste $\sigma$ se va nota cu $Fa_\sigma$.
+
+### Convenții de scriere
+
+- Vom scrie $t = u$ în loc de ${=}tu$
+
+- Presupunând că $V$, $F$, $R$ nu conțin simbolurile $($, $)$, și $,$\
+  putem scrie $p(t_1, \ldots, t_{r(p)})$ în loc de $p\, t_1\cdots t_{r(p)}$ dacă $r(p) > 0$.
+
 ## Formule
 
-Fie $\sigma=(F,R,r)$ o signatură. Numim **formulă atomică** peste
-$\sigma$ un şir de forma ${=}tu$, cu $t$, $u \in T_\sigma$ (numită formulă
-atomică **ecuaţională** sau doar **ecuaţie**) sau un şir de forma
-$st_1\ldots t_n$ cu $s\in R$, $n=r(s)$ şi $t_1,\ldots,t_n\in T_\sigma$
-(numită formulă atomică **relaţională**). Mulţimea formulelor atomice
-peste $\sigma$ se va nota cu $Fa_\sigma$. Mulţimea **formulelor** peste
-$\sigma$ se defineşte prin următoarele (scheme de) reguli:
+Mulţimea **formulelor** peste
+$\sigma$ e definită de următoarele (scheme de) reguli:
 
--   $a$ este formulă, pentru orice formulă atomică $a \in Fa_\sigma$;
+- $a$ este formulă, pentru orice formulă atomică $a \in Fa_\sigma$;
 
--   $\bot$ este formulă;
+- $\bot$ este formulă;
 
--   dacă $\varphi$, $\psi$ sunt formula, atunci $\to\varphi\psi$ este formulă;
+- dacă $\varphi$, $\psi$ sunt formula, atunci $\to\varphi\psi$ este formulă;
 
--   dacă $\varphi$ formulă, atunci $\forall x \varphi\in A$, pentru orice $x \in V$.
+- dacă $\varphi$ formulă, atunci $\forall x \varphi$ e formulă, pentru orice $x \in V$.
 
 Mulţimea formulelor peste $\sigma$ se va nota cu $F_\sigma$.
 
 De asemenea, vom defini **formulele relaţionale** în acelaşi mod, cu
 excepţia că acceptăm în cadrul lor doar formule atomice relaţionale.
 
-## Notaţie infixată şi conectori derivaţi
+### Convenții de scriere
 
-Vom folosi aceeaşi metodă pe care am folosit-o la logica propoziţională
-pentru a putea nota formulele infixat -- pentru orice $\varphi$,
-$\psi \in F_\sigma$, $\varphi\to\psi$ în loc de $\to\varphi\psi$, dar
-şi, pentru orice $t$, $u \in T_\sigma$, $t=u$ în loc de $=tu$.
+Vom scrie $\varphi \to \psi$ în loc de $\to\varphi\psi$ și vom folosi
+parenteze pentru dezambiguizare.
 
-De asemenea, vom nota, ca mai înainte, pentru orice $\varphi$,
-$\psi \in F_\sigma$,
-$$\top:= \bot\to\bot,\quad \neg \varphi:= \varphi\to \bot,\quad \varphi\wedge\psi:=\neg(\varphi\to \neg\psi),$$
-$$\varphi\vee\psi:=(\neg \varphi)\to \psi,\quad \varphi\leftrightarrow\psi := (\varphi\to \psi) \wedge(\psi \to \varphi).$$
-dar şi, pentru orice $x\in V$ şi $\varphi\in F_\sigma$,
-$$\exists x \varphi:= \neg \forall x \neg \varphi.$$
+## Conectori logici derivaţi
+
+
+Pentru orice $\varphi$,$\psi \in F_\sigma$
+
+- $\top:= \bot\to\bot$
+
+- $\neg \varphi:= \varphi\to \bot$
+
+- $\varphi\wedge\psi:=\neg(\varphi\to \neg\psi)$
+
+- $\varphi\vee\psi:=(\neg \varphi)\to \psi$
+
+- $\varphi\leftrightarrow\psi := (\varphi\to \psi) \wedge(\psi \to \varphi)$
+
+- $\exists x \varphi:= \neg \forall x \neg \varphi$, pentru orice $x\in V$ şi $\varphi\in F_\sigma$.
 
 ## Mulţimea variabilelor libere ale unei formule
 
 Definim funcţia $FV : F_\sigma \to \mathcal{P}(V)$, prin:
 
--   pentru orice $t$, $u \in T_\sigma$, $FV(t=u):=Var(t) \cup Var(u)$;
+- pentru orice $t$, $u \in T_\sigma$, $FV(t=u):=Var(t) \cup Var(u)$;
 
--   pentru orice $p \in R$ şi orice $t_1,\ldots,t_{r(p)} \in T_\sigma$,
-    $FV(pt_1\ldots t_{r(p)}):=Var(t_1) \cup \ldots \cup Var(t_{r(p)})$;
+- pentru orice $p \in R$ şi orice $t_1,\ldots,t_{r(p)} \in T_\sigma$,
+  $FV(p\,t_1\cdots t_{r(p)}):=Var(t_1) \cup \ldots \cup Var(t_{r(p)})$;
 
--   $FV(\bot):=\emptyset$;
+- $FV(\bot):=\emptyset$;
 
--   pentru orice $\varphi$, $\psi \in F_\sigma$,
-    $FV(\varphi\to \psi):=FV(\varphi) \cup FV(\psi)$;
+- pentru orice $\varphi$, $\psi \in F_\sigma$,
+  $FV(\varphi\to \psi):=FV(\varphi) \cup FV(\psi)$;
 
--   pentru orice $\varphi\in F_\sigma$ şi $x \in V$,
-    $FV(\forall x \varphi):=FV(\varphi) \setminus \{x\}$.
+- pentru orice $\varphi\in F_\sigma$ şi $x \in V$,
+  $FV(\forall x \varphi):=FV(\varphi) \setminus \{x\}$.
 
 Dacă $\varphi\in F_\sigma$ cu $FV(\varphi)=\emptyset$, atunci $\varphi$
 se numeşte **enunţ**. Mulţimea enunţurilor peste $\sigma$ se notează cu
 $E_\sigma$.
 
+## Numărul de simboluri funcționale
+
+Pentru un termen $t$ definim $n_F(t)$, numărul de simboluri de funcție din $t$ recursiv prin:
+
+- $n_F(x) = 0$ pentru orice variabilă $x$
+- $n_F(f\,t_1\cdots t_{r(f)}) = 1 + n_F(t_1) + \ldots + n_F(t_{r(s)})$
+
+$n_F$ se extinde natural la formule și mulțimi de formule.
+
+- $n_F(t_1 = t_2) = n_F(t_1) + n_F(t_2)$
+- $n_F(p\,t_1\cdots t_{r(p)}) = n_F(t_1) + \cdots + n_F(t_{r(p)})$
+- \ldots
+
+_Observație:_ $n_F$ numără __doar__ simbolurile de funcție
 
 ## Clauze
 
@@ -133,7 +177,8 @@ $\forall(L_1 \lor\ldots\lor L_m)$, unde $L_1,\ldots,L_m$ sunt literali.
 Numim **clauză definită** o clauză unde apare exact un literal pozitiv,
 anume pe prima poziţie. Dacă $A_0,\ldots A_m$ sunt formule atomice
 relaţionale, atunci clauza
-$$\forall(A_0 \lor \neg A_1 \lor\ldots\lor \neg A_m)$$ se scrie şi sub
+$$\forall(A_0 \lor \neg A_1 \lor\ldots\lor \neg A_m)$$
+se scrie şi sub
 forma (cunoscută din limbajul Prolog) $$A_0 \leftarrow A_1,\ldots,A_m.$$
 
 Un **program** va fi o mulţime finită de clauze definite. Un **scop
@@ -144,15 +189,14 @@ definit** este o clauză în care apar doar literali negativi.
 ## Motivaţia unificării
 
 Să zicem că avem un program Prolog care conţine regula
-$$p(f(x),y) \leftarrow p(x,y)$$ şi vrem să interogăm $p(z,f(t))$. Pentru
+$$p(f(X),Y) \leftarrow p(X,Y)$$ şi vrem să interogăm $p(Z,f(T))$. Pentru
 a găsi o soluţie a acestei interogări folosind regula de mai sus,
-trebuie să substituim $x \mapsto x$, $z \mapsto f(x)$, $y \mapsto f(t)$,
-$t \mapsto t$, interogarea devenind $p(f(x),f(t))$, care este redusă,
-conform regulii, la $p(x,f(t))$, care devine practic o nouă interogare.
+trebuie să substituim $X \mapsto X$, $Z \mapsto f(X)$, $Y \mapsto f(T)$,
+$T \mapsto T$, interogarea devenind $p(f(X),f(T))$, care este redusă,
+conform regulii, la $p(X,f(T))$, care devine practic o nouă interogare.
 
 Observăm că o parte esenţială a procesului de rulare a unui program
 Prolog este găsirea acelei substituţii.
-
 
 ## Substituţia termenilor
 
@@ -164,31 +208,44 @@ Se observă, folosind unicitatea, că, pentru orice două substituţii
 $\theta$, $\theta'$,
 $$\widetilde{\widetilde{\theta'} \circ \theta} = \widetilde{\theta'} \circ \widetilde{\theta}.$$
 
-Pentru o variabila $x$ și un termen $t$ definim substituția singleton $[x \mapsto t]$ prin
+Pentru o variabilă $x$ și un termen $t$ definim substituția singleton $[x \mapsto t]$ prin
 $$[x \mapsto t](y) =  \begin{cases} t, & \mbox{dac\u a } y=x, \\
 y, & \mbox{altfel}.\end{cases}$$
-
-Spunem ca un termen $t$ e __mai general__ decât un termen $t'$ dacă \
-există o substituție $\Delta$ astfel încât $t' = \widetilde{\Delta}(t)$
 
 Spunem că o substituție $\Theta$ e __mai generală__ decât altă substituție $\Theta'$ dacă \
 există o substituție $\Delta$ astfel încât $\Theta' = \widetilde{\Delta} \circ \Theta$
 
+- Notăm cu $\Theta \succ \Theta'$ faptul că $\Theta$ e mai generală decât $\Theta'$
+
 ## Unificatori
 
 Dacă $\mathcal{E}$ este o mulţime de ecuaţii, numim **unificator**
-pentru ea o substituţie $\theta$ astfel încât, pentru orice
+pentru ea \
+o substituţie $\theta$ astfel încât, pentru orice
 $(s=t) \in \mathcal{E}$, avem
 $\widetilde{\theta}(s)=\widetilde{\theta}(t)$
 
-Un unificator $\theta$ pentru $\mathcal{E}$ se numeşte \
-**cel mai general unificator** (**cgu**; **most general unifier**, **mgu**) dacă \
+Notăm cu $\cal U(E)$ mulțimea unificatorilor lui $\cal E$
+
+Un unificator $\theta$ pentru $\mathcal{E}$ se numeşte
+**cel mai general unificator**\
+(**cgu**; **most general unifier**, **mgu**) dacă
 este mai general (ca substituție) decât orice alt unificator $\theta'$ pentru $\mathcal{E}$.
 
-## Algoritm de unificare
+Formal $\Theta$ e mgu pentru $\mathcal{E}$ ddacă
+
+- $\Theta \in \cal U(E)$ și
+- pentru orice $\Theta' \in \cal U(E)$, $\Theta \succ \Theta'$
+
+### Propoziție (definiție alternativă)
+
+$\Theta$ e mgu pentru $\mathcal{E}$ ddacă
+$${\cal U(E)} = \{\Theta' : V\to T_\sigma \mid \Theta \succ \Theta' \}$$
+
+## Algoritm de unificare (ușor formalizat)
 
 Algoritmul pornește cu configurația inițială $(\Theta, \mathcal{R}) = (1_V, \mathcal{E})$ și \
-constă în aplicarea nedeterministă a regulilor de mai jos:
+constă în aplicarea nedeterministă a regulilor de mai jos[^1]:
 
 SCOATE
 
@@ -196,12 +253,12 @@ SCOATE
 
 DESCOMPUNE
 
-: $(\Theta, \mathcal{R} \cup \{f(t_1,\ldots,t_n) = f(t_1',\ldots,t_n')\})$ \
+: $(\Theta, \mathcal{R} \cup \{f\,t_1\cdots t_n = f\, t_1'\cdots t_n'\})$ \
   $\Longrightarrow (\Theta, \mathcal{R} \cup \{ t_1 = t_1', \ldots, t_n = t_n' \}$
 
 REZOLVĂ
 
-: $(\Theta, \mathcal{R} \cup \{x = t\})$ \hfill sau \hfill $(\Theta, \mathcal{R} \cup \{t = x\})$ \
+: $(\Theta, \mathcal{R} \cup \{x = t\})$ \quad __sau__ \quad $(\Theta, \mathcal{R} \cup \{t = x\})$ \
   $\Longrightarrow (\widetilde{[x\mapsto t]}\circ \Theta, \{\widetilde{[x\mapsto t]}(t_1) = \widetilde{[x\mapsto t]}(t_2) \mid t_1 = t_2 \in \mathcal{R}\}$ \
   dacă $x \notin Var(t)$.
 
@@ -210,373 +267,192 @@ REZOLVĂ
 EȘEC (conflict)
 
 : există în $\cal R$ o ecuaţie de forma\
-  $f(s_1,\ldots,s_n) = g(t_1,\ldots,t_m)$ cu $f \neq g$.
+  $f\, s_1\cdots s_n = g\, t_1\cdots t_m$ cu $f \neq g$.
 
 EȘEC (ciclu)
 
 : există în $\cal R$ o ecuaţie de forma\
   $x = t$ sau $t = x$ cu $t \neq x$ şi $x \in Var(t)$.
 
+[^1]: Condiție suplimentară pentru orice regulă $(\Theta, \mathcal{R} \cup \{e\}) \Longrightarrow (\Theta', \mathcal{R}')$:
+      $\structure{e \not\in \cal R}$.
+
+## Accesibilitate
+
+_Definiție_: Configurația $(\Theta', \mathcal{R}')$ e __accesibilă__
+din configurația $(\Theta, \mathcal{R})$ dacă\
+există $n\in \N$ și o secvență $(\Theta_i, \mathcal{R}_i)_{i\in \overline{1. n}}$, numită __derivare__ astfel încât:
+
+- $(\Theta_0, \mathcal{R}_0) = (\Theta, \mathcal{R})$
+
+- $(\Theta_n, \mathcal{R}_n) = (\Theta', \mathcal{R}')$
+
+- $(\Theta_i, \mathcal{R}_i) \Longrightarrow (\Theta_{i + 1}, \mathcal{R}_{i+1})$ pentru orice $0\leq i < n$.
+
+## Configurații finale
+
+O configurație $(\Theta, \cal R)$ se numește __finală__ dacă\
+orice ecuație din $\cal R$ este "de eșec", i.e., de forma:
+
+- $x = t$ sau $t = x$ unde $t\neq x$ și $x\in Var(t)$
+
+- $f\, t_1 \cdots t_{r(f)} = g\, t'_1 \cdots t'_{r(g)}$ cu $f \neq g$
+
+### Teoremă
+
+Dacă $(\Theta, \cal R)$ e finală atunci
+${\cal U(R)} = \begin{cases}{T_\sigma}^V & \mbox{dacă } \mathcal{R} = \emptyset\\ \emptyset & \mbox{altfel} \end{cases}$
+
+### Demonstrație
+
+Dacă $\cal R = \emptyset$ afirmația e evidentă din definiția unificatorilor[^2].
+
+Altfel, prin reducere la absurd pentru $\widetilde\Theta(t_1) = \widetilde\Theta(t_2)$ unde $(t_1 = t_2) \in \cal R$
+
+- $\widetilde\Theta(x) = \widetilde\Theta(t)$ contradicție cu $n_F(\widetilde\Theta(x)) < n_F(\widetilde\Theta(t))$
+
+- $\widetilde\Theta(f\, t_1 \cdots t_{r(f)}) = \widetilde\Theta(g\, t'_1 \cdots t'_{r(g)})$ contradicție cu $f\neq g$
+
+[^2]: ${T_\sigma}^V$ este multimea funcțiilor de la $V$ la $T_\sigma$, adică a tuturor substituțiilor.
 
 ## Invariant
 
 ### Teoremă
 
-Pentru orice configurație $(\Theta, \mathcal{R})$ obținută în execuția algoritmului,
-mulțimea unificatorilor lui $\mathcal{R}$ pentru care $\Theta$ e mai generală (ca substituție)
-este invariantă. Mai mult, $\widetilde{\Theta}(t) = t$ pentru orice $t$ care apare în $R$.
+Pentru orice configurație $(\Theta, \mathcal{R})$ accesibilă dintr-o configurație $(1_V, \mathcal{E})$:
+
+$$\mathcal{U(E)} = \{\Theta' \in \mathcal{U(R)} \mid \Theta \succ \Theta' \}$$
+
+### Demonstrație (schiță)
+
+Demonstrăm concluzia teoremei împreună cu următoarele afirmații
+
+- $\forall x\in V.\forall y\in Var(\Theta(x)). \Theta(y) = y$
+
+- $\forall x \in Var(\mathcal{R}).\Theta(x) = x$ \
+  (unde $Var(\mathcal{R}) = \bigcup_{(t_1 = t_2)\in \cal R} (Var(t_1) \cup Var(t_2))$)
+
+prin inducție după lungimea unei derivări.
+
+### Lemă ajutătoare
+
+Fie $\Theta$ unificator pentru $x = t$, unde $x$ variabilă.
+
+Atunci $\Theta = \widetilde\Theta \circ [x \mapsto t]$.
+
+## Corectitudine parțială
+
+Fie $(\Theta, \cal R)$ configurație finală accesibilă din $(1_V, \cal E)$.
+
+- Dacă $\cal R = \emptyset$ atunci $\Theta$ este mgu pentru $\cal E$.
+
+- Dacă $\cal R \neq \emptyset$ atunci $\cal U(E) = \emptyset$.
 
 ### Demonstrație
 
-Arătăm că afirmația e păstrată de reguli.
+Folosind teorema despre invariant avem că
+$$\mathcal{U(E)} = \{\Theta' \in \mathcal{U(R)} \mid \Theta \succ \Theta' \}$$
 
-Scoate: orice substituție care unifică $\mathcal{R}$ unifică și $\mathcal{R} \cup \{t = t\}$ și revers
+Folosim teorema despre configurații finale:
 
-Descompune: Asemănător, folosind proprietatea de citire unică a termenilor.
+- dacă $\cal R = \emptyset$, atunci $\mathcal{U(R)} = {T_\sigma}^V$, deci
+  $\mathcal{U(E)} = \{\Theta' : V \to T_\sigma \mid \Theta \succ \Theta' \}$\
+  de unde $\Theta$ mgu pentru $\cal E$.
 
-Rezolvă: Fie $\Theta'$ unificator pentru $R\cup \{x = t\}$ a.î. $\Theta$ e mai generală.
-Fie $\Delta$ a.î. $\Theta' = \widetilde{\Delta} \circ \Theta$.
-Avem că $\widetilde\Theta(x) = x$ și $\widetilde\Theta(t) = t$, de unde
-$\widetilde{\Theta'}(x) = \widetilde{\Delta}(x)$ și $\widetilde{\Theta'}(t) = \widetilde{\Delta}(t)$.
-Deci $\widetilde{\Delta}(x) = \widetilde{\Delta}(t)$, de unde $\Delta = \widetilde{\Delta} \circ [x \mapsto t]$, atunci
-$\Theta' = \widetilde{\Delta'} \circ \widetilde{[x\mapsto t]} \circ \Theta$.
+- dacă $\cal R \neq \emptyset$, atunci $\mathcal{U(R)} = \emptyset$, deci
+  $\mathcal{U(E)} = \emptyset$
 
-În plus, $\widetilde\Theta' \circ \widetilde{[x\mapsto t]} = \widetilde{\Delta'} \circ \widetilde{[x\mapsto t]} \circ \widetilde\Theta \circ \widetilde{[x\mapsto t]} =  \widetilde{\Delta'} \circ \widetilde{[x\mapsto t]} \circ \widetilde{[x\mapsto t]} \circ \widetilde\Theta = \widetilde{\Delta'} \circ \widetilde{[x\mapsto t]} \circ \Theta = \widetilde\Theta'$
+## Variant
 
-## Corectitudine
+Dată fiind o configurație $(\Theta, \mathcal{R})$ definim
+$$variant((\Theta, \mathcal{R})) := (|Var(\mathcal{R})|, n_F(\mathcal{R}), |\mathcal{R}|).$$
+
+Pe $\N\times\N\times \N$ notăm _ordinea lexicografică_ cu $<$
+
+- $(n_1, n_2, n_3) < (m_1, m_2, m_3)$ ddacă 
+  $n_1 < m_1 \vee (n_1 = m_1 \wedge n_2 < m_2) \vee (n_1 = m_1 \wedge n_2 = m_2 \wedge n_3 < m_3)$
+- $<$ este o _bună ordine_, i.e., nu există secvențe infinite descrescătoare:
+  $$\not\exists (a_n)_{n\in \N} \mbox{ cu } a_n > a_{n+1}\mbox{ pentru orice }n\in \N$$
+
+## Variant
+
+### Teoremă
+
+Dacă $(\Theta, \mathcal{R}) \Longrightarrow (\Theta', \mathcal{R}')$ atunci $variant((\Theta, \mathcal{R})) > variant((\Theta', \mathcal{R}'))$
+
+### Demonstrație
+
+Discuție după pasul din algoritm folosit:
+
+SCOATE
+
+: primele două componente nu cresc și ultima sigur scade cu $1$
+
+DESCOMPUNE
+
+: prima componentă rămâne la fel și a doua scade cu $1$
+
+REZOLVĂ
+
+: Prima componentă scade, pentru că:
+
+  - variabila care este rezolvată apărea în $\cal R$ dar nu va mai apare în $\cal R'$ \
+  (e substituită peste tot cu un termen în care nu apare)
+  - nu apar alte variabile noi
+
+## Terminare
+
+### Teoremă
+
+Algoritmul de unificare nu admite derivări infinite.
+
+### Demonstrație
+
+Presupunem există o derivare infinită $(\Theta_n, \mathcal{R}_n)_{n\in \N}$
+
+Considerăm șirul $(a_n)_{n\in \N}$ definit prin $a_n := variant((\Theta_n, \mathcal{R}_n))$
+
+Deoarece $(\Theta_n, \mathcal{R}_n) \Longrightarrow (\Theta_{n +1}, \mathcal{R}_{n+1})$ pentru orice $n\in \N$,\
+reiese că $a_n > a_{n+1}$ pentru orice $n\in \N$ (din teorema de variant).
+
+Contradicție cu faptul că $<$ e bună ordine pe $\N\times \N \times \N$.
+
+## Progres
+
+### Teoremă
+
+Pentru orice configurație ne-finală $(\Theta, \cal R)$ există o configurație $(\Theta', \cal R')$ cu
+$$(\Theta, {\cal R}) \Longrightarrow (\Theta', \cal R')$$
+
+### Demonstrație
+
+Există cel puțin o ecuație $(t_1 = t_2) \in \cal R$ care nu e "de eșec".\
+Analiză după forma ei. Avem trei cazuri:
+
+$x = x$
+
+: Aplicăm regula ELIMINĂ
+
+$x = t$ sau $t = x$ cu $t \neq x$
+
+: Avem că  $x \not\in Var(t)$ (nu e de eșec).\
+  Aplicăm regula REZOLVĂ
+
+$f\, t_1 \cdots t_{r(f)} = g\, t'_1 \cdots t'_{r(g)}$
+
+: Avem că $f = g$ (nu e de eșec).\
+  Aplicăm regula DESCOMPUNE
+
+## Corectitudine totală
 
 ### Teoremă
 Algoritmul de unificare se termină mereu şi produce
 rezultatul corect.
 
 ### Demonstraţie
-__Terminare:__ asociem fiecărei configurații $(\Theta, \mathcal{R})$ _variantul_ $(nx, nf)$ unde \
 
-$nx$ e nr. variabile distincte din $\cal R$ și $nf$ e nr. simboluri din $\cal R$.
+- Terminare: din teorema de terminare.
 
-Observăm că variantul descrește la aplicarea oricărui pas.
+- Admite configurații finale: din teorema de progres (și terminare).
 
-__Progress:__ Dacă nu eșec și $\mathcal{R} \neq \emptyset$, atunci mai putem face un pas.
-
-__CGU:__ În starea inițială, mulțimea unificatorilor din proprietatea de invarianță este mulțimea tuturor
-unificatorilor lui $\cal E$.
-
-Deoarece aceasta e păstrată de pașii algoritmului, în stare finală avem:
-
-Mulțimea unificatorilor lui $\cal E$ este mulțimea unificatorilor lui $\emptyset$ care sunt mai generali decât $\Theta$.
-
-Deci $\Theta$ este cel mai general unificator pentru $\cal E$.
-
-
-
-# Semantică
-
-## Structuri de ordinul I
-
-Dacă
-$\sigma = (F,R,r)$ este o signatură de ordinul I, atunci \
-o **$\sigma$-structură** este o pereche $(A, \{A_s\}_{s \in F \cup R})$,
-unde:
-
-- $A \neq \emptyset$ (şi se va numi **universul**, **mulţimea
-suport** sau **mulţimea subiacentă** a structurii),
-
-- pentru orice
-$s \in F$, $A_s : A^{r(s)} \to A$ şi
-
-- pentru orice $s \in R$,
-$A_s \subseteq A^{r(s)}$. 
-
-Structurile vor reprezenta domeniile despre
-care vor vorbi formulele corespunzătoare signaturilor.
-
-## Exemple
-
-Putem obţine diverse signaturi dacă punem $\sigma:=(F,R,r)$, iar $F$,
-$R$, $r$ sunt, pe rând:
-
--   $F=\{\cdot,0,1\}$, $R=\emptyset$, $r(\cdot)=2$, $r(0)=r(1)=0$ --
-    atunci $\sigma$-structurile vor fi tuplurile $(A,\cdot,0,1)$ unde
-    $\cdot : A^2 \to A$, iar $0$, $1 \in A$, de exemplu
-    $(\mathbb{Z},+,2,7)$. Observăm că nu impunem în definiţia structurii
-    ca ea să respecte anumite legi -- acest lucru se va face eventual
-    ulterior, după ce vom defini riguros formulele şi satisfacerea lor.
-
--   $F=\emptyset$, $R=\{\leq\}$, $r(\leq)=2$ -- atunci
-    $\sigma$-structurile vor fi perechi $(A,\leq)$ unde $\leq$ este o
-    relaţie binară pe $A$, de exemplu $(\mathbb{N},>)$.
-
--   $F=\emptyset$, $R=\{I,A,B\}$, $r(I)=r(A)=r(B)=1$.
-
-Dacă punem $F=R=\emptyset$, atunci obţinem o signatură care, dat fiind
-că singurele fapte pe care le vom putea exprima peste ea vor folosi
-semnul $=$, se va numi **signatura egalităţii**.
-
-## Signatura aritmeticii
-
-De asemenea, vom defini **signatura aritmeticii** ca fiind
-$$\sigma_{\mathrm{ar}} := (\{\dot{+},\dot{\times},\dot{S},\dot{0}\},\{\dot{<}\},r),$$
-unde $r(\dot{+})=r(\dot{\times})=r(\dot{<})=2$, $r(\dot{S})=1$, iar
-$r(\dot{0})=0$. Dacă definim funcţia $S:\mathbb{N}\to\mathbb{N}$, pentru
-orice $n \in \mathbb{N}$, prin $S(n):=n+1$, iar
-$$\mathcal{N}:=(\mathbb{N},(N_s)_{s \in F \cup R}),$$ unde
-$N_{\dot{+}}=+$, $N_{\dot{\times}} = \cdot$, $N_{\dot{S}} = S$,
-$N_{\dot{0}}=0$, iar $N_{\dot{<}}=<$, avem că $\mathcal{N}$ este o
-$\sigma_{\mathrm{ar}}$-structură.
-
-De remarcat că există şi alte $\sigma_{\mathrm{ar}}$-structuri, de
-exemplu putem înzestra mulţimea $\{0,1\}$ cu $\pmb{\wedge}$,
-$\pmb{\vee}$, $\pmb{\neg}$, $0$ şi $<$ pentru a obţine o altă
-$\sigma_{\mathrm{ar}}$-structură.
-
-## Evaluarea termenilor
-
-Fie $\mathcal{A}=(A,(A_s)_{s \in F \cup R})$ o $\sigma$-structură.
-Atunci pentru orice __valuație__ $v : V \to A$ există şi este unică o funcţie
-$(\cdot)^{\mathcal{A}}_v : T_\sigma \to A$ astfel încât
-
--   pentru orice $x \in V$, $x^{\mathcal{A}}_v=v(x)$;
-
--   pentru orice $s \in F$ şi orice $t_1,\ldots,t_{r(s)} \in T_\sigma$,
-    $(st_1\ldots t_{r(s)})^{\mathcal{A}}_v=A_s((t_1)^{\mathcal{A}}_v,\ldots,(t_{r(s)})^{\mathcal{A}}_v)$ \
-    (în particular, dacă $r(s)=0$, $s^{\mathcal{A}}_v = A_s$).
-
-## Actualizarea valuațiilor
-
-Fie $\mathcal{A}=(A,(A_s)_{s \in F \cup R})$ o $\sigma$-structură.
-Pentru orice $v : V\to A$, $x \in V$, $a \in A$, definim
-$v_{x \leftarrow a} : V \to A$, pentru orice $y \in V$, prin
-$$v_{x \leftarrow a}(y) := \begin{cases} v(y), &\mbox{dac\u a  $y\neq x$,} \\
-a, & \mbox{dac\u a $y=x$}. \end{cases}$$
-
-Observăm că pentru orice
-variabile $x$, $y$ cu $x \neq y$, orice $v: V \to A$ şi orice $a$,
-$b \in A$, avem că
-$$(v_{y\leftarrow b})_{x \leftarrow a}=(v_{x\leftarrow a})_{y \leftarrow b}.$$
-
-În acest caz, notăm valoarea lor comună cu
-$v_{x\leftarrow a, y\leftarrow b}$. Aşadar, pentru orice $z \in V$,
-$$\begin{aligned}
-v_{x\leftarrow a, y\leftarrow b}(z)=\begin{cases}
-v(z) & \text{dac\u a } z\ne x \text{ \c si } z \ne y,\\
-a & \text{dac\u a }  z=x,\\
-b & \text{dac\u a } z=y.
-\end{cases}
-\end{aligned}$$
-
-## Satisfacerea formulelor
-
-Definim o relație $\models$ între structuri, valuații și formule folosind următoarele (scheme de) reguli:
-
--   $\mathcal{A}\models^v t = u$, dacă $t^\mathcal{A}_v=u^\mathcal{A}_v$;
-
--   $\mathcal{A}\models^v st_1\ldots t_{r(s)}$ (unde $s \in R$),
-    dacă $((t_1)^\mathcal{A}_v,\ldots,(t_{r(s)})^\mathcal{A}_v) \in A_s$;
-
--   $\mathcal{A}\not\models^v \bot$;
-
--   $\mathcal{A}\models^v \varphi\to \psi$ dacă
-    $\mathcal{A}\models^v \varphi$ implică că $\mathcal{A}\models^v \psi$
-
--   $\mathcal{A}\models^v \forall x \varphi$, dacă pentru orice $a \in A$, $\mathcal{A}\models^{v_{x \leftarrow a}} \varphi$.
-
-Dacă $\mathcal{A}\models^v \varphi$ pentru orice $v$, scriem $\mathcal{A}\models \varphi$ și spunem că $\mathcal{A}$ **satisface** $\varphi$, sau este **model** pentru $\varphi$. 
-
-Dacă $\mathcal{A}\models \varphi$ pentru orice $\cal A$, scriem $\models \varphi$ și spunem că $\varphi$ este
-**validă**.
-
-## Satisfacerea conectorilor derivaţi
-
-Fie $\mathcal{A}=(A,(A_s)_{s \in F \cup R})$ o $\sigma$-structură. Este
-acum imediat că pentru orice $v: V \to A$, avem:
-
--   $\mathcal{A}\models^v \top$;
-
--   $\mathcal{A}\models^v \varphi\wedge\psi$ ddacă $\mathcal{A}\models^v \varphi$ și $\mathcal{A}\models^v \psi$;
-
--   $\mathcal{A}\models^v \varphi\vee\psi$ ddacă $\mathcal{A}\models^v \varphi$ sau $\mathcal{A}\models^v \psi$;
-
--   $\mathcal{A}\models^v \varphi\leftrightarrow\psi$ ddacă ($\mathcal{A}\models^v \varphi$ ddacă $\mathcal{A}\models^v \psi$);
-
--   $\mathcal{A}\models^v \exists x \varphi$ ddacă există $a\in A$ cu $\mathcal{A}\models^{v_{x \leftarrow a}} \varphi$.
-
-## Satifacerea enunţurilor
-
-Fie $\mathcal{A}=(A,(A_s)_{s \in F \cup R})$ o
-$\sigma$-structură şi $\varphi$ un enunţ.
-
-Atunci, pentru orice $v_1$, $v_2 : V \to A$, avem
-$$\mathcal{A}\models^{v_1} \varphi\mbox{ ddacă }\mathcal{A}\models^{v_2} \varphi,$$
-deci sunt echivalente următoarele două afirmații:
-
-- $\mathcal{A} \models\varphi$, adică pentru orice $v:V \to A$, $\mathcal{A}\models^{v} \varphi$
-- există $v: V\to A$ cu $\mathcal{A}\models^{v} \varphi$.
-
-## Concepte înrudite
-
-Vom defini următoarele concepte, precum şi noi semnificaţii ale semnului
-$\models$, prin analogie cu logica propoziţională:
-
--   Spunem că $\varphi\in E_\sigma$ este **satisfiabil** dacă există
-    $\mathcal{A}$ cu $\mathcal{A}\models \varphi$.
-
--   Spunem că un enunţ $\varphi$ este **nesatisfiabil** dacă $\varphi$
-    nu este satisfiabil.
-
--   Fie $\varphi$, $\psi \in E_\sigma$. Spunem că din $\varphi$ **se
-    deduce semantic** $\psi$ şi scriem $\varphi\models \psi$ dacă pentru
-    orice $\mathcal{A}$ cu $\mathcal{A}\models \varphi$ avem
-    $\mathcal{A} \models \psi$.
-
-Clar, $\bot$ este enunţ, iar pentru orice $\sigma$-structură
-$\mathcal{A}$, avem $\mathcal{A} \not\models \bot$, i.e. $\bot$ este
-nesatisfiabil.
-
-## Mulţimi de enunţuri
-
-Complet analog celor din logica propoziţională, vom introduce noţiuni de
-satisfiabilitate pentru mulţimi de formule, precum şi semnificaţii
-corespunzătoare ale semnului $\models$.
-
-Fie $\Gamma \subseteq E_\sigma$. Pentru orice $\sigma$-structură
-$\mathcal{A}$, spunem că $\mathcal{A}$ **satisface** $\Gamma$ sau că
-$\mathcal{A}$ este **model** pentru $\Gamma$, şi scriem
-$\mathcal{A}\models\Gamma$, dacă pentru orice $\varphi\in\Gamma$,
-$\mathcal{A} \models \varphi$.
-
-Spunem că $\Gamma$ este **satisfiabilă** dacă există o
-$\sigma$-structură $\mathcal{A}$ cu $\mathcal{A}\models\Gamma$; că este
-**nesatisfiabilă** dacă nu este satisfiabilă.
-
-## Proprietăţi
-
-Următoarele proprietăţi se demonstrează perfect analog celor din logica
-propoziţională.
-
-Fie $\Gamma \subseteq E_\sigma$, $\Delta \subseteq\Gamma$ şi
-$\mathcal{A}$ o $\sigma$-structură. Avem următoarele:
-
--   Dacă $\mathcal{A}\models\Gamma$, atunci $\mathcal{A}\models\Delta$.
-
--   Dacă $\Delta$ este nesatisfiabilă, atunci $\Gamma$ este
-    nesatisfiabilă.
-
--   Avem că $\mathcal{A} \models \Gamma$ dacă şi numai dacă pentru orice
-    $\Sigma \subseteq\Gamma$ finită, $\mathcal{A} \models \Sigma$.
-
-## Deducţie semantică din mulţimi
-
-Fie $\Gamma \subseteq E_\sigma$ şi $\varphi\in E_\sigma$. Spunem că din
-$\Gamma$ **se deduce semantic** $\varphi$, şi scriem
-$\Gamma \models \varphi$, dacă pentru orice $\sigma$-structură
-$\mathcal{A}$ cu $\mathcal{A}\models \Gamma$ avem
-$\mathcal{A} \models \varphi$. Această noţiune are următoarele
-proprietăţi analoage celor din logica propoziţională şi demonstrabile
-similar.
-
-__Proprietăți__
-
-Fie $\Gamma \subseteq E_\sigma$, $\Delta \subseteq\Gamma$ şi
-$\varphi$, $\psi \in E_\sigma$. Avem următoarele:
-
--   Dacă $\Delta \models \varphi$, atunci $\Gamma \models \varphi$.
-
--   Mulţimea $\Gamma$ este nesatisfiabilă dacă şi numai dacă
-    $\Gamma \models \bot$.
-
--   Avem $\Gamma\models\varphi$ dacă şi numai dacă
-    $\Gamma \cup \{\neg\varphi\}$ este nesatisfiabilă.
-
-# Universul Herbrand
-
-## Structuri Herbrand
-
-De acum încolo, vom face presupunerea că există măcar o constantă în
-signatură, aşadar $\widetilde{T}_\sigma \neq \emptyset$. Notăm cu
-$B_\sigma$ (numită **baza Herbrand**) mulţimea tuturor
-$\sigma$-formulelor atomice relaţionale fără variabile.
-
-Spunem că o $\sigma$-structură este **Herbrand** atunci când universul
-ei este $\widetilde{T}_\sigma$, iar simbolurile de funcţie sunt
-interpretate "de ele însele". Observăm că o $\sigma$-structură Herbrand
-este complet determinată de mulţimea $J$ a acelor formule din $B_\sigma$
-adevărate în ea. Pentru orice submulţime $J$ a lui $B_\sigma$ şi orice
-enunţ $\varphi$, spunem că $J \models_H \varphi$ atunci când structura
-Herbrand asociată lui $J$ satisface $\varphi$.
-
-Dacă $\mathcal{A}$ este o $\sigma$-structură, vom nota
-$J_\mathcal{A}:= \{\varphi\in B_\sigma \mid \mathcal{A} \models \varphi\}$.
-
-## Proprietăţi
-
-### Teoremă
-Fie $\mathcal{A}$ o $\sigma$-structură şi $\varphi$ o clauză
-definită (sau un scop definit) cu $\mathcal{A} \models \varphi$. Atunci
-$J_\mathcal{A} \models_H \varphi$.
-
-### Demonstraţie
-Presupunem $\varphi$ clauză definită. Avem că există $m$,
-$n \in \mathbb{N}$, formule atomice relaţionale $A_0$, $A_1,\ldots,A_m$
-şi variabile $x_1,\ldots,x_n$ cu
-$$\varphi= \forall x_1\ldots\forall x_n(A_0 \lor \neg A_1 \lor\ldots\lor \neg A_m).$$
-Fie $t_1,\ldots,t_n \in \widetilde{T}_\sigma$. Notăm, pentru orice $i$,
-$A'_i:=A_i[x_1:=t_1]\ldots[x_n:=t_n]$ şi
-$\varphi':=A'_0 \lor \neg A'_1 \lor\ldots\lor \neg A'_m$. Vrem
-$J_\mathcal{A}\models_H\varphi'$. Presupunem că, pentru orice
-$i \geq 1$, $J_\mathcal{A}\models_H A'_i$. Arătăm că
-$J_\mathcal{A} \models_H A'_0$. Deci, pentru orice $i \geq 1$, cum
-$A'_i \in B_\sigma$, $A'_i \in J_\mathcal{A}$, deci
-$\mathcal{A}\models A'_i$. Cum $\mathcal{A} \models \varphi$, avem
-$\mathcal{A} \models \varphi'$, iar, cum, pentru orice $i \geq 1$,
-$\mathcal{A}\models A'_i$, avem $\mathcal{A}\models A'_0$. Cum
-$A'_0 \in B_\sigma$, $A'_0 \in J_\mathcal{A}$, deci
-$J_\mathcal{A} \models_H A'_0$.
-
-## Proprietăţi
-
-### Teoremă
-Fie $P$ un program. Atunci
-$K_P:=\{J \subseteq B_\sigma \mid J \models_H P\}$ este o mulţime Moore
-pe $B_\sigma$.
-
-::: block
-### Demonstraţie
-Faptul că $B_\sigma \models_H P$ rămâne ca exerciţiu. Fie
-acum $K \subseteq K_P$ cu $K \neq\emptyset$. Vrem
-$\bigcap K \models_H P$. Fie $\varphi\in P$. Fie
-$t_1,\ldots,t_n \in \widetilde{T}_\sigma$. Folosim aceleaşi notaţii ca
-în demonstraţia precedentă. Presupunem că, pentru orice $i \geq 1$,
-$\bigcap K \models_H A'_i$. Arătăm că $\bigcap K \models_H A'_0$. Deci,
-pentru orice $i \geq 1$, cum $A'_i \in B_\sigma$, $A'_i \in \bigcap K$,
-deci, pentru orice $J \in K$, $A'_i \in J$, adică $J \models_H A'_i$.
-Fie $J \in K$. Avem $J \models_H \varphi$, deci $J \models_H \varphi'$,
-iar, cum, pentru orice $i \geq 1$, $J\models_H A'_i$, avem
-$J\models_H A'_0$, deci, cum $A'_0 \in B_\sigma$, $A'_0 \in J$. Aşadar,
-$A'_0 \in \bigcap K$, deci $\bigcap K\models_H A'_0$.
-:::
-
-Pentru orice program $P$, notăm $M_P := \bigcap K_P \in K_P$.
-
-## Proprietăţi
-
-### Teoremă
-Pentru orice program $P$,
-$M_P = \{\varphi\in B_\sigma \mid P \models \varphi\}$.
-
-::: block
-### Demonstraţie
-Pentru $\supseteq$", fie $\varphi\in B_\sigma$ cu
-$P \models \varphi$. Fie $J \in K_P$. Vrem $\varphi\in J$. Cum
-$J \models_H P$, avem $J \models_H \varphi$, iar, cum
-$\varphi\in B_\sigma$, $\varphi\in J$.
-
-Pentru $\subseteq$", fie $\varphi\in M_P$. Fie $\mathcal{A}$ cu
-$\mathcal{A} \models P$. Vrem $\mathcal{A} \models \varphi$. Cum $P$
-este o mulţime de clauze definite, dintr-o teoremă anterioară avem
-$J_\mathcal{A} \models_H P$, deci $J_\mathcal{A} \in K_P$. Rezultă
-$M_P \subseteq J_\mathcal{A}$, deci $\varphi\in J_\mathcal{A}$, adică
-$J_\mathcal{A} \models_H \varphi$. Rezultă
-$\mathcal{A} \models \varphi$.
-:::
-
-Numim $M_P$ __modelul Herbrand__ asociat programului $P$
+- Produce rezultatul corect: din teorema de corectitudine parțială.
