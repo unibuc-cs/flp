@@ -40,8 +40,11 @@
 
 \title[FLP]{Fundamentele limbajelor de programare}
 \subtitle{C10}
-\date{}
+\date{Anul II, Semestrul II, 2024/2025}
+\institute{Facultatea de Matematică și Informatică, DL Info}
+\subtitle{Programare Logică. Rezoluție.}
 
+\setbeamertemplate{enumerate item}{\insertenumlabel.}
 
 \begin{document}
 \begin{frame}
@@ -192,8 +195,8 @@ griffin(X) :- father(Y,X),  griffin(Y).
 \frametitle{Exercițiu}
 
 
-Fie alfabetul definit prin ${\mathbf R}=\{<\}$, ${\mathbf F}=\{s, +\}$, ${\mathbf C}=\{0\}$ și\\
-$ari(s)=1$, $ari(+)=ari(<)=2$.
+Fie alfabetul definit prin ${\mathbf R}=\{<\}$, ${\mathbf F}=\{s, +, 0\}$ și\\
+$r(0)=0$, $r(s)=1$, $r(+)=r(<)=2$.
 
 Dați exemple de $3$ termeni, $3$ formule atomice și $3$ enunțuri.
 
@@ -244,7 +247,7 @@ Exemple de \intens{enunțuri}:
 
 \medskip 
 
-\item Dacă $L_1,\ldots, L_n$ sunt literali atunci vom reprezenta clauza
+\item Dacă $L_1,\ldots, L_n$ sunt literali atunci putem reprezenta clauza
 $L_1\vee\ldots\vee L_n$ ca mulțimea
 $\{L_1,\ldots, L_n\}$
 
@@ -372,23 +375,19 @@ $\{L_1,\ldots, L_n\}$
 \end{center}
 
 
-\begin{itemize}
 
 % \item Clauză  \intens{$Q_1\wedge \ldots \wedge Q_n \to P_1\vee \ldots\vee  P_k$}\\
 % unde $n,k\geq 0$ și  $Q_1,\ldots, Q_n,P_1,\ldots, P_k$ sunt formule atomice.
 
 
 \bigskip
-\item Fie $x_1, \ldots, x_m$ toate variabilele care apar într-o clauza scop 
-$Q_1,\ldots, Q_n$. Atunci avem echivalența
+Avem echivalența
 
-\vspace{-.6cm}
 $$
-\forall x_1\ldots \forall x_m (\neg Q_1\vee\ldots \vee \neg Q_n) 
-\equiv \neg \exists x_1\ldots \exists x_m (Q_1\wedge \ldots \wedge  Q_n)
+\forall (\neg Q_1\vee\ldots \vee \neg Q_n) 
+\equiv \neg \exists (Q_1\wedge \ldots \wedge  Q_n)
 $$
 
-\end{itemize}
 
 \begin{center}
 \intens{Negația unei "întrebări" în PROLOG este clauză scop.} 
@@ -462,12 +461,14 @@ Putem pune întrebările:
 
 Pentru un program logic definit $KB$  avem \intens{Regula de deducție \textit{backchain}:}
 
-  \hfill \(\displaystyle
+\vfill  
+\hfill \(\displaystyle
   \infer[\mbox{ unde }Q_1 \wedge Q_2 \wedge \ldots \wedge Q_n \to P \in KB]{\theta(Q)}{\theta(Q_1)\quad \theta(Q_2) \quad \ldots \quad \theta(Q_n)}
-  \)\vspace{-2ex}
+  \)\vspace{-1.5ex}
 
   \hfill iar $\theta$ cmgu pentru $Q$ și $P$.
 
+  \vfill
 \vspace{.4cm}
 Regula \textit{backchain} conduce la un \intens{sistem de deducție complet}:
 \begin{center}
@@ -539,7 +540,7 @@ pentru a obține o nouă țintă
 
 
 %---------------------------------------------------------------------
-\begin{frame}{Puncte de decizie în programarea logica}
+\begin{frame}{Puncte de decizie în programarea logică}
 Având doar această regulă, care sunt punctele de decizie în căutare?
 \begin{itemize}
    
@@ -667,7 +668,7 @@ stark(X) :- father(Y,X),
 \texttt{?- stark(jonSnow)}
 \end{minipage}
 
-\vspace{.2cm}
+\vfill
 \begin{center}
 \intens{SLD}
 \fbox{
@@ -709,7 +710,7 @@ $$\displaystyle\frac{\onslide<1->{\intens{\neg stark(jonSnow)}}}
 \end{minipage}
 
 
-\vspace{.2cm}
+\vfill
 \begin{center}
 \intens{SLD}
 \fbox{
@@ -753,7 +754,7 @@ $$\displaystyle\frac {\intens{ \neg stark(eddard)}}{\Box}$$
 \end{minipage}
 
 
-\vspace{.2cm}
+\vfill
 \begin{center}
 \intens{SLD}
 \fbox{
@@ -1082,6 +1083,148 @@ Desenați arborele SLD pentru programul Prolog de mai jos și ținta \\\texttt{?
 
 \end{frame}
 
+\begin{frame}[fragile]{Un exemplu inspirat din Minecraft}
+
+  \begin{lstlisting}[language=Prolog]
+  activate_structure(power_module(X), Y) :-
+    verify_component(X),
+    match_resource(Y, X).
+  
+  verify_component(X) :-
+    combine_elements(craft_token(Y), X),
+    match_resource(Y, Y).
+  
+  match_resource(oak_log, oak_log).
+  match_resource(redstone_block, redstone_block).
+  
+  combine_elements(craft_token(oak_log), redstone_block).
+  
+  ?- activate_structure(X, Y)
+  \end{lstlisting}
+\end{frame}
+  
+\begin{frame}[fragile]{Un exemplu inspirat din Minecraft}
+
+\begin{lstlisting}[language=Prolog, basicstyle=\tiny]
+activate_structure(power_module(X), Y) :-
+  verify_component(X),
+  match_resource(Y, X).
+
+verify_component(X) :-
+  combine_elements(craft_token(Y), X),
+  match_resource(Y, Y).
+
+match_resource(oak_log, oak_log).
+match_resource(redstone_block, redstone_block).
+
+combine_elements(craft_token(oak_log), redstone_block).
+
+?- activate_structure(X, Y)
+\end{lstlisting}
+
+\begin{block}{Clauze asociate}
+\begin{enumerate}
+  \item $\forall as(pm(X), Y) \vee \neg vc(X) \vee \neg mr(Y, X)$
+  \item $\forall vc(X) \vee \neg ce(ct(Y), X) \vee \neg mr(Y, Y)$
+  \item $\forall mr(ol, ol)$
+  \item $\forall mr(rb, rb)$
+  \item $\forall ce(ct(ol), rb)$
+\end{enumerate}
+Scop: $\forall \neg as(X, Y)$
+\end{block}
+
+\end{frame}
+
+\begin{frame}{Rezolvare prin rezoluție}
+  \begin{block}{Clauze asociate}
+    \begin{enumerate}
+      \item $\forall as(pm(X), Y) \vee \neg vc(X) \vee \neg mr(Y, X)$
+      \item $\forall vc(X) \vee \neg ce(ct(Y), X) \vee \neg mr(Y, Y)$
+      \item $\forall mr(ol, ol)$
+      \item $\forall mr(rb, rb)$
+      \item $\forall ce(ct(ol), rb)$
+    \end{enumerate}
+    Scop: $\forall \neg as(X, Y)$
+    \end{block}
+\begin{overprint}    
+\only<2-6>{
+Scop: %
+\only<2>{$\forall \alert{\neg as(X, Y)}$}%
+\only<3>{$\forall \alert{\neg vc(X_1)} \vee \neg mr(Y, X_1)$}%
+\only<4>{$\forall \alert{\neg ce(ct(Y_2), X_1)} \vee \neg mr(Y_2, Y_2) \vee \neg mr(Y, X_1)$}%
+\only<5>{$\forall \alert{\neg mr(ol, ol)} \vee \neg mr(Y, rb)$}%
+\only<6>{$\forall \alert{\neg mr(Y, rb)}$}
+
+Alegem clauza %
+\only<2>{1}%
+\only<3>{2}%
+\only<4>{5}%
+\only<5>{3}%
+\only<6>{4}
+ și redenumim variabilele
+
+\only<2>{$\forall \alert{as(pm(X_1), Y_1)} \vee \structure{\neg vc(X_1) \vee \neg mr(Y_1, X_1)}$}%
+\only<3>{$\forall \alert{vc(X_2)} \vee \structure{\neg ce(ct(Y_2), X_2) \vee \neg mr(Y_2, Y_2)}$}%
+\only<4>{$\forall \alert{ce(ct(ol), rb)}$}%
+\only<5>{$\forall \alert{mr(ol, ol)}$}%
+\only<6>{$\forall \alert{mr(rb, rb)}$}
+
+unificăm 
+\only<2>{$\alert{as(X, Y)}$}%
+\only<3>{$\alert{vc(X_1)}$}%
+\only<4>{$\alert{ce(ct(Y_2), X_1)}$}%
+\only<5>{$\alert{mr(ol, ol)}$}%
+\only<6>{$\alert{mr(Y, rb)}$}
+ cu %
+\only<2>{$\alert{as(pm(X_1), Y_1)}$}%
+\only<3>{$\alert{vc(X_2)}$}%
+\only<4>{$\alert{ce(ct(ol), rb)}$}%
+\only<5>{$\alert{mr(ol, ol)}$}%
+\only<6>{$\alert{mr(rb, rb)}$}
+ și obținem substituția
+
+\only<2>{$X \mapsto pm(X_1), Y_1 \mapsto Y$}%
+\only<3>{$X_2 \mapsto X_1$}%
+\only<4>{$X_1 \mapsto rb, Y_2\mapsto ol$}%
+\only<5>{identitate}%
+\only<6>{$Y \mapsto rb$}
+
+Inlocuim în scop %
+\only<2>{$\alert{\neg as(X, Y)}$}%
+\only<3>{$\alert{\neg vc(X_1)}$}%
+\only<4>{$\alert{\neg ce(ct(Y_2), X_1)}$}%
+\only<5>{$\alert{\neg mr(ol, ol)}$}%
+\only<6>{$\alert{\neg mr(Y, rb)}$}
+ cu 
+\only<2>{$\structure{\neg vc(X_1) \vee \neg mr(Y_1, X_1)}$}%
+\only<3>{$\structure{\neg ce(ct(Y_2), X_2) \vee \neg mr(Y_2, Y_2)}$}%
+\only<4->{nimic} \\
+și aplicăm substituția.
+
+Noul scop: %
+\only<2>{$\forall \neg vc(X_1) \vee \neg mr(Y, X_1)$}
+\only<3>{$\forall \neg ce(ct(Y_2), X_1) \vee \neg mr(Y_2, Y_2) \vee \neg mr(Y, X_1)$}
+\only<4>{$\forall \neg mr(ol, ol) \vee \neg mr(Y, rb)$}%
+\only<5>{$\forall \neg mr(Y, rb)$}%
+\only<6>{clauza vidă}
+}
+
+\only<7>{
+Deci negația interogării nu este validă pentru substituția calculată:
+
+$[Y \mapsto rb] \circ 1 \circ [X_1 \mapsto rb, Y_2\mapsto ol] \circ [X_2 \mapsto X_1] \circ [X \mapsto pm(X_1), Y_1 \mapsto Y]$
+
+\bigskip
+Care prin simplificare devine:
+$[X \mapsto pm(rb), Y_1\mapsto rb, X_2\mapsto rb, Y_2\mapsto ol]$
+
+\bigskip
+Așadar interogarea are soluție, dată de substituția calculată:
+$$X \mapsto pm(rb), Y\mapsto rb$$
+}
+\end{overprint}    
+  
+\end{frame}
 
 %---------------------------------------------
 % \begin{frame}

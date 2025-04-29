@@ -28,45 +28,6 @@ $A_s \subseteq A^{r(s)}$.
 Structurile vor reprezenta domeniile despre
 care vor vorbi formulele corespunzătoare signaturilor.
 
-## Exemple
-
-Putem obţine diverse signaturi dacă punem $\sigma:=(F,R,r)$, iar $F$,
-$R$, $r$ sunt, pe rând:
-
--   $F=\{\cdot,0,1\}$, $R=\emptyset$, $r(\cdot)=2$, $r(0)=r(1)=0$ --
-    atunci $\sigma$-structurile vor fi tuplurile $(A,\cdot,0,1)$ unde
-    $\cdot : A^2 \to A$, iar $0$, $1 \in A$, de exemplu
-    $(\mathbb{Z},+,2,7)$. Observăm că nu impunem în definiţia structurii
-    ca ea să respecte anumite legi -- acest lucru se va face eventual
-    ulterior, după ce vom defini riguros formulele şi satisfacerea lor.
-
--   $F=\emptyset$, $R=\{\leq\}$, $r(\leq)=2$ -- atunci
-    $\sigma$-structurile vor fi perechi $(A,\leq)$ unde $\leq$ este o
-    relaţie binară pe $A$, de exemplu $(\mathbb{N},>)$.
-
--   $F=\emptyset$, $R=\{I,A,B\}$, $r(I)=r(A)=r(B)=1$.
-
-Dacă punem $F=R=\emptyset$, atunci obţinem o signatură care, dat fiind
-că singurele fapte pe care le vom putea exprima peste ea vor folosi
-semnul $=$, se va numi **signatura egalităţii**.
-
-## Signatura aritmeticii
-
-De asemenea, vom defini **signatura aritmeticii** ca fiind
-$$\sigma_{\mathrm{ar}} := (\{\dot{+},\dot{\times},\dot{S},\dot{0}\},\{\dot{<}\},r),$$
-unde $r(\dot{+})=r(\dot{\times})=r(\dot{<})=2$, $r(\dot{S})=1$, iar
-$r(\dot{0})=0$. Dacă definim funcţia $S:\mathbb{N}\to\mathbb{N}$, pentru
-orice $n \in \mathbb{N}$, prin $S(n):=n+1$, iar
-$$\mathcal{N}:=(\mathbb{N},(N_s)_{s \in F \cup R}),$$ unde
-$N_{\dot{+}}=+$, $N_{\dot{\times}} = \cdot$, $N_{\dot{S}} = S$,
-$N_{\dot{0}}=0$, iar $N_{\dot{<}}=<$, avem că $\mathcal{N}$ este o
-$\sigma_{\mathrm{ar}}$-structură.
-
-De remarcat că există şi alte $\sigma_{\mathrm{ar}}$-structuri, de
-exemplu putem înzestra mulţimea $\{0,1\}$ cu $\pmb{\wedge}$,
-$\pmb{\vee}$, $\pmb{\neg}$, $0$ şi $<$ pentru a obţine o altă
-$\sigma_{\mathrm{ar}}$-structură.
-
 ## Evaluarea termenilor
 
 Fie $\mathcal{A}=(A,(A_s)_{s \in F \cup R})$ o $\sigma$-structură.
@@ -225,6 +186,97 @@ $\varphi$, $\psi \in E_\sigma$. Avem următoarele:
 -   Avem $\Gamma\models\varphi$ dacă şi numai dacă
     $\Gamma \cup \{\neg\varphi\}$ este nesatisfiabilă.
 
+# Corectitudinea rezoluției
+
+## Regula rezoluţiei
+
+Fie $G$, $G'$ scopuri şi $C$ clauză cu $Var(G) \cap Var(C) = \emptyset$.
+Fie $m$, $k \in \mathbb{N}$ astfel încât
+$G = \forall (\neg A_1 \lor \ldots \lor \neg A_m)$ şi
+$C = \forall (B_0 \lor \neg B_1 \lor \ldots \lor \neg B_k)$. Considerăm
+$B_0$ ca fiind de forma $p(t_1,\ldots,t_n)$. Fie $i \leq m$ astfel încât
+$A_i$ este de forma $p(s_1,\ldots,s_n)$. Fie $\theta$ un cgu al lui
+$A_i$ şi $B_0$, adică al mulţimii $\{s_1=t_1,\ldots,s_n=t_n\}$. Spunem
+că $G'$ este **derivat prin rezoluţie** din $G$, $C$ şi $\theta$, şi
+notăm $G \xRightarrow{C,\theta} G'$, dacă
+$$G' = \forall (\neg A_1 \lor \ldots \lor \neg A_{i-1} \lor \neg B_1 \lor \ldots \lor \neg B_k \lor \neg A_{i+1} \lor \ldots \lor \neg A_m)\theta.$$
+
+__Notație__: Pentru orice formulă fără cuantificatori $\varphi$ şi orice substituţie
+$\theta$, notăm cu $\varphi\theta$ formula care se obţine din $\varphi$
+aplicând pe $\theta$ pe toate variabilele sale libere.
+
+## Derivări
+
+Fie $a \in \mathbb{N}^* \cup \{\mathbb{N}\}$. Numim o **$P$-derivare
+(prin rezoluţie)** o secvență
+$$G_0 \xRightarrow{C_0,\theta_0} G_1 \xRightarrow{C_1,\theta_1} \cdots  \xRightarrow{C_{n-1},\theta_{n-1}}  G_n$$
+astfel încât, pentru orice $i < n$,  $C_i$ este o clauză obţinută dintr-o clauză din $P$ prin redenumirea variabilelor sale.
+
+Spunem că **substituţia calculată** a derivării este 
+$\widetilde{\theta}_{n-1} \circ \ldots \circ \widetilde{\theta}_1 \circ \theta_0$.
+
+Fie $G$ un scop, $n \in \mathbb{N}^*$ şi
+$G_0 \xRightarrow{C_0,\theta_0} G_1 \xRightarrow{C_1,\theta_1} \cdots  \xRightarrow{C_{n-1},\theta_{n-1}}  G_n$
+o $P$-derivare cu
+$G_0=G$ şi $G_{n}=\bot$. Atunci spunem că derivarea este o
+**$P$-respingere** a lui $G$, iar substituţia sa calculată spunem că
+este o **$P$-soluţie** a lui $G$.
+
+Fie $G$ un scop, $n \in \mathbb{N}^*$ şi
+$G_0 \xRightarrow{C_0,\theta_0} G_1 \xRightarrow{C_1,\theta_1} \cdots  \xRightarrow{C_{n-1},\theta_{n-1}}  G_n$ o $P$-derivare cu
+$G_0=G$ şi $G_n \neq \bot$ care nu admite o prelungire. Atunci spunem că derivarea este o **$P$-derivare eşuată**
+a lui $G$.
+
+## Teorema de corectitudine
+
+### Teorema de corectitudine
+Fie $m \in \mathbb{N}^*$, $A_1,\ldots,A_m$
+formule atomice relaţionale şi $\theta$ o $P$-soluţie a lui
+$\forall (\neg A_1  \lor \ldots \lor \neg A_m)$. Atunci
+$P \models \forall(A_1 \land \ldots \land A_m)\theta$.
+
+### Demonstraţie
+Demonstrăm după lungimea $P$-respingerii. Pasul de bază are
+loc atunci când avem o singură aplicare a rezoluţiei, aşadar trebuie să
+avem $m=1$, iar clauza folosită are tot lungime $1$, fie ea
+$\forall B_0$. Atunci $\theta$ este cgu pentru $A_1$ şi $B_0$, deci
+$A_1\theta=B_0\theta$. Cum $\forall B_0$ este o redenumire a unei clauze
+din $P$, avem $P \models\forall B_0$, deci
+$P \models \forall B_0\theta$, aşadar $P \models \forall A_1 \theta$,
+ceea ce trebuia demonstrat.
+
+## Teorema de corectitudine
+
+### Demonstraţie (cont.)
+Pentru pasul de inducţie, notăm  $P$-respingerea cu
+$G_0 \xRightarrow{C_0,\theta_0} G_1 \xRightarrow{C_1,\theta_1} \cdots  \xRightarrow{C_{n-1},\theta_{n-1}}  G_n$.
+Luăm $C_0$ de forma
+$\forall(B_0 \lor \neg B_1 \lor \ldots \lor \neg B_k)$ şi fie $i$ astfel
+încât $\theta_0$ este cgu al lui $A_i$ şi $B_0$. Aşadar, $G_1$ este
+$$\forall (\neg A_1 \lor \ldots \lor \neg A_{i-1} \lor \neg B_1 \lor \ldots \lor \neg B_k \lor \neg A_{i+1} \lor \ldots \lor \neg A_m)\theta_0.$$
+Din ipoteza de inducţie, avem
+$$P \models \forall (A_1 \land \ldots \land A_{i-1} \land B_1 \land \ldots \land B_k \land A_{i+1} \land \ldots \land A_m) \theta.$$
+Cum $C_0$ este o redenumire a unei clauze din $P$, avem
+$$P \models \forall(B_0 \lor \neg B_1 \lor \ldots \lor \neg B_k)\theta,$$
+deci
+$P \models \forall (A_1 \land \ldots \land A_{i-1} \land B_0 \land A_{i+1} \land \ldots \land A_m) \theta$.
+Cum $B_0\theta_0=A_i\theta_0$, $B_0\theta=A_i\theta$, deci
+$P \models \forall(A_1 \land \ldots \land A_m)\theta$.
+
+## O propoziţie
+
+### Propoziţie
+Fie $G$ un scop astfel încât există o $P$-respingere a lui
+$G$. Atunci $P \cup \{G\}$ este nesatisfiabilă.
+
+### Demonstraţie
+Scriem $G=\forall (\neg A_1  \lor \ldots \lor \neg A_m)$.
+Din teorema de corectitudine, rezultă
+$P \models \exists (A_1 \land \ldots \land A_m)$, deci
+$$P \models \neg \forall (\neg A_1  \lor \ldots \lor \neg A_m) = \neg G,$$
+de unde obţinem concluzia.
+
+
 # Universul Herbrand
 
 ## Structuri Herbrand
@@ -319,118 +371,11 @@ $\mathcal{A} \models \varphi$.
 
 Numim $M_P$ __modelul Herbrand__ asociat programului $P$
 
-
-
-## Clauze şi scopuri
-
-Reamintim că o **clauză (definită)** era o formulă de forma
-$$\forall (A_0 \lor \neg A_1 \lor \ldots \lor \neg A_m),$$ unde
-$A_0,\ldots,A_m$ erau formule atomice relaţionale, un **program** era o
-mulţime finită de clauze, iar un **scop** era o formulă de forma
-$$\forall (\neg A_1  \lor \ldots \lor \neg A_m).$$ Formula de mai sus
-este echivalentă semantic cu
-$$\neg \exists (A_1 \land \ldots \land A_m),$$ care corespunde intuitiv
-ideii de a căuta o soluţie.
-
-Pentru orice formulă fără cuantificatori $\varphi$ şi orice substituţie
-$\theta$, notăm cu $\varphi\theta$ formula care se obţine din $\varphi$
-aplicând pe $\theta$ pe toate variabilele sale libere.
-
-## Regula rezoluţiei
-
-Fie $G$, $G'$ scopuri şi $C$ clauză cu $Var(G) \cap Var(C) = \emptyset$.
-Fie $m$, $k \in \mathbb{N}$ astfel încât
-$G = \forall (\neg A_1 \lor \ldots \lor \neg A_m)$ şi
-$C = \forall (B_0 \lor \neg B_1 \lor \ldots \lor \neg B_k)$. Considerăm
-$B_0$ ca fiind de forma $p(t_1,\ldots,t_n)$. Fie $i \leq m$ astfel încât
-$A_i$ este de forma $p(s_1,\ldots,s_n)$. Fie $\theta$ un cgu al lui
-$A_i$ şi $B_0$, adică al mulţimii $\{s_1=t_1,\ldots,s_n=t_n\}$. Spunem
-că $G'$ este **derivat prin rezoluţie** din $G$, $C$ şi $\theta$, şi
-notăm $(G,C,\theta) \triangleright G'$, dacă
-$$G' = \forall (\neg A_1 \lor \ldots \lor \neg A_{i-1} \lor \neg B_1 \lor \ldots \lor \neg B_k \lor \neg A_{i+1} \lor \ldots \lor \neg A_m)\theta.$$
-
-
-De acum încolo, vom fixa $P$ un program.
-
-
-## Derivări
-
-Fie $a \in \mathbb{N}^* \cup \{\mathbb{N}\}$. Numim o **$P$-derivare
-(prin rezoluţie)** un triplet
-$((G_i)_{i <a}, (C_i)_{i+1<a}, (\theta_i)_{i+1<a})$, astfel încât,
-pentru orice $i$ cu $i+1<a$, $C_i$ este o clauză obţinută dintr-o clauză
-din $P$ prin redenumirea variabilelor sale şi
-$(G_i,C_i,\theta_i) \triangleright G_{i+1}$.
-
-Fie $n \in \mathbb{N}^*$ şi
-$((G_i)_{i <n}, (C_i)_{i+1<n}, (\theta_i)_{i+1<n})$ o $P$-derivare.
-Spunem că **substituţia calculată** a sa este
-$\widetilde{\theta}_{n-2} \circ \ldots \circ \widetilde{\theta}_1 \circ \theta_0$.
-
-Fie $G$ un scop, $n \in \mathbb{N}^*$ şi
-$((G_i)_{i <n}, (C_i)_{i+1<n}, (\theta_i)_{i+1<n})$ o $P$-derivare cu
-$G_0=G$ şi $G_{n-1}=\bot$. Atunci spunem că derivarea este o
-**$P$-respingere** a lui $G$, iar substituţia sa calculată spunem că
-este o **$P$-soluţie** a lui $G$.
-
-Fie $G$ un scop, $n \in \mathbb{N}^*$ şi
-$((G_i)_{i <n}, (C_i)_{i+1<n}, (\theta_i)_{i+1<n})$ o $P$-derivare cu
-$G_0=G$ şi $G_{n-1} \neq \bot$ care nu admite o prelungire la una de
-lungime $n+1$. Atunci spunem că derivarea este o **$P$-derivare eşuată**
-a lui $G$.
-
-## Teorema de corectitudine
-
-### Teorema de corectitudine
-Fie $m \in \mathbb{N}^*$, $A_1,\ldots,A_m$
-formule atomice relaţionale şi $\theta$ o $P$-soluţie a lui
-$\forall (\neg A_1  \lor \ldots \lor \neg A_m)$. Atunci
-$P \models \forall(A_1 \land \ldots \land A_m)\theta$.
-
-### Demonstraţie
-Demonstrăm după lungimea $P$-respingerii. Pasul de bază are
-loc atunci când avem o singură aplicare a rezoluţiei, aşadar trebuie să
-avem $m=1$, iar clauza folosită are tot lungime $1$, fie ea
-$\forall B_0$. Atunci $\theta$ este cgu pentru $A_1$ şi $B_0$, deci
-$A_1\theta=B_0\theta$. Cum $\forall B_0$ este o redenumire a unei clauze
-din $P$, avem $P \models\forall B_0$, deci
-$P \models \forall B_0\theta$, aşadar $P \models \forall A_1 \theta$,
-ceea ce trebuia demonstrat.
-
-## Teorema de corectitudine
-
-### Demonstraţie (cont.)
-Pentru pasul de inducţie, notăm cu
-$((G_i)_{i <n}, (C_i)_{i+1<n}, (\theta_i)_{i+1<n})$ $P$-respingerea.
-Luăm $C_0$ de forma
-$\forall(B_0 \lor \neg B_1 \lor \ldots \lor \neg B_k)$ şi fie $i$ astfel
-încât $\theta_0$ este cgu al lui $A_i$ şi $B_0$. Aşadar, $G_1$ este
-$$\forall (\neg A_1 \lor \ldots \lor \neg A_{i-1} \lor \neg B_1 \lor \ldots \lor \neg B_k \lor \neg A_{i+1} \lor \ldots \lor \neg A_m)\theta_0.$$
-Din ipoteza de inducţie, avem
-$$P \models \forall (A_1 \land \ldots \land A_{i-1} \land B_1 \land \ldots \land B_k \land A_{i+1} \land \ldots \land A_m) \theta.$$
-Cum $C_0$ este o redenumire a unei clauze din $P$, avem
-$$P \models \forall(B_0 \lor \neg B_1 \lor \ldots \lor \neg B_k)\theta,$$
-deci
-$P \models \forall (A_1 \land \ldots \land A_{i-1} \land B_0 \land A_{i+1} \land \ldots \land A_m) \theta$.
-Cum $B_0\theta_0=A_i\theta_0$, $B_0\theta=A_i\theta$, deci
-$P \models \forall(A_1 \land \ldots \land A_m)\theta$.
-
-## O propoziţie
-
-### Propoziţie
-Fie $G$ un scop astfel încât există o $P$-respingere a lui
-$G$. Atunci $P \cup \{G\}$ este nesatisfiabilă.
-
-### Demonstraţie
-Scriem $G=\forall (\neg A_1  \lor \ldots \lor \neg A_m)$.
-Din teorema de corectitudine, rezultă
-$P \models \exists (A_1 \land \ldots \land A_m)$, deci
-$$P \models \neg \forall (\neg A_1  \lor \ldots \lor \neg A_m) = \neg G,$$
-de unde obţinem concluzia.
+# Completitudinea rezoluției
 
 ## Operatorul $T_P$
 
-Putem defini operatorul
+Definim operatorul
 $T_P: \mathcal{P}(B_\sigma) \to \mathcal{P}(B_\sigma)$ în felul următor:
 pentru orice $J$, $T_P(J)$ este mulţimea acelor $\varphi\in B_\sigma$ cu
 proprietatea că există $A_1,\ldots,A_m \in J$ astfel încât
@@ -448,7 +393,8 @@ pentru orice $J$ cu $T_P(J) \subseteq J$, $\varphi\in J$.
 :::
 
 Se observă şi că $T_P$ este monoton şi, deci, din cele de mai sus,
-$M_P = \mu T_P$.
+
+$$M_P = \mu T_P = \bigcap \{J \mid T_P(J) \subseteq J \}.$$
 
 ## Mulţimea $S_P$
 
