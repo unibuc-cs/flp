@@ -3,11 +3,11 @@ TITLE ?= Program Verification
 
 %.pdf: %.tex $(BASE_DIR)header.sty
 	cat $(BASE_DIR)header.sty >main.tex
-	echo -e '\n\\subtitle{$(TITLE)}' >>main.tex
-	@echo -e '\\begin{document}' >> main.tex
-	@echo -e '\\maketitle' >> main.tex
+	printf '\n\\subtitle{$(TITLE)}' >>main.tex
+	@printf '\\begin{document}' >> main.tex
+	@printf '\\maketitle' >> main.tex
 	cat $< >> main.tex
-	@echo -e '\n\\end{document}' >> main.tex
+	@printf '\n\\end{document}' >> main.tex
 	latexmk -pdf main || latexmk -C
 	cp main.pdf $@
 

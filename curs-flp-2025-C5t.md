@@ -34,11 +34,11 @@ Fie $\mathcal{A}=(A,(A_s)_{s \in F \cup R})$ o $\sigma$-structură.
 Atunci pentru orice __valuație__ $v : V \to A$ există şi este unică o funcţie
 $(\cdot)^{\mathcal{A}}_v : T_\sigma \to A$ astfel încât
 
--   pentru orice $x \in V$, $x^{\mathcal{A}}_v=v(x)$;
+- pentru orice $x \in V$, $x^{\mathcal{A}}_v=v(x)$;
 
--   pentru orice $s \in F$ şi orice $t_1,\ldots,t_{r(s)} \in T_\sigma$,
-    $(st_1\ldots t_{r(s)})^{\mathcal{A}}_v=A_s((t_1)^{\mathcal{A}}_v,\ldots,(t_{r(s)})^{\mathcal{A}}_v)$ \
-    (în particular, dacă $r(s)=0$, $s^{\mathcal{A}}_v = A_s$).
+- pentru orice $s \in F$ şi orice $t_1,\ldots,t_{r(s)} \in T_\sigma$,
+  $(st_1\ldots t_{r(s)})^{\mathcal{A}}_v=A_s((t_1)^{\mathcal{A}}_v,\ldots,(t_{r(s)})^{\mathcal{A}}_v)$ \
+  (în particular, dacă $r(s)=0$, $s^{\mathcal{A}}_v = A_s$).
 
 ## Actualizarea valuațiilor
 
@@ -67,17 +67,17 @@ b & \text{dac\u a } z=y.
 
 Definim o relație $\models$ între structuri, valuații și formule folosind următoarele (scheme de) reguli:
 
--   $\mathcal{A}\models^v t = u$, dacă $t^\mathcal{A}_v=u^\mathcal{A}_v$;
+- $\mathcal{A}\models^v t = u$, dacă $t^\mathcal{A}_v=u^\mathcal{A}_v$;
 
--   $\mathcal{A}\models^v st_1\ldots t_{r(s)}$ (unde $s \in R$),
-    dacă $((t_1)^\mathcal{A}_v,\ldots,(t_{r(s)})^\mathcal{A}_v) \in A_s$;
+- $\mathcal{A}\models^v st_1\ldots t_{r(s)}$ (unde $s \in R$),
+  dacă $((t_1)^\mathcal{A}_v,\ldots,(t_{r(s)})^\mathcal{A}_v) \in A_s$;
 
--   $\mathcal{A}\not\models^v \bot$;
+- $\mathcal{A}\not\models^v \bot$;
 
--   $\mathcal{A}\models^v \varphi\to \psi$ dacă
-    $\mathcal{A}\models^v \varphi$ implică că $\mathcal{A}\models^v \psi$
+- $\mathcal{A}\models^v \varphi\to \psi$ dacă
+  $\mathcal{A}\models^v \varphi$ implică că $\mathcal{A}\models^v \psi$
 
--   $\mathcal{A}\models^v \forall x \varphi$, dacă pentru orice $a \in A$, $\mathcal{A}\models^{v_{x \leftarrow a}} \varphi$.
+- $\mathcal{A}\models^v \forall x \varphi$, dacă pentru orice $a \in A$, $\mathcal{A}\models^{v_{x \leftarrow a}} \varphi$.
 
 Dacă $\mathcal{A}\models^v \varphi$ pentru orice $v$, scriem $\mathcal{A}\models \varphi$ și spunem că $\mathcal{A}$ **satisface** $\varphi$, sau este **model** pentru $\varphi$. 
 
@@ -89,15 +89,15 @@ Dacă $\mathcal{A}\models \varphi$ pentru orice $\cal A$, scriem $\models \varph
 Fie $\mathcal{A}=(A,(A_s)_{s \in F \cup R})$ o $\sigma$-structură. Este
 acum imediat că pentru orice $v: V \to A$, avem:
 
--   $\mathcal{A}\models^v \top$;
+- $\mathcal{A}\models^v \top$;
 
--   $\mathcal{A}\models^v \varphi\wedge\psi$ ddacă $\mathcal{A}\models^v \varphi$ și $\mathcal{A}\models^v \psi$;
+- $\mathcal{A}\models^v \varphi\wedge\psi$ ddacă $\mathcal{A}\models^v \varphi$ și $\mathcal{A}\models^v \psi$;
 
--   $\mathcal{A}\models^v \varphi\vee\psi$ ddacă $\mathcal{A}\models^v \varphi$ sau $\mathcal{A}\models^v \psi$;
+- $\mathcal{A}\models^v \varphi\vee\psi$ ddacă $\mathcal{A}\models^v \varphi$ sau $\mathcal{A}\models^v \psi$;
 
--   $\mathcal{A}\models^v \varphi\leftrightarrow\psi$ ddacă ($\mathcal{A}\models^v \varphi$ ddacă $\mathcal{A}\models^v \psi$);
+- $\mathcal{A}\models^v \varphi\leftrightarrow\psi$ ddacă ($\mathcal{A}\models^v \varphi$ ddacă $\mathcal{A}\models^v \psi$);
 
--   $\mathcal{A}\models^v \exists x \varphi$ ddacă există $a\in A$ cu $\mathcal{A}\models^{v_{x \leftarrow a}} \varphi$.
+- $\mathcal{A}\models^v \exists x \varphi$ ddacă există $a\in A$ cu $\mathcal{A}\models^{v_{x \leftarrow a}} \varphi$.
 
 ## Satifacerea enunţurilor
 
@@ -116,16 +116,16 @@ deci sunt echivalente următoarele două afirmații:
 Vom defini următoarele concepte, precum şi noi semnificaţii ale semnului
 $\models$, prin analogie cu logica propoziţională:
 
--   Spunem că $\varphi\in E_\sigma$ este **satisfiabil** dacă există
-    $\mathcal{A}$ cu $\mathcal{A}\models \varphi$.
+- Spunem că $\varphi\in E_\sigma$ este **satisfiabil** dacă există
+  $\mathcal{A}$ cu $\mathcal{A}\models \varphi$.
 
--   Spunem că un enunţ $\varphi$ este **nesatisfiabil** dacă $\varphi$
-    nu este satisfiabil.
+- Spunem că un enunţ $\varphi$ este **nesatisfiabil** dacă $\varphi$
+  nu este satisfiabil.
 
--   Fie $\varphi$, $\psi \in E_\sigma$. Spunem că din $\varphi$ **se
-    deduce semantic** $\psi$ şi scriem $\varphi\models \psi$ dacă pentru
-    orice $\mathcal{A}$ cu $\mathcal{A}\models \varphi$ avem
-    $\mathcal{A} \models \psi$.
+- Fie $\varphi$, $\psi \in E_\sigma$. Spunem că din $\varphi$ **se
+  deduce semantic** $\psi$ şi scriem $\varphi\models \psi$ dacă pentru
+  orice $\mathcal{A}$ cu $\mathcal{A}\models \varphi$ avem
+  $\mathcal{A} \models \psi$.
 
 Clar, $\bot$ este enunţ, iar pentru orice $\sigma$-structură
 $\mathcal{A}$, avem $\mathcal{A} \not\models \bot$, i.e. $\bot$ este
@@ -155,13 +155,13 @@ propoziţională.
 Fie $\Gamma \subseteq E_\sigma$, $\Delta \subseteq\Gamma$ şi
 $\mathcal{A}$ o $\sigma$-structură. Avem următoarele:
 
--   Dacă $\mathcal{A}\models\Gamma$, atunci $\mathcal{A}\models\Delta$.
+- Dacă $\mathcal{A}\models\Gamma$, atunci $\mathcal{A}\models\Delta$.
 
--   Dacă $\Delta$ este nesatisfiabilă, atunci $\Gamma$ este
-    nesatisfiabilă.
+- Dacă $\Delta$ este nesatisfiabilă, atunci $\Gamma$ este
+  nesatisfiabilă.
 
--   Avem că $\mathcal{A} \models \Gamma$ dacă şi numai dacă pentru orice
-    $\Sigma \subseteq\Gamma$ finită, $\mathcal{A} \models \Sigma$.
+- Avem că $\mathcal{A} \models \Gamma$ dacă şi numai dacă pentru orice
+  $\Sigma \subseteq\Gamma$ finită, $\mathcal{A} \models \Sigma$.
 
 ## Deducţie semantică din mulţimi
 
@@ -178,13 +178,29 @@ __Proprietăți__
 Fie $\Gamma \subseteq E_\sigma$, $\Delta \subseteq\Gamma$ şi
 $\varphi$, $\psi \in E_\sigma$. Avem următoarele:
 
--   Dacă $\Delta \models \varphi$, atunci $\Gamma \models \varphi$.
+- Dacă $\Delta \models \varphi$, atunci $\Gamma \models \varphi$.
 
--   Mulţimea $\Gamma$ este nesatisfiabilă dacă şi numai dacă
-    $\Gamma \models \bot$.
+- Mulţimea $\Gamma$ este nesatisfiabilă dacă şi numai dacă
+  $\Gamma \models \bot$.
 
--   Avem $\Gamma\models\varphi$ dacă şi numai dacă
-    $\Gamma \cup \{\neg\varphi\}$ este nesatisfiabilă.
+- Avem $\Gamma\models\varphi$ dacă şi numai dacă
+  $\Gamma \cup \{\neg\varphi\}$ este nesatisfiabilă.
+
+## Proprietăți ale substituției
+
+Fie $\theta$ o substituție și $\cal A$ o $\sigma$-structură.
+
+Fie $v$ o valuație. Construim valuația $v'$ care evaluează fiecare variabilă
+$x$ în evaluarea termenului $\theta(x)$ folosind valuația $v$.
+
+Atunci:
+
+- Pentru orice $t$ termen, $(t\theta)^\mathcal{A}_v = t^\mathcal{A}_{v'}$
+
+- Pentru orice $\varphi$ formulă, $\mathcal{A} \models^{v'} \varphi$
+  ddacă $\mathcal{A} \models^v \varphi\theta$.
+
+- Corolar: dacă $\mathcal{A} \models\varphi$ atunci $\mathcal{A} \models \varphi\theta$.
 
 # Corectitudinea rezoluției
 
@@ -275,7 +291,6 @@ Din teorema de corectitudine, rezultă
 $P \models \exists (A_1 \land \ldots \land A_m)$, deci
 $$P \models \neg \forall (\neg A_1  \lor \ldots \lor \neg A_m) = \neg G,$$
 de unde obţinem concluzia.
-
 
 # Universul Herbrand
 
