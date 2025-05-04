@@ -23,7 +23,7 @@ theme: CambridgeUS
 
 ## Lambda-termeni: Interpretarea informală
 
-După cum am zis, $\lambda$-termenii au fost gândiţi ca reprezentând
+Lambda-termenii au fost gândiţi ca reprezentând
 funcţii. Mai exact (fixând $x$, $y$, $z \in V$ distincte două câte
 două):
 
@@ -32,16 +32,16 @@ două):
     poate sau nu să apară variabila $x$).\
     De exemplu: $\lambda x.x$ ar reprezenta funcţia identitate,
     $\lambda x.y$ ar reprezenta o funcţie constant egală cu $y$.
--   Un termen de forma $MN$ reprezintă rezultatul aplicării funcţiei"
-    $M$ pe argumentul" $N$.\
+-   Un termen de forma $MN$ reprezintă rezultatul aplicării „funcţiei”
+    $M$ pe „argumentul” $N$.\
     De exemplu: am vrea ca $(\lambda x.x)z$ să reprezinte $z$, iar
     $(\lambda x.y)z$ să reprezinte $y$.
 
 Remarcăm că aceste interpretări sunt aici pur informale: a le face
 riguroase a fost mult timp o problemă aproape insurmontabilă. Situaţia
 devine mai uşoară dacă nu ne propunem să formalizăm termenii ca funcţii
-(semantică denotaţională"), ci doar să stabilim regulile prin care ei
-sunt manipulaţi (semantică operaţională").
+(semantică denotaţională), ci doar să stabilim regulile prin care ei
+sunt manipulaţi (semantică operaţională).
 
 ## Lambda termeni: Descrierea formală
 
@@ -68,7 +68,7 @@ Mulțimea lambda termenilor este dată de următoarea formă BNF:
 
 -   $(x\, y), (y\, x)$, $(x\, (yx\, ))$
 
--   $(\lambda x.\,x), \lambda x.\,(x\, y), \lambda z.\,(x\, y)$
+-   $(\lambda x.\,x), (\lambda x.\,(x\, y)), (\lambda z.\,(x\, y))$
 :::
 
 ::: column
@@ -77,7 +77,7 @@ Mulțimea lambda termenilor este dată de următoarea formă BNF:
 
 -   $(\lambda f.\,(\lambda x.\,(f\, (f\, x))))$
 
--   $(\lambda x.\,x)\, (\lambda x.\,x)$
+-   $((\lambda x.\,x)\, (\lambda x.\,x))$
 :::
 :::::
 
@@ -210,14 +210,14 @@ lui $M$.
 ## Spre substituţie
 
 De exemplu, când spunem că $(\lambda x.x)z$ am vrea să reprezinte $z$,
-sugerăm că $x$-ul din corpul funcţiei" am vrea să fie substituit cu $z$.
+sugerăm că $x$-ul din corpul „funcţiei” am vrea să fie substituit cu $z$.
 Pentru aceasta, avem nevoie de o definiţie a substituţiei. Nu putem
 substitui **naiv** variabilele cu $\lambda$-termeni din aceleaşi
 considerente ca la logica de ordinul I: am putea să ne trezim cu urmări
 nedorite, de exemplu, dacă în $\lambda$-termenul $$\lambda x.y,$$
-reprezentând funcţia constant egală cu $y$", substituim fără atenţie $y$
+reprezentând funcţia „constant egală cu $y$”, substituim fără atenţie $y$
 cu $x$, ajungem la $\lambda$-termenul $$\lambda x.x,$$ care reprezintă o
-funcţie identitate (variabila $x$ fiind capturată accidental" de către
+funcţie identitate (variabila $x$ fiind capturată „accidental” de către
 $\lambda x$). Or, aceasta contravine intuiţiei care ne spune că o
 funcţie compusă cu una constantă nu poate fi neconstantă.
 
@@ -242,24 +242,24 @@ folosind recursivitatea.
 
 Pentru orice $\lambda$-termeni $M$, $N$ şi orice $x \in V$, vom defini
 termenul $M[x:=N]$, reprezentând $M$ în care $x$ a fost înlocuit cu $N$.
-O vom face recursiv, în felul următor (unde $x$, $y \in V$ cu
-$x \neq y$, iar $N$, $P$, $Q$ sunt $\lambda$-termeni):
+O vom face recursiv, în felul următor (unde $x$, $y \in V$, iar $N$, $P$, $Q$ sunt $\lambda$-termeni):
 
 -   $x[x:=N] := N$;
 
--   $x[y:=N] := x$;
+-   $x[y:=N] := x$, dacă $y\neq x$;
 
 -   $(PQ)[x:=N] := (P[x:=N])(Q[x:=N])$;
 
 -   $(\lambda x.P)[x:=N] := \lambda x.P$;
 
--   $(\lambda y.P)[x:=N] := \lambda y.(P[x:=N])$, dacă
+-   $(\lambda y.P)[x:=N] := \lambda y.(P[x:=N])$, dacă $y\neq x$ și
     $y \not\in FV(N)$;
 
 -   $(\lambda y.P)[x:=N] := \lambda z.(P[y:=z][x:=N])$, dacă
-    $y \in FV(N)$, unde $z$ este variabila de indice minim care nu
-    aparţine lui $Var(\lambda x .(NP))$, caz care corespunde fenomenului
-    prezentat mai devreme.
+    $y\neq x$ și $y \in FV(N)$, unde $z$ este o variabilă „nouă”[^1]
+
+[^1]: variabila de indice minim diferită de $x$ și care nu apare în $N$ sau $P$,
+      caz care corespunde fenomenului prezentat mai devreme.
 
 ## Exemple
 
@@ -478,8 +478,8 @@ La fiecare pas, subliniem redexul ales în procesul de $\beta$-reducție.
 
 ::: center
   ------------------------------------------------------------------------- --------------------- ---------------------------------------------------------------------
-    $(\lambda x.\,y)\, (\underline{(\lambda z.\,zz\, )\, (\lambda w.\,w)})$  $\rightarrow_\beta$  $(\lambda x.\,y)\, ( (z\, z)[\lambda w.\,w/z] )$
-                                                                                  $\equiv$        $(\lambda x.\,y)\, ( (z[\lambda w.\,w/z])\, (z[\lambda w.\,w/z] )$
+    $(\lambda x.\,y)\, (\underline{(\lambda z.\,zz\, )\, (\lambda w.\,w)})$  $\rightarrow_\beta$  $(\lambda x.\,y)\, ( (z\, z)[z := \lambda w.\,w] )$
+                                                                                  $\equiv$        $(\lambda x.\,y)\, ( (z[z := \lambda w.\,w])\, (z[z := \lambda w.\,w] )$
                                                                                   $\equiv$        $(\lambda x.\,y)\, (\underline{(\lambda w.\,w)\, (\lambda w.\,w)})$
                                                                              $\rightarrow_\beta$  $\underline{(\lambda x.\,y)\, (\lambda w.\,w)}$
                                                                              $\rightarrow_\beta$  $y$
@@ -500,7 +500,7 @@ Ultimul termen nu mai are redex-uri, deci este în formă normală.
 
 ::: center
   ------------------------------------------------------------------------- --------------------- ----------------------------------------------
-    $\underline{(\lambda x.\,y)\, ((\lambda z.\,zz\, )\, (\lambda w.\,w))}$  $\rightarrow_\beta$  $y[(\lambda z.\,zz\, )\, (\lambda w.\,w)/x]$
+    $\underline{(\lambda x.\,y)\, ((\lambda z.\,zz\, )\, (\lambda w.\,w))}$  $\rightarrow_\beta$  $y[x := (\lambda z.\,zz\, )\, (\lambda w.\,w)]$
                                                                                   $\equiv$        $y$
   ------------------------------------------------------------------------- --------------------- ----------------------------------------------
 :::
@@ -529,7 +529,7 @@ normală (evaluarea nu se termină).
 :::
 
 Observați că lungimea unui termen nu trebuie să scadă în procesul de
-$\beta$-reducție; poate crește sau rămâne neschimbat.
+$\beta$-reducție; poate crește sau rămâne neschimbată.
 
 ## $\beta$-formă normală
 
@@ -571,22 +571,20 @@ dar nu puternic normalizabil.
 
 ## Confluența $\beta$-reducției
 
-\alert{Teorema Church-Rosser.} Dacă $M \twoheadrightarrow_\beta M_1$
-și $M \twoheadrightarrow_\beta M_2$ atunci există $M'$ astfel încât
-$M_1 \twoheadrightarrow_\beta M'$ și $M_2\twoheadrightarrow_\beta M'$.
+\alert{Teorema Church-Rosser.} Dacă $a \twoheadrightarrow_\beta b$
+și $a \twoheadrightarrow_\beta c$ atunci există $d$ astfel încât
+$b \twoheadrightarrow_\beta d$ și $c\twoheadrightarrow_\beta d$.
+
+![Confluență](images/confluence.png){ width=20% }
 
 \alert{Consecință.} Un lambda termen are cel mult o $\beta$-formă
 normală (modulo $\alpha$-echivalență).
 
-### Exerciții
-
-**Exercițiu.** Verificați dacă termenii de mai jos pot fi aduși la o
-$\beta$-formă normală:
+**Exercițiu.** Pot fi termenii de mai jos aduși la o
+$\beta$-formă normală?
 
 1.  \alert{$(\lambda x.\,x)\, M$}
-
 2.  \alert{$(\lambda xy.\,x)\, M\, N$}
-
 3.  \alert{$(\lambda x.\,x\, x)\, (\lambda y.\,y\, y\, y)$}
 
 #  Strategii de evaluare
@@ -663,7 +661,7 @@ $(\lambda x.\,x)\, 1$ nu este.
 
 Sub CBV, funcțille pot fi apelate doar prin valori (argumentele trebuie
 să fie complet evaluate). Astfel, putem face $\beta$-reducția
-$(\lambda x.\,M)\, N \twoheadrightarrow_\beta M[N/x]$ doar dacă $N$ este
+$(\lambda x.\,M)\, N \twoheadrightarrow_\beta M[x := N]$ doar dacă $N$ este
 valoare.
 
 Sub CBN, amânăm evaluarea argumentelor cât mai mult posibil, făcând
