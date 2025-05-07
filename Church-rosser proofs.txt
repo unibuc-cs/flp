@@ -1,0 +1,18 @@
+Church-rosser proofs:
+
+Standard (parallel reductions proof):
+https://student.cs.uwaterloo.ca/~cs442/W25/extras/c-r-thm-proof.pdf
+
+Alternative proof:
+https://www.cs.cornell.edu/~kozen/Papers/ChurchRosser.pdf
+
+
+
+Theorem (Normal Order Reduction Theorem):
+If a lambda term has a normal form (i.e., it is weakly normalizing), then the normal order reduction strategy will eventually find it.
+
+Standardization Theorem:
+If 𝑀 →∗ 𝑁 (i.e., M reduces to N through some reduction sequence), then there exists a standard reduction sequence from M to N.
+A standard reduction sequence always reduces the leftmost, outermost redex first when possible.
+
+https://www.is.c.titech.ac.jp/~kashima/pub/C-145.pdf

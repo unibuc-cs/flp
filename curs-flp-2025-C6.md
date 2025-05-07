@@ -548,12 +548,12 @@ Contează \alert{strategia de evaluare.}
 
 ## $\beta$-formă normală
 
-Notăm cu $M \twoheadrightarrow_\beta M'$ faptul că $M$ poate fi
+Notăm cu $M \to^*_\beta M'$ faptul că $M$ poate fi
 $\beta$-redus până la $M'$ în $0$ sau mai mulți pași (închiderea
 reflexivă și tranzitivă a relației $\rightarrow_\beta$).
 
 $M$ este slab normalizabil *(weakly normalising)* dacă există $N$ în
-formă normală astfel încât $M \twoheadrightarrow_\beta N$.
+formă normală astfel încât $M \to^*_\beta N$.
 
 $M$ este puternic normalizabil *(strong normalising)* dacă nu există
 reduceri infinite care încep din $M$.
@@ -571,9 +571,9 @@ dar nu puternic normalizabil.
 
 ## Confluența $\beta$-reducției
 
-\alert{Teorema Church-Rosser.} Dacă $a \twoheadrightarrow_\beta b$
-și $a \twoheadrightarrow_\beta c$ atunci există $d$ astfel încât
-$b \twoheadrightarrow_\beta d$ și $c\twoheadrightarrow_\beta d$.
+\alert{Teorema Church-Rosser.} Dacă $a \to^*_\beta b$
+și $a \to^*_\beta c$ atunci există $d$ astfel încât
+$b \to^*_\beta d$ și $c\to^*_\beta d$.
 
 ![Confluență](images/confluence.png){ width=20% }
 
@@ -661,7 +661,7 @@ $(\lambda x.\,x)\, 1$ nu este.
 
 Sub CBV, funcțille pot fi apelate doar prin valori (argumentele trebuie
 să fie complet evaluate). Astfel, putem face $\beta$-reducția
-$(\lambda x.\,M)\, N \twoheadrightarrow_\beta M[x := N]$ doar dacă $N$ este
+$(\lambda x.\,M)\, N \to^*_\beta M[x := N]$ doar dacă $N$ este
 valoare.
 
 Sub CBN, amânăm evaluarea argumentelor cât mai mult posibil, făcând
@@ -681,10 +681,10 @@ Strategia CBV:
 
 ::: center
   --------------------------------------------------------- ---------------------------- ---------------------------------------
-    $(\lambda x.\,succ\, x)\, ((\lambda y.\,succ\, y)\, 3)$  $\twoheadrightarrow_\beta$  $(\lambda x.\,succ\, x)\, (succ\, 3)$
-                                                                   $\rightarrow$         $(\lambda x.\,succ\, x)\, 4$
-                                                             $\twoheadrightarrow_\beta$  $succ\, 4$
-                                                                   $\rightarrow$         $5$
+    $(\lambda x.\,succ\, x)\, ((\lambda y.\,succ\, y)\, 3)$  $\to^*_\beta$                $(\lambda x.\,succ\, x)\, (succ\, 3)$
+                                                                   $\rightarrow$          $(\lambda x.\,succ\, x)\, 4$
+                                                             $\to^*_\beta$                $succ\, 4$
+                                                                   $\rightarrow$          $5$
   --------------------------------------------------------- ---------------------------- ---------------------------------------
 :::
 
@@ -692,9 +692,9 @@ Strategia CBN:
 
 ::: center
   --------------------------------------------------------- ---------------------------- ---------------------------------------
-    $(\lambda x.\,succ\, x)\, ((\lambda y.\,succ\, y)\, 3)$  $\twoheadrightarrow_\beta$  $succ\, ((\lambda y.\,succ\, y)\, 3)$
-                                                             $\twoheadrightarrow_\beta$  $succ\, (succ\, 3)$
-                                                                   $\rightarrow$         $succ\, 4$
-                                                                   $\rightarrow$         $5$
+   $(\lambda x.\,succ\, x)\, ((\lambda y.\,succ\, y)\, 3)$   $\to^*_\beta$                $succ\, ((\lambda y.\,succ\, y)\, 3)$
+                                                             $\to^*_\beta$                $succ\, (succ\, 3)$
+                                                                   $\rightarrow$          $succ\, 4$
+                                                                   $\rightarrow$          $5$
   --------------------------------------------------------- ---------------------------- ---------------------------------------
 :::
