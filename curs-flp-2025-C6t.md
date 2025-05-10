@@ -118,17 +118,97 @@ $\reg{M \to^*_{\alpha,\beta} N}{}{M \to^*_\beta N' \mbox{ și } N \equiv_\alpha 
 
 Definim următoarea relație[^1]:
 
-- $\reg{(\lambda x. M)\, N \to_\beta^1 M[x := N]}{}{}$
+- $\reg{(\lambda x. M)\, N \xrightarrow{1}_\beta M[x := N]}{}{}$
 
-- $\reg{M\, P  \to_\beta^n N\, P}{M \to_\beta^n N}{M \mbox{ nu este o abstracție}}$
-  $\reg{M\, P  \to_\beta^{n+1} N\, P}{M \to_\beta^n N}{M \mbox{ este o abstracție}}$
+- $\reg{M\, P  \xrightarrow{n}_\beta N\, P}{M \xrightarrow{n}_\beta N}{M \mbox{ nu este o abstracție}}$
+  $\reg{M\, P  \xrightarrow{n+1}_\beta N\, P}{M \xrightarrow{n}_\beta N}{M \mbox{ este o abstracție}}$
 
-- $\reg{P\, M  \to_\beta^{n+\#r(P)} P\, N}{M \to_\beta^n N}{P \mbox{ nu este o abstracție}}$
-  $\reg{P\, M  \to_\beta^{n+\#r(P) + 1} P\, N}{M \to_\beta^n N}{P \mbox{ este o abstracție}}$
+- $\reg{P\, M  \xrightarrow{n + \#r(P)}_\beta P\, N}{M \xrightarrow{n}_\beta N}{P \mbox{ nu este o abstracție}}$
+  $\reg{P\, M  \xrightarrow{n+\#r(P) + 1}_\beta P\, N}{M \xrightarrow{n}_\beta N}{P \mbox{ este o abstracție}}$
 
-- $\reg{\lambda x. M  \to_\beta^{n} \lambda x. N}{M \to_\beta^n N}{}$
+- $\reg{\lambda x. M  \xrightarrow{n}_\beta \lambda x. N}{M \xrightarrow{n}_\beta N}{}$
 
 [^1]: Pentru un termen $M$, fie $\#r(M)$ numărul de $\beta$-redexuri din $M$.
 
 ## Intuiție si proprietăți pentru $\to_\beta^n$
 
+$M \xrightarrow{n}_\beta N$ reprezintă faptul că $N$ a fost obținut din $M$ aplicând o beta-reducție
+pe al $n$-ulea redex din $M$ în ordinea leftmost-outermost.
+
+### Proprietăți
+
+- $M \to_\beta N$ dacă și numai dacă există $n$ astfel încât $M \xrightarrow{n}_\beta N$
+
+- $M \xrightarrow{1}_\beta N$ reprezintă o reducție folosind strategia normală
+
+## Secvențe de reducție standard
+
+### Definiție
+
+O secvență $M_0 \xrightarrow{n_1} M_1 \xrightarrow{n_2} \cdots  \xrightarrow{n_k} M_k$
+se numește __standard__ dacă $n_1 \leq n_2 \leq \cdots \leq n_k$
+
+### Observații
+
+- Într-o secvență standard de reducție, toți redecșii cu index mai mic decât cel folosit la un pas nu vor fi modificați de nici unul din pașii următori.
+
+- O secvență folosind strategia normală este standard (fiecare $n_i$ este $1$)
+
+## Secvențe de reducție standard și forme normale
+
+Următorul rezultat ne arată că pentru a arăta că strategia normală ajunge mereu
+la o formă normală (dacă aceasta există) e suficient să arătăm că orice secvență
+de reducție poate fi convertită la una standard.
+
+### Propoziție
+
+Orice secvență standard care ajunge intr-o formă normală este conform strategiei normale
+
+### Demonstrație
+
+Ne uităm la ultimul pas de reducție $M_{k-1} \xrightarrow{n_k} M_k$.
+
+Deoarece $M_k$ este formă normală, înseamnă că nu are nici un redex, de unde înseamnă că $n_k = 1$.
+
+Din definiția sevcenței standard, înseamnă că toți $n_i$ sunt $1$.
+
+## Reducția la începutul unei aplicații
+
+Vom defini recursiv o relație care generează secvențe folosind strategia normală.
+
+### Definiție
+
+$\reg{(\lambda x. M) N \to_h M[x := N]}{}{}$ și $\reg{M N \to_h M' N}{M \to_h M'}{}$
+
+### Lemă
+
+Dacă $M \to_h^* N$ atunci $M \xrightarrow{1}_\beta^* N$
+
+
+## Reducția standard
+
+Vom defini recursiv o relație care generează secvențe standard de reducție.
+
+### Definiție
+
+- $\reg{L \to_{st} x}{}{L \to_h^* x}$
+
+- $\reg{L \to_{st} C\, D}{A \to_{st} C \qquad B \to_{st} D}{L \to_h^* A\, B}$
+
+- $\reg{L \to_{st} \lambda x. B}{A \to_{st} B}{L \to_h^* \lambda x. A}$
+
+### Lemă
+
+Dacă $M \to_st N$ atunci există o secvență standard de la $M$ la $N$.
+
+## Proprietăți
+
+- $M \to_{st} M$
+
+- Dacă $M \to_h^* N$ atunci $M P \to_h^* N P$
+
+- Dacă $L \to_h^* M \to_{st} N$ atunci $L \to_{st} N$
+
+- Dacă $M \to_h^* N$ atunci $M[x := P] \to_h^* N[x := P]$
+
+- Dacă $M \to_{st} N$ și $P \to_{st} Q$, atunci $M[x := P] \to_{st} N[x := Q]$
