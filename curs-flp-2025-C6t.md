@@ -203,6 +203,8 @@ Dacă $M \to_st N$ atunci există o secvență standard de la $M$ la $N$.
 
 ## Proprietăți
 
+Următoarele proprietăți se demonstrează ușor prin inducție:
+
 - $M \to_{st} M$
 
 - Dacă $M \to_h^* N$ atunci $M P \to_h^* N P$
@@ -212,3 +214,40 @@ Dacă $M \to_st N$ atunci există o secvență standard de la $M$ la $N$.
 - Dacă $M \to_h^* N$ atunci $M[x := P] \to_h^* N[x := P]$
 
 - Dacă $M \to_{st} N$ și $P \to_{st} Q$, atunci $M[x := P] \to_{st} N[x := Q]$
+
+### Lemă
+
+Dacă $L \to_{st} (\lambda x. M)\, N$, atunci $L \to_{st} M[x := N]$.
+
+### Demonstrație
+
+Explicitând definițiile și folosind proprietățile de mai sus.
+
+## Beta-reducțiile pot fi absorbite în reducții standard
+
+### Lemă
+
+Dacă $L \to_{st} M \to_\beta N$ atunci $L \to_{st} N$
+
+### Demonstrație
+
+Inducție pe regulile de definire ale lui $M \xrightarrow{n}_\beta N$
+
+### Lemă
+
+Dacă $M \to_\beta^* N$ atunci $M \to_{st} N$
+
+### Demonstrație
+
+Inducție pe lungimea secevenței, folosind proprietatea că $\to_{st}$ e reflexivă
+și lema de mai sus.
+
+## Teorema de standardizare
+
+### Teoremă (standardizare)
+
+Dacă $M \to_\beta^* N$ atunci există o secvență standard de $\beta$-reducție de la $M$ la $N$.
+
+### Demonstrație
+
+Evident din lema de mai sus și proprietățile reducției standard.
