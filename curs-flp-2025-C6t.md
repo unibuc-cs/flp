@@ -3,7 +3,7 @@ author: Traian Florin Șerbănuță și Andrei Sipoș
 institute: Facultatea de Matematică și Informatică, DL Info
 date: Anul II, Semestrul II, 2024/2025
 title: Fundamentele limbajelor de programare
-subtitle: Programare funcțională. $\lambda$-calcul. Confluență. Normalizare
+subtitle: Programare funcțională. $\lambda$-calcul. Confluență. Standardizare.
 theme: CambridgeUS
 ---
 
@@ -211,13 +211,13 @@ $\to_\parallel$ are proprietatea diamant
 
 $\to_\beta^\ast$ are proprietatea diamant
 
-# Teorema de normalizare
+# Teorema de standardizare
 
 ## Scop
 
 În această secțiune vom argumenta veridicitatea următorului rezultat.
 
-### Teoremă (normalizare)
+### Teorema de standardizare
 
 Dacă $M$ are o formă normală $N$ atunci $N$ poate fi obținut din $M$ folosind
 strategia normală de reducție, adică, reducând la fiecare pas redex-ul cel mai
