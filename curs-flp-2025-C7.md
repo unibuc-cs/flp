@@ -207,7 +207,7 @@ $(\alpha\to\alpha)\to\beta$, $\beta$ şi $\gamma$, respectiv, atunci
 $(\lambda z.(\lambda u.z))(yx)$ este un termen de tip
 $\gamma \to \beta$.
 
-## Asociere explicită *(Church-typing)*. Exemplu.
+## Exemplu
 
 Aplicare
 
@@ -231,7 +231,7 @@ Vrem să calculăm tipul expresiei $(\lambda zu.\,z)\, (y\, x)$ știind că
 3.  ${\color{True}{\color{True}z\hspace{-.05cm}:}\,{\color{Orchid}\beta}}$
 4.  ${\color{True}{\color{True}u\hspace{-.05cm}:}\,{\color{Orchid}\gamma}}$
 
-## Asociere explicită *(Church-typing)*. Exemplu.
+## Exemplu
 
 Aplicare
 
@@ -319,7 +319,7 @@ $(\lambda z.(\lambda u.z))(yx)$ folosind aceste reguli. Acest exemplu ne
 arată că, într-un anume fel, cele două moduri de
 a gândi tipurile sunt echivalente.
 
-## Asociere implicită *(Curry-typing)*. Exemplu. 
+## Exemplu
 
 Aplicare
 
@@ -341,7 +341,7 @@ Putem să \"ghicim\" tipurile variabilelor astfel încât $M$ să *aibă
 tip*?
 
 
-## Asociere implicită *(Curry-typing)*. Exemplu. 
+## Exemplu
 
 Aplicare
 
@@ -373,7 +373,7 @@ tip*?
 -   În acest caz, avem
     ${\color{True}M\hspace{-.05cm}:}\,{\color{Orchid}B}$.
 
-## Asociere implicită *(Curry-typing)*. Exemplu (cont.)
+## Exemplu (cont.)
 
 Aplicare
 
@@ -414,7 +414,7 @@ ${\color{True}M\hspace{-.05cm}:}\,{\color{Orchid}B}$
     ${\color{True}x\hspace{-.05cm}:}\,{\color{Orchid}E}$. Atunci
     ${\color{True}y\, x\hspace{-.05cm}:}\,{\color{Orchid}F}$.
 
-## Asociere implicită *(Curry-typing)*. Exemplu (cont.)
+## Exemplu (cont.)
 
 Știm $M = (\lambda zu.\,z)\, (y\, x)$. Am dedus următoarele:
 
@@ -449,7 +449,7 @@ adică ${\color{True}M\hspace{-.05cm}:}\,{\color{Orchid}C \to A}$.
 Am obținut o schemă generală $(*)$ pentru tipurile lui $x,y,z,u$ care
 induc un tip pentru $M$.
 
-## Asociere implicită *(Curry-typing)*. Exemplu (cont.)
+## Exemplu (cont.)
 
 Știm $M = (\lambda zu.\,z)\, (y\, x)$. Am obținut schema generală
 
@@ -543,12 +543,6 @@ sunt *typeable*.
 De exemplu,
 $\mathbf{Y} \triangleq \lambda y.\,(\lambda x.\,y\, (x\, x))\, (\lambda x.\,y\, (x\, x))$
 nu este typeable.
-
-Dar avem recursie primitivă (recursie care permite doar *looping* în
-care numărul de iterații este cunoscut dinainte).
-
-De exemplu, $\mathbf{add}\triangleq \lambda mnfx.\,m\, f\, (n\, f\, x)$
-este o funcție primitiv recursivă.
 
 Faptul că orice evaluare se termină este important pentru implementări
 ale logicilor folosind lambda-calculul.
