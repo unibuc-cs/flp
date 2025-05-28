@@ -306,13 +306,26 @@ obiecte de forma $x:\sigma$, cu $x$ variabilă şi $\sigma \in T$
 (simbolizând faptul că variabilei $x$ i se alocă tipul $\sigma$), astfel
 încât orice variabilă apare cu cel mult un tip.
 
+### Operații
+
+$\Gamma \uplus \{x : \sigma\}$
+
+: Reuniune, cu promisiunea că $x$ nu apare în $\Gamma$
+
+
+$\Gamma \oplus \{x : \sigma\}$
+
+: ${}= \{ y : \tau \mid y : \tau \in \Gamma \wedge y \neq x \} \cup \{ x : \sigma \}$\
+  Actualizarea lui $\Gamma$
+
+
 ## Reguli de deducţie
 
 Regulile de deducţie vor fi următoarele:
 
-$$\frac{}{\Gamma \cup \{x:\sigma\} \vdash x:\sigma}$$
+$$\frac{}{\Gamma \uplus \{x:\sigma\} \vdash x:\sigma}$$
 
-$$\frac{\Gamma \cup \{x:\sigma\} \vdash M : \tau}{\Gamma \vdash \lambda x. M : \sigma\to \tau} \qquad \frac{\Gamma\vdash M: \sigma \to \tau \quad \Gamma \vdash N: \sigma}{\Gamma\vdash M\; N : \tau}$$
+$$\frac{\Gamma \oplus \{x:\sigma\} \vdash M : \tau}{\Gamma \vdash \lambda x. M : \sigma\to \tau} \qquad \frac{\Gamma\vdash M: \sigma \to \tau \quad \Gamma \vdash N: \sigma}{\Gamma\vdash M\; N : \tau}$$
 
 Încercaţi să deduceţi tipul termenului „de mai devreme”
 $(\lambda z.(\lambda u.z))(yx)$ folosind aceste reguli. Acest exemplu ne
@@ -518,8 +531,8 @@ simbolul săgeată (vezi discuţia de la început).
 ## Finalizare
 
 Definim: $$\begin{aligned}
-c(x,\Gamma \cup \{x : \tau\}, Z) &:= \{\tau = Z\}\\
-c(\lambda x:\sigma. M, \Gamma, Z) &:= c(M , \Gamma \cup \{x:\sigma\}, W) \cup \{Z = \sigma \to W\}\\
+c(x,\Gamma \uplus \{x : \tau\}, Z) &:= \{\tau = Z\}\\
+c(\lambda x:\sigma. M, \Gamma, Z) &:= c(M , \Gamma \oplus \{x:\sigma\}, W) \cup \{Z = \sigma \to W\}\\
 c(M\; N, \Gamma, Z) &:= c(M, \Gamma, W_1) \cup c(N, \Gamma, W_2) \cup \{W_1 = W_2 \to Z\}
 \end{aligned}$$
 

@@ -13,7 +13,7 @@ theme: CambridgeUS
 
 - $\reg[var]{\Gamma \uplus \{x:\sigma\} \vdash x:\sigma}{}{}$
 
-- $\reg[abs]{\Gamma \vdash \lambda x. M : \sigma\to \tau}{\Gamma \cup \{x:\sigma\} \vdash M : \tau}{}$
+- $\reg[abs]{\Gamma \vdash \lambda x. M : \sigma\to \tau}{\Gamma \oplus \{x:\sigma\} \vdash M : \tau}{}$
 
 - $\reg[app]{\Gamma\vdash M\; N : \tau}{\Gamma\vdash M: \sigma \to \tau \quad \Gamma \vdash N: \sigma}{}$
 
@@ -77,7 +77,7 @@ Dacă $\Gamma \vdash M : \sigma$ atunci există $\theta$ unificator pentru $c(M,
   
   $c(x, Z) = \{X = Z\}$, Aleg $\theta(X) = \theta(Z) = \sigma$
 
-- $\reg[abs]{\Gamma \vdash \lambda x. M : \sigma\to \tau}{\Gamma \cup \{x:\sigma\} \vdash M : \tau}{}$
+- $\reg[abs]{\Gamma \vdash \lambda x. M : \sigma\to \tau}{\Gamma \oplus \{x:\sigma\} \vdash M : \tau}{}$
 
   $c(\lambda x. M, Z) = c(M, W) \cup \{Z = X \to W\}$
 
@@ -360,7 +360,7 @@ Demonstrație prin inducție după $B$
 
 $B = A_{n+1} \to B'$:
 
-: trebuie să arăt că pentru orice $\sigma$, $(\lambda x.\ t)\sigma u_0 u_1 \cdots u_n \in [[A_{n+1}\to B]]$.\
+: trebuie să arăt că pentru orice $\sigma$, $(\lambda x.\ t)\sigma u_0 u_1 \cdots u_n \in [[A_{n+1}\to B']]$.\
   Fie $u_{n+1}$ arbitrar ales. Aplic ipoteza de inducție pentru $B'$ și $t\sigma \in [[A_1 \to \cdots A_n \to A_{n+1} \to B']]$ și $x$ de tip $A_0$ și $u_i$, $0\leq i \leq n+1$ și obțin
   $(\lambda x.\ t)\sigma u_0\ u_1 \cdots u_n\ u_{n+1} \in [[B']]$\
   Concluzia urmează din faptul că $u_{n+1}$ arbitrar ales.
