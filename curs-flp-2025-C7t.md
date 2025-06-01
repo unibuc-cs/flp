@@ -20,7 +20,10 @@ theme: CambridgeUS
 
 ## Algoritmul de inferență a tipurilor
 
-Pornim cu un $\lambda$ termen fără tipuri în care variabilele au fost redenumite, presupunem că fiecărei variabile $x$ îi asociem un tip $X$, unde $X$ e variabilă.
+Pornim cu un $\lambda$ termen fără tipuri în care toate variabilele legate au fost redenumite cu variabile noi.
+Atunci putem asocia fiecărei variabile $x$ un tip $X$, unde $X$ e variabilă.
+
+### Algoritm simplificat
 
 $$\begin{aligned}
 c(x, Z) &:= \{X = Z\}\\
@@ -35,7 +38,7 @@ Corectitudine
 Completitudine
 
 : $\Gamma \vdash M : \sigma$ implică există $\theta$ unificator pentru $c(M, Z)$ cu\
-  - $\Gamma(x) = \Gamma_\theta(x)$ pentru orice $x\in FV(M)$ și\
+  - $\Gamma(x) = \Gamma_\theta(x) = \theta(X)$ pentru orice $x\in FV(M)$ și\
   - $\theta(Z) = \sigma$
 
 ## Corectitudinea algoritmului de inferență
@@ -110,27 +113,17 @@ Dacă $\Gamma \vdash M : \sigma$ atunci există $\theta$ unificator pentru $c(M,
 
 ## Ce este Normalizarea?
 
-- Normalizarea este proprietatea conform căreia orice termen bine format se poate (beta-)reduce la o formă normală.
-- În Calculul Lambda cu Tipuri Simple (CLTS), toți termenii bine formați sunt normalizabili.
+: Normalizarea slabă
 
----
+orice termen bine format se poate (beta-)reduce la o formă normală.
 
-## Obiectivul demonstrației
+: Normalizare puternică
 
-- Dorim să demonstrăm că **toți termenii bine formați** în CLTS sunt **puternic normalizabili**.
-- Aceasta implică că nu există secvențe infinite de reduceri beta pentru astfel de termeni.
+orice termen bine format se (beta-)reduce la o formă normală _pe orice cale_.
 
----
+### Teorema de normalizare
 
-## Preliminarii
-
-- Sistemul de tipuri este bazat pe:
-  - Variabile de tip (tipuri de bază): $\alpha$
-  - Tipuri funcționale: $A \rightarrow B$
-- Reguli de formare a termenilor:
-  - Variabilă
-  - Abstracție
-  - Aplicație
+În Calculul Lambda cu Tipuri Simple (CLTS), toți termenii bine formați sunt puternic normalizabili.
 
 ---
 
@@ -236,7 +229,6 @@ Tipuri săgeată
   
   $$[[A \rightarrow B]] := \{ t\mid \forall u \in [[A]],\ t\ u \in [[B]] \}$$
 
-
 ---
 
 ## Proprietăți ale interpretării
@@ -244,7 +236,7 @@ Tipuri săgeată
 - Dacă $t \in [[A \rightarrow B]]$ și $u \in [[A]]$, atunci $t\ u \in [[B]]$.
 - Dacă $t \in [[A]]$ atunci $t: A$
 - Toți termenii din interpretare sunt puternic normalizabili.
-  - Prin inducție: dacă $SN(t\ u)$ atunci și $SN(t)$ normalizabil
+  - Prin inducție: dacă $SN(t\ u)$ atunci și $SN(t)$
 
 ---
 
@@ -279,11 +271,11 @@ Dacă $t \in [[A]]$ și $t \Rightarrow t'$ atunci $t' \in [[A]]$.
 
 ### Demonstrație: inducție după $A$.
 
-- Dacă $A = \alpha$, atunci $SN(t)$ și deci și $SN(t')$
+- Dacă $A = \alpha$, atunci $SN(t)$ și deci și $t' : A$ și $SN(t')$
 
 - Dacă $A = B \to C$, fie $u \in [[B]]$, arbitrar.
   Avem că $t\ u \in [[C]]$.
-  
+
   Aplicând ipoteza de inducție pentru $C$ și 
   $t\ u \Rightarrow t'\ u$, reiese că $t'\ u \in [[B]]$
 
@@ -297,9 +289,11 @@ Dacă $t \in [[A]]$ și $t \Rightarrow t'$ atunci $t' \in [[A]]$.
 
 O substituție de la variabile la termeni se numește compatibilă (cu interpretarea) dacă duce orice variabilă de tip $A$ într-un termen din $[[A]]$, interpretarea lui $A$.
 
-### Observație
+### Proprietăți
 
-Substituția identitate este compatibilă.
+- Substituția identitate este compatibilă.
+
+- Dacă $\sigma$ compatibilă, $t\sigma \in [[A]]$ și $t \Rightarrow t'$, atunci $t'\sigma \in [[A]]$.
 
 ---
 
@@ -310,7 +304,7 @@ Substituția identitate este compatibilă.
 Deoarece substituția identitate este compatibilă și interpretarea
 unui tip conține doar termeni în SN, este suficient să demonstrăm următorul rezultat:
 
-Dacă $t : A$ atunci pentru orice substituție compatibilă $\sigma$, $t\sigma$ este bine format și aparține lui $[[A]]$.
+Dacă $t : A$ atunci pentru orice substituție compatibilă $\sigma$, $t\sigma \in [[A]]$.
 
 ---
 
